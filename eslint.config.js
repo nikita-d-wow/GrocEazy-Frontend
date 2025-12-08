@@ -8,7 +8,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{js,jsx,ts,tsx}'],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,
@@ -18,6 +18,28 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+    rules: {
+      'no-console': 'error',
+      'no-debugger': 'error',
+      'no-unused-vars': 'warn',
+      'no-undef': 'error',
+      eqeqeq: ['error', 'always'],
+      curly: 'error',
+      'no-var': 'error',
+
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/consistent-type-imports': 'error',
+
+      'react-refresh/only-export-components': 'warn',
+      'react/jsx-uses-react': 'off',
+      'react/react-in-jsx-scope': 'off',
+
+      'prefer-const': 'error',
+      'no-multiple-empty-lines': ['warn', { max: 1 }],
+      'arrow-spacing': ['error', { before: true, after: true }],
+      'comma-dangle': ['error', 'always-multiline'],
     },
   },
 ]);

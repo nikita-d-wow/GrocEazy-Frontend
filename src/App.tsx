@@ -1,9 +1,14 @@
 import './App.css';
 
 function App() {
+  const check = () => {
+    // console.log('check console logs on commit');
+  };
   return (
     <>
-      <h1 className="text-5xl text-center text-black my-40">GROCEAZY</h1>
+      <button onClick={check} className="text-5xl text-center text-black my-40">
+        GROCEAZY
+      </button>
     </>
   );
 }
