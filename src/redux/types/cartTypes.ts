@@ -1,0 +1,3 @@
+type CartItem = {
+  id: string;
+};
