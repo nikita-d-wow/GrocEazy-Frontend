@@ -4,6 +4,9 @@
 * {
   font-family: 'Outfit', sans-serif;
 }
+.app-container {
+  @apply px-6 sm:px-10 lg:px-20;
+}
 
 @theme {
   --color-primary: #555676;

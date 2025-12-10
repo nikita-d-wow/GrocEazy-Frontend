@@ -1,18 +1,11 @@
 import './App.css';
+import Dashboard from './views/customer/Dashboard';
 
 function App() {
-  const check = () => {
-    // console.log('check console logs on commit');
-  };
   return (
-    <>
-      <button
-        onClick={check}
-        className="text-5xl text-center text-primary my-40"
-      >
-        GROCEAZY
-      </button>
-    </>
+    <div>
+      <Dashboard />
+    </div>
   );
 }
 
