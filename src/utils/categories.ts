@@ -1,4 +1,4 @@
-import type { Category } from '../types/Category';
+import type { CategoryCard } from '../components/customer/CategoryCard';
 
 import organic_vegitable_image from '../assets/organic.png';
 import fresh_fruits_image from '../assets/fruits.png';
@@ -7,7 +7,7 @@ import dairy_product_image from '../assets/dairy.png';
 import bakery_image from '../assets/bakery.png';
 import grain_image from '../assets/grain.png';
 
-export const categories: Category[] = [
+export const categories: CategoryCard[] = [
   {
     text: 'Organic veggies',
     path: 'Vegetables',

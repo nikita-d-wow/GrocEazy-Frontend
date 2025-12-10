@@ -50,7 +50,7 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
   ) => {
     const { name, value } = e.target;
 
-    setFormData((prev) => {
+    setFormData((prev: Partial<Category>) => {
       const updated = { ...prev, [name]: value || undefined };
 
       // ✅ slug generation WITHOUT effect

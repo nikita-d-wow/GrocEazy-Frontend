@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import type { Product } from '../../types/product';
-
 interface ProductCardProps {
   product: Product;
 }
