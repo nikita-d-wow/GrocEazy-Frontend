@@ -1,4 +1,6 @@
 import { combineReducers } from '@reduxjs/toolkit';
+import categoryReducer from './reducers/categoryReducer';
+import productReducer from './reducers/productReducer';
 
 // Define dummy reducer BEFORE using it
 const dummyReducer = (state = {}) => {
@@ -6,8 +8,8 @@ const dummyReducer = (state = {}) => {
 };
 
 const rootReducer = combineReducers({
-  // add reducers later
-  dummy: dummyReducer,
+  category: categoryReducer,
+  product: productReducer,
 });
 
 export default rootReducer;
