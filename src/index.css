@@ -4,10 +4,49 @@
 * {
   font-family: 'Outfit', sans-serif;
 }
+
 .app-container {
   @apply px-6 sm:px-10 lg:px-20;
 }
 
 @theme {
-  --color-primary: #555676;
+  --color-primary: #5ba65f; /* main brand green */
+  --color-primary-dark: #3e8e41; /* hover green */
+  --color-primary-light: #e7f5e9; /* soft background */
+
+  --color-accent-yellow: #f8e9a1; /* offers / sale */
+  --color-accent-orange: #f9a825; /* CTA button */
+
+  --color-text-dark: #1e1e1e;
+  --color-surface: #ffffff;
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 0.6s ease forwards;
+  }
+
+  .animate-slideUp {
+    animation: slideUp 0.7s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
