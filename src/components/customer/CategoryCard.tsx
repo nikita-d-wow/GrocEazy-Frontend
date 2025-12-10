@@ -1,6 +1,11 @@
-import type { Category } from '../../types/Category';
+export interface CategoryCard {
+  text: string;
+  path: string;
+  image: string;
+  bgColor: string;
+}
 
-export default function CategoryCard({ image, text, bgColor }: Category) {
+export default function CategoryCard({ image, text, bgColor }: CategoryCard) {
   return (
     <div
       style={{ backgroundColor: bgColor }}

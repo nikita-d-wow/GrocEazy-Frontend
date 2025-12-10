@@ -1,6 +1,9 @@
-import type { Product } from '../../types/Product';
+interface ProductCard {
+  name: string;
+  image: string;
+}
 
-export default function ProductCard({ name, image }: Product) {
+export default function ProductCard({ name, image }: ProductCard) {
   return (
     <div className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition cursor-pointer">
       <img src={image} alt={name} className="w-full h-32 object-contain mb-4" />
