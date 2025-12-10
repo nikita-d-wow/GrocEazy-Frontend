@@ -6,7 +6,10 @@ function App() {
   };
   return (
     <>
-      <button onClick={check} className="text-5xl text-center text-black my-40">
+      <button
+        onClick={check}
+        className="text-5xl text-center text-primary my-40"
+      >
         GROCEAZY
       </button>
     </>
