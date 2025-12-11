@@ -1,8 +1,8 @@
+// src/App.tsx
 import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Dashboard from './views/customer/Dashboard';
-
 import ProductsPage from './views/customer/products/ProductsPage';
 import CategoriesPage from './views/customer/categories/CategoriesPage';
 import ProductDetailsPage from './views/customer/products/ProductDetailsPage';
@@ -13,11 +13,17 @@ import CustomerLayout from './layouts/CustomerLayout';
 import ContactSupport from './views/customer/ContactSupport';
 import OrdersPage from './views/customer/OrderPage';
 
-//import Login from './views/auth/Login';
+import Login from './views/auth/Login';
+import Register from './views/auth/Register';
 
 function App() {
   return (
     <Routes>
+      {/* AUTH */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* CUSTOMER ROUTES */}
       {/* ✅ AUTH */}
 
       {/* ✅ CUSTOMER */}
@@ -31,9 +37,13 @@ function App() {
       <Route path="/products/:id" element={<ProductDetailsPage />} />
       <Route path="/categories" element={<CategoriesPage />} />
       <Route path="/customer/dashboard" element={<Dashboard />} />
-      {/* ✅ MANAGER (CRUD) */}
+
+      {/* MANAGER ROUTES */}
       <Route path="/manager/products" element={<ProductManagement />} />
       <Route path="/manager/categories" element={<CategoryManagement />} />
+
+      {/* FALLBACK */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

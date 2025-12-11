@@ -8,14 +8,18 @@ import { Provider } from 'react-redux';
 //import { PersistGate } from 'redux-persist/integration/react';
 import { store } from './redux/store';
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      {/* <PersistGate loading={<div className="p-10 text-center">Loading Application...</div>} persistor={persistor}> */}
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-      {/* </PersistGate> */}
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </GoogleOAuthProvider>
     </Provider>
-  </StrictMode>
+  </StrictMode>,
 );
