@@ -39,7 +39,6 @@ export default defineConfig([
       'prefer-const': 'error',
       'no-multiple-empty-lines': ['warn', { max: 1 }],
       'arrow-spacing': ['error', { before: true, after: true }],
-      'comma-dangle': ['error', 'always-multiline'],
     },
   },
 ]);
