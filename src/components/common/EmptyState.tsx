@@ -24,8 +24,11 @@ const EmptyState: FC<EmptyStateProps> = ({
           {icon}
         </div>
       )}
+
       <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+
       <p className="text-gray-500 max-w-sm mb-8">{description}</p>
+
       {action && (
         <Button onClick={action.onClick} variant="primary">
           {action.label}
