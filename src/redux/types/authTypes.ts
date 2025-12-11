@@ -16,6 +16,10 @@ export const AUTH_LOGIN_SUCCESS = 'AUTH_LOGIN_SUCCESS';
 export const AUTH_LOGIN_FAILURE = 'AUTH_LOGIN_FAILURE';
 export const AUTH_LOGOUT = 'AUTH_LOGOUT';
 
+export const AUTH_REGISTER_REQUEST = 'AUTH_REGISTER_REQUEST';
+export const AUTH_REGISTER_SUCCESS = 'AUTH_REGISTER_SUCCESS';
+export const AUTH_REGISTER_FAILURE = 'AUTH_REGISTER_FAILURE';
+
 interface AuthLoginRequestAction {
   type: typeof AUTH_LOGIN_REQUEST;
 }
@@ -35,7 +39,21 @@ export type AuthActionTypes =
   | AuthLoginRequestAction
   | AuthLoginSuccessAction
   | AuthLoginFailureAction
-  | AuthLogoutAction;
+  | AuthLogoutAction
+  | AuthRegisterRequestAction
+  | AuthRegisterSuccessAction
+  | AuthRegisterFailureAction;
+
+interface AuthRegisterRequestAction {
+  type: typeof AUTH_REGISTER_REQUEST;
+}
+interface AuthRegisterSuccessAction {
+  type: typeof AUTH_REGISTER_SUCCESS;
+}
+interface AuthRegisterFailureAction {
+  type: typeof AUTH_REGISTER_FAILURE;
+  payload: { error: string };
+}
 
 export interface AuthState {
   loading: boolean;

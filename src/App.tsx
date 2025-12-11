@@ -9,16 +9,27 @@ import ProductDetailsPage from './views/customer/products/ProductDetailsPage';
 
 import ProductManagement from './views/manager/ProductManagement';
 import CategoryManagement from './views/manager/CategoryManagement';
+import CustomerLayout from './layouts/CustomerLayout';
+import ContactSupport from './views/customer/ContactSupport';
 
 import Login from './views/auth/Login';
+import Register from './views/auth/Register';
 
 function App() {
   return (
     <Routes>
       {/* AUTH */}
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       {/* CUSTOMER ROUTES */}
+      {/* ✅ AUTH */}
+
+      {/* ✅ CUSTOMER */}
+      <Route element={<CustomerLayout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/contact" element={<ContactSupport />} />
+      </Route>
       <Route path="/" element={<Navigate to="/products" replace />} />
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />

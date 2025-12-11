@@ -1,172 +1,120 @@
-// src/views/auth/Login.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, Link } from 'react-router-dom';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { login } from '../../redux/actions/authActions';
 import type { RootState } from '../../redux/rootReducer';
-import { useNavigate } from 'react-router-dom';
+import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
-type FormState = {
-  email: string;
-  password: string;
-};
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
 
-const EmailField: React.FC<{
-  value: string;
-  onChange: (v: string) => void;
-  error?: string;
-}> = ({ value, onChange, error }) => (
-  <div
-    className="min-h-screen flex items-center justify-center bg-gray-50 p-6"
-    style={{ outline: '6px solid magenta' }}
-  >
-    <label className="block text-sm font-medium mb-1">Email</label>
-    <input
-      type="email"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={`w-full p-3 border rounded ${error ? 'border-red-500' : 'border-gray-200'}`}
-      placeholder="you@example.com"
-      aria-label="email"
-    />
-    {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-  </div>
-);
-
-const PasswordField: React.FC<{
-  value: string;
-  onChange: (v: string) => void;
-  error?: string;
-}> = ({ value, onChange, error }) => {
-  const [visible, setVisible] = useState(false);
-  return (
-    <div className="mb-4">
-      <label className="block text-sm font-medium mb-1">Password</label>
-      <div className="relative">
-        <input
-          type={visible ? 'text' : 'password'}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`w-full p-3 border rounded ${error ? 'border-red-500' : 'border-gray-200'}`}
-          placeholder="Enter your password"
-          aria-label="password"
-        />
-        <button
-          type="button"
-          onClick={() => setVisible((v) => !v)}
-          className="absolute right-2 top-2 text-sm text-gray-500"
-        >
-          {visible ? 'Hide' : 'Show'}
-        </button>
-      </div>
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-    </div>
-  );
-};
+type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
-  // useDispatch<any>() keeps typing simple and avoids pulling redux-thunk types
-  // console.log("Login component mounted"); // debug - remove later
-
   const dispatch = useDispatch<any>();
-
   const navigate = useNavigate();
-  const auth = useSelector((s: RootState) => s.auth);
+  const { loading, error, accessToken, user } = useSelector((state: RootState) => state.auth);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [form, setForm] = useState<FormState>({ email: '', password: '' });
-  const [formError, setFormError] = useState<{
-    email?: string;
-    password?: string;
-    general?: string;
-  }>({});
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const validate = (): boolean => {
-    const errs: typeof formError = {};
-
-    if (!form.email) {
-      errs.email = 'Email is required';
-    } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
-      errs.email = 'Enter a valid email';
-    }
-
-    if (!form.password) {
-      errs.password = 'Password is required';
-    } else if (form.password.length < 8) {
-      errs.password = 'Password must be at least 8 characters';
-    }
-
-    setFormError(errs);
-    return Object.keys(errs).length === 0;
+  const onSubmit = (data: LoginFormInputs) => {
+    dispatch(login(data));
   };
 
-  const onSubmit = async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-
-    setFormError({});
-
-    if (!validate()) {
-      return;
-    }
-
-    dispatch(login({ email: form.email, password: form.password }) as any);
-  };
-
-  React.useEffect(() => {
-    if (!auth.loading && auth.accessToken && auth.user) {
-      if (auth.user.role === 'admin') {
+  useEffect(() => {
+    if (accessToken && user) {
+      if (user.role === 'admin') {
         navigate('/admin');
-      } else if (auth.user.role === 'manager') {
+      } else if (user.role === 'manager') {
         navigate('/manager');
       } else {
         navigate('/');
       }
-    } else if (!auth.loading && auth.error) {
-      setFormError((s) => ({
-        ...s,
-        general: auth.error || 'Login failed',
-      }));
     }
-  }, [auth, navigate]);
+  }, [accessToken, user, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-2xl font-semibold mb-6 text-gray-800">
-          Login to your account
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
+          <p className="text-gray-500 mt-2">Sign in to continue to GrocEazy</p>
+        </div>
 
-        {formError.general && (
-          <div className="mb-4 text-red-600 text-sm">{formError.general}</div>
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+            {error}
+          </div>
         )}
 
-        <form onSubmit={onSubmit} noValidate>
-          <EmailField
-            value={form.email}
-            onChange={(v) => setForm((s) => ({ ...s, email: v }))}
-            error={formError.email}
-          />
-          <PasswordField
-            value={form.password}
-            onChange={(v) => setForm((s) => ({ ...s, password: v }))}
-            error={formError.password}
-          />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <input
+              {...register('email')}
+              type="email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+              placeholder="you@example.com"
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div className="relative">
+              <input
+                {...register('password')}
+                type={showPassword ? "text" : "password"}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
+                placeholder="Enter your password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+          </div>
 
           <button
             type="submit"
-            className="w-full py-3 mt-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-60"
-            disabled={auth.loading}
+            disabled={loading}
+            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center"
           >
-            {auth.loading ? 'Signing in...' : 'Sign in'}
+            {loading ? <Loader2 className="animate-spin w-5 h-5" /> : 'Sign In'}
           </button>
         </form>
 
-        <div className="mt-4 text-sm text-gray-600">
-          <span>Don't have an account? </span>
-          <a href="/register" className="text-green-600">
-            Create one
-          </a>
+        <div className="mt-6 flex items-center">
+          <div className="flex-1 border-t border-gray-200"></div>
+          <span className="px-4 text-sm text-gray-500">Or continue with</span>
+          <div className="flex-1 border-t border-gray-200"></div>
         </div>
+
+        <GoogleAuthButton />
+
+        <p className="text-center mt-8 text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/register" className="font-semibold text-green-600 hover:text-green-700">
+            Create account
+          </Link>
+        </p>
       </div>
     </div>
   );
