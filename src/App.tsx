@@ -12,6 +12,7 @@ import CategoryManagement from './views/manager/CategoryManagement';
 import CustomerLayout from './layouts/CustomerLayout';
 import ContactSupport from './views/customer/ContactSupport';
 import OrdersPage from './views/customer/OrderPage';
+import CartPage from './views/customer/CartPage';
 
 import Login from './views/auth/Login';
 import Register from './views/auth/Register';
@@ -31,6 +32,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/contact" element={<ContactSupport />} />
         <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Route>
       <Route path="/" element={<Navigate to="/products" replace />} />
       <Route path="/products" element={<ProductsPage />} />
