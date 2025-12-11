@@ -5,7 +5,7 @@ import ProductFilters from '../../../components/products/ProductFilters';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
 import { fetchProducts } from '../../../redux/actions/productActions';
-import type { Product } from '../../../types/product';
+import type { Product } from '../../../types/Product';
 
 const ProductsPage: FC = () => {
   const dispatch = useAppDispatch();

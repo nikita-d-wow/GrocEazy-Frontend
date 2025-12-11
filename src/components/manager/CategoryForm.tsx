@@ -10,7 +10,7 @@ import {
 } from '../../redux/reducers/categoryReducer';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 
-import type { Category } from '../../types/category';
+import type { Category } from '../../types/Category';
 
 import Modal from '../common/Modal';
 import Input from '../common/Input';

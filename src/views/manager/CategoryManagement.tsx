@@ -12,7 +12,7 @@ import {
   selectCategoryLoading,
 } from '../../redux/selectors/categorySelectors';
 
-import type { Category } from '../../types/category';
+import type { Category } from '../../types/Category';
 
 import CategoryForm from '../../components/manager/CategoryForm';
 import Button from '../../components/common/Button';

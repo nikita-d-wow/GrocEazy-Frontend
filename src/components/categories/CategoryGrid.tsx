@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import type { Category } from '../../types/category';
+import type { Category } from '../../types/Category';
 import CategoryCard from './CategoryCard';
 import EmptyState from '../common/EmptyState';
 import { Search } from 'lucide-react';
