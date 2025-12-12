@@ -16,6 +16,7 @@ import CartPage from './views/customer/CartPage';
 
 import Login from './views/auth/Login';
 import Register from './views/auth/Register';
+import Wishlist from './views/customer/Wishlist';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="/contact" element={<ContactSupport />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/wishlist" element={<Wishlist />} />
       </Route>
       <Route path="/" element={<Navigate to="/products" replace />} />
       <Route path="/products" element={<ProductsPage />} />

@@ -1,0 +1,43 @@
+import type { WishlistItem } from '../types/Wishlist';
+
+export const wishlistData: WishlistItem[] = [
+  {
+    _id: 'prod_1',
+    name: 'Organic Avocado (2 pcs)',
+    description: 'Fresh avocados rich in nutrients',
+    size: '2 pcs pack',
+    dietary: 'Vegan',
+    stock: 40,
+    lowStockThreshold: 5,
+    price: 249,
+    images: ['https://picsum.photos/seed/avocado/400/300'],
+    isActive: true,
+    categoryId: 'cat_fruits',
+  },
+  {
+    _id: 'prod_2',
+    name: 'Cold-Pressed Olive Oil 500ml',
+    description: 'Pure cold-pressed extra virgin olive oil',
+    size: '500 ml',
+    dietary: 'Vegetarian',
+    stock: 60,
+    lowStockThreshold: 10,
+    price: 799,
+    images: ['https://picsum.photos/seed/oil/400/300'],
+    isActive: true,
+    categoryId: 'cat_oils',
+  },
+  {
+    _id: 'prod_3',
+    name: 'Multigrain Bread',
+    description: 'Freshly baked multigrain bread',
+    size: '400g loaf',
+    dietary: 'High Fiber',
+    stock: 25,
+    lowStockThreshold: 5,
+    price: 119,
+    images: ['https://picsum.photos/seed/bread/400/300'],
+    isActive: true,
+    categoryId: 'cat_bakery',
+  },
+];
