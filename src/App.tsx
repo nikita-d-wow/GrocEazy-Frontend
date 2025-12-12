@@ -16,6 +16,10 @@ import CartPage from './views/customer/CartPage';
 
 import Login from './views/auth/Login';
 import Register from './views/auth/Register';
+import Unauthorized from './views/auth/Unauthorized';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminDashboard from './views/admin/AdminDashboard';
+import ManagerDashboard from './views/manager/ManagerDashboard';
 
 function App() {
   return (
@@ -41,8 +45,18 @@ function App() {
       <Route path="/customer/dashboard" element={<Dashboard />} />
 
       {/* MANAGER ROUTES */}
-      <Route path="/manager/products" element={<ProductManagement />} />
-      <Route path="/manager/categories" element={<CategoryManagement />} />
+      <Route element={<ProtectedRoute allowedRoles={['manager', 'admin']} />}>
+        <Route path="/manager" element={<ManagerDashboard />} />
+        <Route path="/manager/products" element={<ProductManagement />} />
+        <Route path="/manager/categories" element={<CategoryManagement />} />
+      </Route>
+
+      {/* ADMIN ROUTES */}
+      <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Route>
+
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />

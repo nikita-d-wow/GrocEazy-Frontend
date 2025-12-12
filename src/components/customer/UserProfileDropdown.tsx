@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, User, Settings, ShoppingBag, ChevronDown } from 'lucide-react';
+import { LogOut, User, Settings, ShoppingBag, ChevronDown, ShieldCheck, Briefcase } from 'lucide-react';
 import { logout } from '../../redux/actions/authActions';
 import type { RootState } from '../../redux/rootReducer';
 
@@ -60,6 +60,24 @@ const UserProfileDropdown: React.FC = () => {
                         <p className="text-xs text-gray-500 truncate">{user.email}</p>
                     </div>
 
+                    {user.role === 'admin' && (
+                        <button
+                            onClick={() => { setIsOpen(false); navigate('/admin'); }}
+                            className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                        >
+                            <ShieldCheck size={16} />
+                            Admin Dashboard
+                        </button>
+                    )}
+                    {(user.role === 'manager' || user.role === 'admin') && (
+                        <button
+                            onClick={() => { setIsOpen(false); navigate('/manager'); }}
+                            className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                        >
+                            <Briefcase size={16} />
+                            Manager Dashboard
+                        </button>
+                    )}
                     <div className="px-1">
                         <button
                             onClick={() => { setIsOpen(false); /* Navigate to profile */ }}
