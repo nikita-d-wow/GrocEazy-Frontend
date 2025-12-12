@@ -92,7 +92,7 @@ const Modal: FC<ModalProps> = ({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

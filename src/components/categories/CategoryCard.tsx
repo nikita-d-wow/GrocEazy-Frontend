@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import type { Category } from '../../types/category';
+import type { Category } from '../../types/Category';
 import { categoryBgVariants } from '../../utils/colors';
 
 interface Props {

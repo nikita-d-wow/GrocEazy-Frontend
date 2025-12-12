@@ -11,7 +11,7 @@ import type {
   Product,
   ProductVariant,
   VariantOption,
-} from '../../../types/product';
+} from '../../../types/Product';
 
 const ProductDetailsPage: FC = () => {
   const { id } = useParams<{ id: string }>();

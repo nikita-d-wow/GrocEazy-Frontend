@@ -11,7 +11,7 @@ import {
   selectProductLoading,
 } from '../../redux/selectors/productSelectors';
 
-import type { Product } from '../../types/product';
+import type { Product } from '../../types/Product';
 
 import ProductForm from '../../components/manager/ProductForm';
 import Button from '../../components/common/Button';

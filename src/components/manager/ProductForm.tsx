@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { addProduct, updateProduct } from '../../redux/reducers/productReducer';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 
-import type { Product, ProductVariant } from '../../types/product';
+import type { Product, ProductVariant } from '../../types/Product';
 
 import Modal from '../common/Modal';
 import Input from '../common/Input';

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import { fetchCategories } from '../../redux/actions/categoryActions';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
-import type { Category } from '../../types/category';
+import type { Category } from '../../types/Category';
 
 interface FilterState {
   selectedCategory: string | null;

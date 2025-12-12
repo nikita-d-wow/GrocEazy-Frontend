@@ -12,7 +12,7 @@ import {
   selectCategoryLoading,
 } from '../../redux/selectors/categorySelectors';
 
-import type { Category } from '../../types/category';
+import type { Category } from '../../types/Category';
 
 import CategoryForm from '../../components/manager/CategoryForm';
 import Button from '../../components/common/Button';
@@ -36,7 +36,7 @@ const CategoryManagement: FC = () => {
 
   const filteredCategories = useMemo(() => {
     return categories.filter((c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase())
+      c.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [categories, searchTerm]);
 
