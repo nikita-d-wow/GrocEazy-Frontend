@@ -5,9 +5,16 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../redux/rootReducer';
 import UserProfileDropdown from './UserProfileDropdown';
 
+import { adminNav, managerNav, customerNav } from '../../utils/navitems';
+
 export default function Header() {
   const [open, setOpen] = useState(false);
   const { user } = useSelector((state: RootState) => state.auth);
+
+  // Pick nav items based on user role
+  const role = user?.role || 'manager';
+  const navItems =
+    role === 'admin' ? adminNav : role === 'manager' ? managerNav : customerNav;
 
   return (
     <header className="w-full bg-white border-b border-gray-200 py-4 sticky top-0 z-50">
@@ -26,10 +33,11 @@ export default function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
-          <a href="#">Home</a>
-          <a href="#">Catalog</a>
-          <a href="#">Shop</a>
-          <a href="#">Contact</a>
+          {navItems.map((item) => (
+            <Link key={item.path} to={item.path}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
 
         {/* Actions */}
@@ -77,18 +85,22 @@ export default function Header() {
             className="w-full px-4 py-2 bg-gray-100 rounded-lg text-sm"
           />
 
+          {/* Mobile Nav */}
           <div className="flex flex-col gap-4 text-gray-700 font-medium">
-            <a href="#">Home</a>
-            <a href="#">Catalog</a>
-            <a href="#">Shop</a>
-            <a href="#">Contact</a>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
+          {/* Login / Profile */}
           {user ? (
-            <button
-              className="w-full text-left font-medium text-gray-700 bg-gray-50 p-2 rounded"
-              onClick={() => { /* Mobile profile nav logic could go here */ }}
-            >
+            <button className="w-full text-left font-medium text-gray-700 bg-gray-50 p-2 rounded">
               Hi, {user.name || user.email}
             </button>
           ) : (
