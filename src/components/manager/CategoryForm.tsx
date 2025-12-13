@@ -1,16 +1,15 @@
-import type { FC } from 'react';
-import React from 'react';
+import type { FC, ChangeEvent, FormEvent } from 'react';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { Upload } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
-  addCategory,
+  createCategory,
   updateCategory,
-} from '../../redux/reducers/categoryReducer';
-import { selectCategories } from '../../redux/selectors/categorySelectors';
+} from '../../redux/actions/categoryActions';
 
-import type { Category } from '../../types/Category';
+import type { Category, CategoryFormData } from '../../types/Category';
 
 import Modal from '../common/Modal';
 import Input from '../common/Input';
@@ -21,69 +20,62 @@ interface Props {
   onClose: () => void;
 }
 
-const createInitialState = (category?: Category | null): Partial<Category> => {
-  if (category) {
-    return { ...category };
-  }
-
-  return {
-    name: '',
-    slug: '',
-    image: '',
-    description: '',
-    parentId: undefined,
-  };
-};
-
 const CategoryForm: FC<Props> = ({ category, onClose }) => {
   const dispatch = useAppDispatch();
-  const categories = useSelector(selectCategories);
 
-  const [formData, setFormData] = useState<Partial<Category>>(() =>
-    createInitialState(category)
+  const [formData, setFormData] = useState<CategoryFormData>({
+    name: category?.name || '',
+    image: category?.image,
+  });
+
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | undefined>(
+    category?.image
   );
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-
-    setFormData((prev: Partial<Category>) => {
-      const updated = { ...prev, [name]: value || undefined };
-
-      // ✅ slug generation WITHOUT effect
-      if (name === 'name' && !category) {
-        updated.slug = value
-          ?.toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-      }
-
-      return updated;
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value || undefined,
+    }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const payload: Category = {
-      id: category?.id ?? crypto.randomUUID(),
-      name: formData.name?.trim() || 'Untitled',
-      slug: formData.slug || '',
-      image: formData.image,
-      description: formData.description,
-      parentId: formData.parentId,
-    };
+    try {
+      const submitData: CategoryFormData = {
+        ...formData,
+        image: imageFile || formData.image,
+      };
 
-    if (category) {
-      dispatch(updateCategory(payload));
-    } else {
-      dispatch(addCategory(payload));
+      if (category) {
+        await dispatch(updateCategory(category._id, submitData));
+        toast.success('Category updated successfully');
+      } else {
+        await dispatch(createCategory(submitData));
+        toast.success('Category created successfully');
+      }
+
+      onClose();
+    } catch {
+      toast.error('Failed to save category');
     }
-
-    onClose();
   };
 
   return (
@@ -97,59 +89,49 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
         <Input
           label="Name"
           name="name"
-          value={formData.name || ''}
+          value={formData.name}
           onChange={handleChange}
           required
         />
 
-        {/* Parent Category */}
+        {/* Image Upload */}
         <div className="space-y-1.5">
           <label className="block text-sm font-medium text-gray-700 ml-1">
-            Parent Category (Optional)
+            Category Image
           </label>
-          <select
-            name="parentId"
-            value={formData.parentId || ''}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-50 bg-white"
-          >
-            <option value="">None (Top Level)</option>
-            {categories
-              .filter((c) => c.id !== category?.id)
-              .map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-          </select>
+          <div className="flex items-center gap-4">
+            {imagePreview && (
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200"
+              />
+            )}
+            <label className="flex-1 cursor-pointer">
+              <div className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-200 rounded-xl hover:border-green-500 transition-colors bg-white">
+                <Upload className="w-5 h-5 text-gray-400" />
+                <span className="text-sm text-gray-600">
+                  {imageFile ? imageFile.name : 'Choose image file'}
+                </span>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+            </label>
+          </div>
         </div>
 
+        {/* Image URL fallback */}
         <Input
-          label="Slug"
-          name="slug"
-          value={formData.slug || ''}
-          disabled={!!category}
-        />
-
-        <Input
-          label="Image URL"
+          label="Or enter Image URL"
           name="image"
-          value={formData.image || ''}
+          value={typeof formData.image === 'string' ? formData.image : ''}
           onChange={handleChange}
+          placeholder="https://example.com/image.jpg"
         />
-
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700 ml-1">
-            Description
-          </label>
-          <textarea
-            name="description"
-            value={formData.description || ''}
-            onChange={handleChange}
-            rows={3}
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-green-500 focus:ring-4 focus:ring-green-50"
-          />
-        </div>
 
         <div className="pt-6 flex justify-end space-x-3 border-t">
           <Button type="button" variant="ghost" onClick={onClose}>

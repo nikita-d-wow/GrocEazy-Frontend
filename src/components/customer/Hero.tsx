@@ -1,6 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import banner from '../../assets/main_banner_bg.png';
+import Button from '../common/Button';
 
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="py-6 px-4 sm:px-6 lg:px-12">
       <div
@@ -8,7 +12,9 @@ export default function Hero() {
           max-w-7xl mx-auto 
           relative 
           overflow-hidden 
+          rounded-3xl
           h-[220px] sm:h-[280px] md:h-[340px]
+          shadow-xl
         "
       >
         {/* Background Image */}
@@ -18,24 +24,28 @@ export default function Hero() {
           className="absolute inset-0 w-full h-full object-cover"
         />
 
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/35"></div>
+        {/* Overlay with pastel gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/60 to-green-800/40"></div>
 
         {/* Text Content */}
         <div className="relative z-10 h-full flex flex-col justify-center px-6 sm:px-12 lg:px-20">
-          <div className="inline-flex items-center gap-2 bg-white/20 text-yellow-300 px-3 py-1 rounded-full mb-3 text-xs sm:text-sm w-fit backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 bg-white/30 text-green-100 px-4 py-1.5 rounded-full mb-4 text-xs sm:text-sm w-fit backdrop-blur-md border border-white/20">
             <span>🏷️</span>
-            <span>Grocery Delivery Service</span>
+            <span className="font-medium">Grocery Delivery Service</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
-            <span className="text-yellow-300">Fastest</span> Delivery <br />
-            <span className="text-yellow-300">Easy</span> Pickup.
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg">
+            <span className="text-green-200">Fastest</span> Delivery <br />
+            <span className="text-green-200">Easy</span> Pickup.
           </h1>
 
-          <button className="mt-4 bg-orange-500 text-white px-6 py-2 sm:px-8 sm:py-3 rounded-lg font-semibold hover:bg-orange-600 w-fit">
-            Shop Now
-          </button>
+          <Button
+            onClick={() => navigate('/products')}
+            className="mt-6 w-fit"
+            size="lg"
+          >
+            Shop Now →
+          </Button>
         </div>
       </div>
     </section>

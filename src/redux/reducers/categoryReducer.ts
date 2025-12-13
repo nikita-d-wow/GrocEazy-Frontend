@@ -21,17 +21,22 @@ const categorySlice = createSlice({
       state.categories = action.payload;
     },
     addCategory(state, action: PayloadAction<Category>) {
+      if (!state.categories) {
+        state.categories = [];
+      }
       state.categories.push(action.payload);
     },
     updateCategory(state, action: PayloadAction<Category>) {
-      const idx = state.categories.findIndex((c) => c.id === action.payload.id);
+      const idx = state.categories.findIndex(
+        (c) => c._id === action.payload._id
+      );
       if (idx !== -1) {
         state.categories[idx] = action.payload;
       }
     },
     deleteCategory(state, action: PayloadAction<string>) {
       state.categories = state.categories.filter(
-        (c) => c.id !== action.payload
+        (c) => c._id !== action.payload
       );
     },
     setLoading(state, action: PayloadAction<boolean>) {

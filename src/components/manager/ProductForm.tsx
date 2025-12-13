@@ -1,13 +1,18 @@
 import type { FC, ChangeEvent, FormEvent } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Plus, Trash2 } from 'lucide-react';
+import { Trash2, Upload } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
-import { addProduct, updateProduct } from '../../redux/reducers/productReducer';
+import {
+  createProduct,
+  updateProduct as updateProductAction,
+} from '../../redux/actions/productActions';
+import { fetchCategories } from '../../redux/actions/categoryActions';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 
-import type { Product, ProductVariant } from '../../types/Product';
+import type { Product, ProductFormData } from '../../types/Product';
 
 import Modal from '../common/Modal';
 import Input from '../common/Input';
@@ -18,105 +23,89 @@ interface Props {
   onClose: () => void;
 }
 
-const createInitialState = (product?: Product | null): Partial<Product> => {
-  if (product) {
-    return { ...product };
-  }
-
-  return {
-    name: '',
-    slug: '',
-    description: '',
-    price: 0,
-    stock: 0,
-    categoryId: '',
-    images: [''],
-    variants: [],
-  };
-};
-
 const ProductForm: FC<Props> = ({ product, onClose }) => {
   const dispatch = useAppDispatch();
   const categories = useSelector(selectCategories);
 
-  const [formData, setFormData] = useState<Partial<Product>>(() =>
-    createInitialState(product)
+  // Fetch categories on mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  const [formData, setFormData] = useState<ProductFormData>({
+    name: product?.name || '',
+    description: product?.description || '',
+    size: product?.size,
+    dietary: product?.dietary,
+    stock: product?.stock || 0,
+    lowStockThreshold: product?.lowStockThreshold || 5,
+    price: product?.price || 0,
+    isActive: product?.isActive ?? true,
+    categoryId: product?.categoryId || '',
+    images: product?.images || [],
+  });
+
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>(
+    product?.images || []
   );
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
 
-    setFormData((prev: Partial<Product>) => {
-      const updated: Partial<Product> = {
-        ...prev,
-        [name]: name === 'price' || name === 'stock' ? Number(value) : value,
-      };
-
-      // ✅ Auto-generate slug
-      if (name === 'name' && !product) {
-        updated.slug = value
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/(^-|-$)+/g, '');
-      }
-
-      return updated;
-    });
-  };
-
-  const handleImageChange = (index: number, value: string) => {
-    setFormData((prev: Partial<Product>) => {
-      const images = [...(prev.images ?? [])];
-      images[index] = value;
-      return { ...prev, images };
-    });
-  };
-
-  const addImageField = () => {
-    setFormData((prev: Partial<Product>) => ({
+    setFormData((prev) => ({
       ...prev,
-      images: [...(prev.images ?? []), ''],
+      [name]:
+        type === 'number'
+          ? Number(value)
+          : type === 'checkbox'
+            ? (e.target as HTMLInputElement).checked
+            : value,
     }));
   };
 
-  const addVariantGroup = () => {
-    setFormData((prev: Partial<Product>) => ({
-      ...prev,
-      variants: [
-        ...(prev.variants ?? []),
-        {
-          id: crypto.randomUUID(),
-          name: '',
-          options: [],
-        },
-      ],
-    }));
+  const handleImageFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviews((prev) => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+      setImageFiles((prev) => [...prev, ...files]);
+    }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const removeImagePreview = (index: number) => {
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const payload: Product = {
-      id: product?.id ?? crypto.randomUUID(),
-      name: formData.name || 'Untitled',
-      slug: formData.slug || '',
-      description: formData.description || '',
-      price: formData.price || 0,
-      stock: formData.stock || 0,
-      categoryId: formData.categoryId || '',
-      images: formData.images ?? [],
-      variants: formData.variants as ProductVariant[],
-    };
+    try {
+      const submitData: ProductFormData = {
+        ...formData,
+        images: imageFiles.length > 0 ? imageFiles : formData.images,
+      };
 
-    if (product) {
-      dispatch(updateProduct(payload));
-    } else {
-      dispatch(addProduct(payload));
+      if (product) {
+        await dispatch(updateProductAction(product._id, submitData));
+        toast.success('Product updated successfully');
+      } else {
+        await dispatch(createProduct(submitData));
+        toast.success('Product created successfully');
+      }
+
+      onClose();
+    } catch (error) {
+      toast.error('Failed to save product');
     }
-
-    onClose();
   };
 
   return (
@@ -129,107 +118,159 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label="Name"
+            label="Product Name"
             name="name"
-            value={formData.name || ''}
+            value={formData.name}
             onChange={handleChange}
             required
           />
 
           <Input
-            label="Slug"
-            name="slug"
-            value={formData.slug || ''}
-            disabled
-          />
-
-          <Input
-            label="Price"
+            label="Price (₹)"
             type="number"
             name="price"
-            value={formData.price ?? 0}
+            value={formData.price}
             onChange={handleChange}
+            min="0"
+            step="0.01"
+            required
           />
 
           <Input
             label="Stock"
             type="number"
             name="stock"
-            value={formData.stock ?? 0}
+            value={formData.stock}
             onChange={handleChange}
+            min="0"
+            required
           />
 
-          {/* ✅ Category Dropdown */}
-          <div>
-            <label className="text-sm font-medium text-gray-700">
+          <Input
+            label="Low Stock Threshold"
+            type="number"
+            name="lowStockThreshold"
+            value={formData.lowStockThreshold}
+            onChange={handleChange}
+            min="0"
+          />
+
+          <Input
+            label="Size (optional)"
+            name="size"
+            value={formData.size || ''}
+            onChange={handleChange}
+            placeholder="e.g., 500g, 1kg, 1L"
+          />
+
+          <Input
+            label="Dietary Info (optional)"
+            name="dietary"
+            value={formData.dietary || ''}
+            onChange={handleChange}
+            placeholder="e.g., Vegan, Gluten-Free"
+          />
+
+          {/* Category Dropdown */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Category
             </label>
             <select
               name="categoryId"
-              value={formData.categoryId || ''}
+              value={formData.categoryId}
               onChange={handleChange}
-              className="w-full mt-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50"
+              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50 bg-white"
               required
             >
               <option value="">Select category</option>
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
+              {categories
+                .filter((cat) => !cat.isDeleted)
+                .map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
             </select>
           </div>
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
             Description
           </label>
           <textarea
             name="description"
-            value={formData.description || ''}
+            value={formData.description}
             onChange={handleChange}
             rows={4}
-            className="w-full mt-1 px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50"
+            className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50"
+            required
           />
         </div>
 
-        {/* Images */}
-        <div className="space-y-2">
-          <label className="font-medium text-sm">Images</label>
-          {formData.images?.map((img: string, idx: number) => (
-            <div key={idx} className="flex gap-2">
-              <Input
-                value={img}
-                onChange={(e) => handleImageChange(idx, e.target.value)}
-              />
-
-              {(formData.images?.length ?? 0) > 1 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setFormData((prev: Partial<Product>) => ({
-                      ...prev,
-                      images: prev.images?.filter(
-                        (_: string, i: number) => i !== idx
-                      ),
-                    }))
-                  }
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </button>
-              )}
-            </div>
-          ))}
-
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={addImageField}
+        {/* Active Status */}
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="isActive"
+            name="isActive"
+            checked={formData.isActive}
+            onChange={handleChange}
+            className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+          />
+          <label
+            htmlFor="isActive"
+            className="text-sm font-medium text-gray-700"
           >
-            <Plus className="w-4 h-4 mr-1" /> Add Image
-          </Button>
+            Product is active (visible to customers)
+          </label>
+        </div>
+
+        {/* Images */}
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-700">
+            Product Images
+          </label>
+
+          {/* Image Previews */}
+          {imagePreviews.length > 0 && (
+            <div className="grid grid-cols-4 gap-4">
+              {imagePreviews.map((preview, idx) => (
+                <div key={idx} className="relative group">
+                  <img
+                    src={preview}
+                    alt={`Preview ${idx + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImagePreview(idx)}
+                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Upload Button */}
+          <label className="cursor-pointer">
+            <div className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 transition-colors">
+              <Upload className="w-5 h-5 text-gray-400" />
+              <span className="text-sm text-gray-600">
+                Upload product images (multiple files)
+              </span>
+            </div>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageFilesChange}
+              className="hidden"
+            />
+          </label>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t">

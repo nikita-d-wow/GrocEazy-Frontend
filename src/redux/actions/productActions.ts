@@ -1,43 +1,107 @@
 import type { AppDispatch } from '../store';
-import { setProducts, setLoading, setError } from '../reducers/productReducer';
-import type { Product } from '../../types/product';
+import type { Product, ProductFormData } from '../../types/Product';
+import * as productApi from '../../services/productApi';
+import {
+  setProducts,
+  setLoading,
+  setError,
+  addProduct as addProductAction,
+  updateProduct as updateProductAction,
+  deleteProduct as deleteProductAction,
+} from '../reducers/productReducer';
 
+/**
+ * Fetch all products
+ */
 export const fetchProducts = () => async (dispatch: AppDispatch) => {
   dispatch(setLoading(true));
+  dispatch(setError(null));
   try {
-    const mockProducts: Product[] = [
-      {
-        id: '1',
-        name: 'Fresh Bananas',
-        slug: 'fresh-bananas',
-        description: 'Organic bananas',
-        price: 40,
-        discountPrice: 35,
-        stock: 50,
-        categoryId: '1',
-        images: ['https://images.unsplash.com/photo-1603833665858'],
-        rating: 4.5,
-        reviewsCount: 120,
-        isFeatured: true,
-      },
-      {
-        id: '2',
-        name: 'Red Apples',
-        slug: 'red-apples',
-        description: 'Juicy apples',
-        price: 120,
-        stock: 30,
-        categoryId: '1',
-        images: ['https://images.unsplash.com/photo-1560806887'],
-      },
-    ];
+    const products = await productApi.getProducts();
+    dispatch(setProducts(products));
+  } catch (error: any) {
+    dispatch(
+      setError(error.response?.data?.message || 'Failed to fetch products')
+    );
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
 
-    setTimeout(() => {
-      dispatch(setProducts(mockProducts));
+/**
+ * Fetch products by category
+ */
+export const fetchProductsByCategory =
+  (categoryId: string) => async (dispatch: AppDispatch) => {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    try {
+      const products = await productApi.getProductsByCategory(categoryId);
+      dispatch(setProducts(products));
+    } catch (error: any) {
+      dispatch(
+        setError(error.response?.data?.message || 'Failed to fetch products')
+      );
+    } finally {
       dispatch(setLoading(false));
-    }, 600);
-  } catch {
-    dispatch(setError('Failed to fetch products'));
+    }
+  };
+
+/**
+ * Create a new product
+ */
+export const createProduct =
+  (data: ProductFormData) => async (dispatch: AppDispatch) => {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    try {
+      const product = await productApi.createProduct(data);
+      dispatch(addProductAction(product));
+    } catch (error: any) {
+      dispatch(
+        setError(error.response?.data?.message || 'Failed to create product')
+      );
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+/**
+ * Update an existing product
+ */
+export const updateProduct =
+  (id: string, data: ProductFormData) => async (dispatch: AppDispatch) => {
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    try {
+      const product = await productApi.updateProduct(id, data);
+      dispatch(updateProductAction(product));
+    } catch (error: any) {
+      dispatch(
+        setError(error.response?.data?.message || 'Failed to update product')
+      );
+      throw error;
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+/**
+ * Delete a product
+ */
+export const deleteProduct = (id: string) => async (dispatch: AppDispatch) => {
+  dispatch(setLoading(true));
+  dispatch(setError(null));
+  try {
+    await productApi.deleteProduct(id);
+    dispatch(deleteProductAction(id));
+  } catch (error: any) {
+    dispatch(
+      setError(error.response?.data?.message || 'Failed to delete product')
+    );
+    throw error;
+  } finally {
     dispatch(setLoading(false));
   }
 };

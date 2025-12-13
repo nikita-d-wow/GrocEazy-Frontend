@@ -8,7 +8,7 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children: ReactNode;
-  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  maxWidth?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
 }
 
 const Modal: FC<ModalProps> = ({
@@ -39,6 +39,8 @@ const Modal: FC<ModalProps> = ({
     lg: 'max-w-lg',
     xl: 'max-w-xl',
     '2xl': 'max-w-2xl',
+    '3xl': 'max-w-3xl',
+    '4xl': 'max-w-4xl',
   };
 
   return createPortal(
@@ -48,7 +50,7 @@ const Modal: FC<ModalProps> = ({
       role="dialog"
       aria-modal="true"
     >
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <div className="flex items-center justify-center min-h-screen px-4 py-6 sm:py-8">
         {/* Backdrop */}
         <div
           className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"
@@ -56,25 +58,19 @@ const Modal: FC<ModalProps> = ({
           onClick={onClose}
         ></div>
 
-        <span
-          className="hidden sm:inline-block sm:align-middle sm:h-screen"
-          aria-hidden="true"
-        >
-          &#8203;
-        </span>
-
         {/* Modal Panel */}
         <div
           className={`
-          inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle w-full ${maxWidthClasses[maxWidth]}
-          border border-gray-100
+          relative bg-white rounded-3xl text-left shadow-2xl transform transition-all w-full ${maxWidthClasses[maxWidth]}
+          border border-gray-100 max-h-[90vh] flex flex-col
         `}
         >
-          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div className="flex justify-between items-center mb-6">
+          {/* Header - Fixed */}
+          <div className="flex-shrink-0 px-6 pt-6 pb-4 border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
+            <div className="flex justify-between items-center">
               {title && (
                 <h3
-                  className="text-xl font-bold text-gray-900"
+                  className="text-2xl font-bold text-gray-900"
                   id="modal-title"
                 >
                   {title}
@@ -82,17 +78,20 @@ const Modal: FC<ModalProps> = ({
               )}
               <button
                 onClick={onClose}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"
+                className="p-2 rounded-full hover:bg-white/80 transition-colors text-gray-500 hover:text-gray-700 ml-auto"
+                aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div>{children}</div>
           </div>
+
+          {/* Content - Scrollable */}
+          <div className="flex-1 overflow-y-auto px-6 py-6">{children}</div>
         </div>
       </div>
     </div>,
-    document.body,
+    document.body
   );
 };
 
