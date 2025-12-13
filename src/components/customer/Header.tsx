@@ -12,7 +12,7 @@ export default function Header() {
   const { user } = useSelector((state: RootState) => state.auth);
 
   // Pick nav items based on user role
-  const role = user?.role || 'manager';
+  const role = user?.role || 'admin';
   const navItems =
     role === 'admin' ? adminNav : role === 'manager' ? managerNav : customerNav;
 

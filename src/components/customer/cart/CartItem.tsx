@@ -35,6 +35,7 @@ export default function CartItem({
         {/* QUANTITY */}
         <div className="mt-4 flex items-center gap-4">
           <button
+            type="button"
             onClick={() => updateQty(item._id, 'dec')}
             className="
               p-2 rounded-xl bg-red-50 border border-red-200 
@@ -49,6 +50,7 @@ export default function CartItem({
           </span>
 
           <button
+            type="button"
             onClick={() => updateQty(item._id, 'inc')}
             className="
               p-2 rounded-xl bg-green-50 border border-green-200 
@@ -60,13 +62,13 @@ export default function CartItem({
         </div>
       </div>
 
-      {/* TOTAL + REMOVE */}
       <div className="text-right">
         <p className="text-xl font-bold text-gray-900">
           ₹{item.unitPrice * item.quantity}
         </p>
 
         <button
+          type="button"
           onClick={() => removeItem(item._id)}
           className="text-red-500 hover:text-red-700 mt-4 active:scale-95 transition"
         >
