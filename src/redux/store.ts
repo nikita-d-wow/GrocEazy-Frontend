@@ -4,16 +4,14 @@ import rootReducer from './rootReducer';
 
 const store = configureStore({
   reducer: rootReducer,
-
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // required for redux-persist
+      serializableCheck: false,
     }),
-
   devTools: import.meta.env.DEV,
 });
 
-export const persistor = persistStore(store);
+export const persistor = persistStore(store as any);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
