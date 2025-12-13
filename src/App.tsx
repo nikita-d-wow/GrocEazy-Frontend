@@ -16,8 +16,6 @@ function App() {
       {AdminRoutes}
 
       <Route path="/unauthorized" element={<Unauthorized />} />
-
-      {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
