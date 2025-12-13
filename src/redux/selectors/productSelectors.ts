@@ -1,6 +1,11 @@
+import { createSelector } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
-export const selectProducts = (state: RootState) => state.product.products;
+// Memoized selector to prevent unnecessary re-renders
+export const selectProducts = createSelector(
+  [(state: RootState) => state.product.products],
+  (products) => products ?? []
+);
 
 export const selectProductLoading = (state: RootState) => state.product.loading;
 

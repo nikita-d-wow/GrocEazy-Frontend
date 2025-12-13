@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { Send } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 interface FormValues {
   subject: string;
@@ -13,8 +14,9 @@ export default function SupportForm() {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const onSubmit = (data: FormValues) => {
-    // console.log(data);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const onSubmit = (_data: FormValues) => {
+    toast.success('Support ticket submitted successfully');
   };
 
   return (

@@ -1,27 +1,31 @@
-export interface VariantOption {
-  value: string;
-  priceModifier?: number;
-}
-
-export interface ProductVariant {
-  id: string;
-  name: string;
-  options: VariantOption[];
-}
-
 export interface Product {
-  id: string;
+  _id: string;
   name: string;
-  slug: string;
   description: string;
-  price: number;
-  discountPrice?: number;
+  size?: string;
+  dietary?: string;
   stock: number;
+  lowStockThreshold: number;
+  price: number;
   images: string[];
+  isActive: boolean;
   categoryId: string;
-  variants?: ProductVariant[];
-  rating?: number;
-  reviewsCount?: number;
-  isNew?: boolean;
-  isFeatured?: boolean;
+  createdBy?: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// DTO for creating/updating products
+export interface ProductFormData {
+  name: string;
+  description: string;
+  size?: string;
+  dietary?: string;
+  stock: number;
+  lowStockThreshold?: number;
+  price: number;
+  images?: (File | string)[];
+  isActive?: boolean;
+  categoryId: string;
 }

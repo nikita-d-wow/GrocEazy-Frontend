@@ -10,17 +10,16 @@ import CategoryManagement from '../views/manager/CategoryManagement';
 export const ManagerRoutes = (
   <>
     <Route
+      path="/manager"
       element={
         <ProtectedRoute allowedRoles={['manager', 'admin']}>
           <ManagerLayout />
         </ProtectedRoute>
       }
     >
-      <Route path="/manager" element={<ManagerDashboard />}>
-        <Route index element={<ManagerDashboard />} />
-        <Route path="products" element={<ProductManagement />} />
-        <Route path="categories" element={<CategoryManagement />} />
-      </Route>
+      <Route index element={<ManagerDashboard />} />
+      <Route path="products" element={<ProductManagement />} />
+      <Route path="categories" element={<CategoryManagement />} />
     </Route>
   </>
 );

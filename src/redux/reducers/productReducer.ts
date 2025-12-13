@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { Product } from '../../types/product';
+import type { Product } from '../../types/Product';
 
 interface ProductState {
   products: Product[];
@@ -21,16 +21,21 @@ const productSlice = createSlice({
       state.products = action.payload;
     },
     addProduct(state, action: PayloadAction<Product>) {
+      if (!state.products) {
+        state.products = [];
+      }
       state.products.push(action.payload);
     },
     updateProduct(state, action: PayloadAction<Product>) {
-      const index = state.products.findIndex((p) => p.id === action.payload.id);
+      const index = state.products.findIndex(
+        (p) => p._id === action.payload._id
+      );
       if (index !== -1) {
         state.products[index] = action.payload;
       }
     },
     deleteProduct(state, action: PayloadAction<string>) {
-      state.products = state.products.filter((p) => p.id !== action.payload);
+      state.products = state.products.filter((p) => p._id !== action.payload);
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;

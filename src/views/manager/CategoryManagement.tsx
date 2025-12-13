@@ -2,10 +2,13 @@ import type { FC } from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { Plus, Edit2, Trash2, Search, Layers } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
-import { fetchCategories } from '../../redux/actions/categoryActions';
-import { deleteCategory } from '../../redux/reducers/categoryReducer';
+import {
+  fetchCategories,
+  deleteCategory,
+} from '../../redux/actions/categoryActions';
 
 import {
   selectCategories,
@@ -35,14 +38,20 @@ const CategoryManagement: FC = () => {
   }, [dispatch]);
 
   const filteredCategories = useMemo(() => {
-    return categories.filter((c) =>
-      c.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    return categories.filter(
+      (c) =>
+        c && c.name && c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [categories, searchTerm]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
-      dispatch(deleteCategory(id));
+      try {
+        await dispatch(deleteCategory(id));
+        toast.success('Category deleted successfully');
+      } catch {
+        toast.error('Failed to delete category');
+      }
     }
   };
 
@@ -115,7 +124,7 @@ const CategoryManagement: FC = () => {
                     Category
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Slug
+                    Created Date
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
                     Actions
@@ -125,14 +134,14 @@ const CategoryManagement: FC = () => {
               <tbody className="divide-y divide-gray-100">
                 {filteredCategories.map((category) => (
                   <tr
-                    key={category.id}
+                    key={category._id}
                     className="hover:bg-gray-50/50 transition-colors"
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-4">
                         <div className="h-12 w-12 rounded-xl bg-gray-100 p-1">
                           <img
-                            className="h-full w-full rounded-lg object-contain"
+                            className="h-full w-full rounded-lg object-cover"
                             src={
                               category.image ||
                               `https://ui-avatars.com/api/?name=${category.name}`
@@ -144,19 +153,21 @@ const CategoryManagement: FC = () => {
                           <div className="text-sm font-semibold text-gray-900">
                             {category.name}
                           </div>
-                          {category.parentId && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                              Subcategory
-                            </span>
-                          )}
                         </div>
                       </div>
                     </td>
 
                     <td className="px-6 py-4">
-                      <code className="text-xs bg-gray-50 px-2 py-1 rounded border">
-                        {category.slug}
-                      </code>
+                      <span className="text-sm text-gray-600">
+                        {new Date(category.createdAt).toLocaleDateString(
+                          'en-US',
+                          {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          }
+                        )}
+                      </span>
                     </td>
 
                     <td className="px-6 py-4 text-right">
@@ -168,7 +179,7 @@ const CategoryManagement: FC = () => {
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(category.id)}
+                          onClick={() => handleDelete(category._id)}
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
                         >
                           <Trash2 className="w-4 h-4" />
