@@ -65,16 +65,6 @@ export default function Header() {
               Sign In
             </Link>
           )}
-          {user ? (
-            <UserProfileDropdown />
-          ) : (
-            <Link
-              to="/login"
-              className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-            >
-              Sign In
-            </Link>
-          )}
         </div>
 
         {/* Mobile Menu Button */}
