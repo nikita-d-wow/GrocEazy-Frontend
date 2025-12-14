@@ -8,24 +8,27 @@ import { ManagerRoutes } from './routes/ManagerRoutes';
 import { AdminRoutes } from './routes/AdminRoutes';
 
 import Unauthorized from './views/auth/Unauthorized';
-
+import { Toaster } from 'react-hot-toast';
 function App() {
   return (
-    <Routes>
-      {/* PUBLIC ROUTES (Login, Register, Landing, etc.) */}
-      {PublicRoutes}
+    <div>
+      <Toaster />
 
-      {/* PROTECTED ROUTES */}
-      {CustomerRoutes}
-      {ManagerRoutes}
-      {AdminRoutes}
+      <Routes>
+        {PublicRoutes}
 
-      {/* COMMON ROUTES */}
-      <Route path="/unauthorized" element={<Unauthorized />} />
+        {/* PROTECTED ROUTES */}
+        {CustomerRoutes}
+        {ManagerRoutes}
+        {AdminRoutes}
 
-      {/* FALLBACK */}
-      <Route path="*" element={<Unauthorized />} />
-    </Routes>
+        {/* COMMON ROUTES */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+        {/* FALLBACK */}
+        <Route path="*" element={<Unauthorized />} />
+      </Routes>
+    </div>
   );
 }
 
