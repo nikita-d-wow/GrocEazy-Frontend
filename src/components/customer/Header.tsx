@@ -122,23 +122,6 @@ export default function Header() {
             ))}
           </div>
 
-          {isCustomer && (
-            <div className="flex gap-4">
-              <Link
-                to="/wishlist"
-                className="flex-1 text-center py-2 rounded-lg bg-pink-100 text-pink-700"
-              >
-                Wishlist
-              </Link>
-              <Link
-                to="/cart"
-                className="flex-1 text-center py-2 rounded-lg bg-orange-500 text-white"
-              >
-                Cart
-              </Link>
-            </div>
-          )}
-
           {isLoggedIn ? (
             <div className="pt-2 border-t border-gray-100">
               <div className="text-sm text-gray-700 font-medium mb-2">

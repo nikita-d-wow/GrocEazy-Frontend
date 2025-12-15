@@ -40,7 +40,10 @@ const CategoryManagement: FC = () => {
   const filteredCategories = useMemo(() => {
     return categories.filter(
       (c) =>
-        c && c.name && c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        !c.isDeleted &&
+        c &&
+        c.name &&
+        c.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [categories, searchTerm]);
 

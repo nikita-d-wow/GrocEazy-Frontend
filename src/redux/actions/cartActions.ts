@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import api from '../../services/api';
 import {
   CART_FETCH_REQUEST,
@@ -32,32 +33,54 @@ export const fetchCart = () => {
 
 export const updateCartQty = (cartId: string, quantity: number) => {
   return async (dispatch: AppDispatch) => {
-    await api.put(`/api/cart/${cartId}`, { quantity });
-    dispatch(fetchCart());
+    try {
+      if (quantity < 0) {
+        return;
+      } // Prevent negative quantity
+      await api.put(`/api/cart/${cartId}`, { quantity });
+      dispatch(fetchCart());
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to update quantity');
+    }
   };
 };
 
 export const removeCartItem = (cartId: string) => {
   return async (dispatch: AppDispatch) => {
-    await api.delete(`/api/cart/${cartId}`);
-    dispatch(fetchCart());
+    try {
+      await api.delete(`/api/cart/${cartId}`);
+      dispatch(fetchCart());
+      toast.success('Item removed from cart');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to remove item');
+    }
   };
 };
 
 export const clearCart = () => {
   return async (dispatch: AppDispatch) => {
-    await api.delete('/api/cart');
-    dispatch({ type: CART_CLEAR });
+    try {
+      await api.delete('/api/cart');
+      dispatch({ type: CART_CLEAR });
+      toast.success('Cart cleared');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to clear cart');
+    }
   };
 };
 
 export const addToCart = (productId: string, quantity = 1) => {
   return async (dispatch: AppDispatch) => {
-    await api.post('/api/cart', {
-      productId,
-      quantity,
-    });
+    try {
+      await api.post('/api/cart', {
+        productId,
+        quantity,
+      });
 
-    dispatch(fetchCart());
+      dispatch(fetchCart());
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to add item to cart');
+      throw err;
+    }
   };
 };

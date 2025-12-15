@@ -26,7 +26,7 @@ const CategoryGrid: FC<CategoryGridProps> = ({
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
       {categories.map((cat) => (
-        <CategoryCard key={cat.id} category={cat} onClick={onCategoryClick} />
+        <CategoryCard key={cat._id} category={cat} onClick={onCategoryClick} />
       ))}
     </div>
   );

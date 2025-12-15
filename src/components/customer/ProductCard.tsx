@@ -1,13 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 
-interface ProductCardProps {
-  _id: string;
-  name: string;
-  image: string;
-  price: number;
-  stock?: number;
-}
+import type { CustomerProductCardProps } from '../../types/Product';
 
 export default function ProductCard({
   _id,
@@ -15,7 +9,7 @@ export default function ProductCard({
   image,
   price,
   stock,
-}: ProductCardProps) {
+}: CustomerProductCardProps) {
   const navigate = useNavigate();
 
   return (

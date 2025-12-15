@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
 import { fetchProducts } from '../../../redux/actions/productActions';
 import type { Product } from '../../../types/Product';
+import MobileCategorySidebar from '../../../components/products/MobileCategorySidebar';
+import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
 
 const ProductsPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -140,16 +142,28 @@ const ProductsPage: FC = () => {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Sidebar Filters */}
-        <aside className="w-full lg:w-64 flex-shrink-0">
+      <div className="flex flex-col lg:flex-row gap-8 relative items-start">
+        {/* Mobile Split View Sidebar */}
+        <div className="lg:hidden fixed left-0 top-16 bottom-0 z-40 bg-white border-r border-gray-100 shadow-sm w-24">
+          <MobileCategorySidebar
+            selectedCategory={filters.selectedCategory}
+            onSelectCategory={(id) =>
+              handleSetFilters({ ...filters, selectedCategory: id })
+            }
+          />
+        </div>
+
+        {/* Sidebar Filters (Desktop) */}
+        <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
           <ProductFilters filters={filters} setFilters={handleSetFilters} />
         </aside>
 
         {/* Product Grid */}
-        <main className="flex-1">
+        <main className="flex-1 w-full pl-32 pr-2 lg:pl-0 lg:pr-0">
+          {' '}
+          {/* pl-32 for extra sidebar offset */}
           {loading && products.length === 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div
                   key={i}
@@ -159,6 +173,24 @@ const ProductsPage: FC = () => {
             </div>
           ) : (
             <>
+              {/* Reset Filters / Results header for mobile */}
+              <div className="lg:hidden mb-4 flex justify-between items-center pr-4">
+                <h2 className="text-lg font-bold">
+                  {filters.selectedCategory
+                    ? (
+                        products.find(
+                          (p: Product) =>
+                            (p.categoryId as any)._id ===
+                            filters.selectedCategory
+                        )?.categoryId as any
+                      )?.name
+                    : 'All Products'}
+                </h2>
+                <span className="text-xs text-gray-500">
+                  {filteredProducts.length} items
+                </span>
+              </div>
+
               <ProductGrid products={displayedProducts} />
 
               {/* Infinite Scroll Trigger & Loading Indicator */}
@@ -187,6 +219,8 @@ const ProductsPage: FC = () => {
           )}
         </main>
       </div>
+
+      <FloatingCartBar />
     </div>
   );
 };
