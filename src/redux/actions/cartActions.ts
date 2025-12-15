@@ -50,3 +50,14 @@ export const clearCart = () => {
     dispatch({ type: CART_CLEAR });
   };
 };
+
+export const addToCart = (productId: string, quantity = 1) => {
+  return async (dispatch: AppDispatch) => {
+    await api.post('/api/cart', {
+      productId,
+      quantity,
+    });
+
+    dispatch(fetchCart());
+  };
+};

@@ -1,6 +1,7 @@
 // src/App.tsx
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 import { PublicRoutes } from './routes/PublicRoutes';
 import { CustomerRoutes } from './routes/CustomerRoutes';

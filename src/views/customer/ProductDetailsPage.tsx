@@ -6,7 +6,7 @@ import { ChevronRight, Minus, Plus } from 'lucide-react';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { fetchProducts } from '../../redux/actions/productActions';
 import { selectProducts } from '../../redux/selectors/productSelectors';
-import type { Product } from '../../types/Product';
+// import type { Product } from '../../types/Product';
 import ProductCard from '../../components/products/ProductCard';
 import toast from 'react-hot-toast';
 
