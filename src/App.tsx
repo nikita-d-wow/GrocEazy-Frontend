@@ -9,15 +9,13 @@ import { ManagerRoutes } from './routes/ManagerRoutes';
 import { AdminRoutes } from './routes/AdminRoutes';
 
 import Unauthorized from './views/auth/Unauthorized';
-
+import { Toaster } from 'react-hot-toast';
 function App() {
   return (
-    <>
-      {/* Toast container */}
+    <div>
       <Toaster />
 
       <Routes>
-        {/* PUBLIC ROUTES */}
         {PublicRoutes}
 
         {/* PROTECTED ROUTES */}
@@ -31,7 +29,7 @@ function App() {
         {/* FALLBACK */}
         <Route path="*" element={<Unauthorized />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

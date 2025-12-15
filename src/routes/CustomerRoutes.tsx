@@ -11,12 +11,15 @@ import ProductsPage from '../views/customer/products/ProductsPage';
 import ProductDetailsPage from '../views/customer/products/ProductDetailsPage';
 import CategoriesPage from '../views/customer/categories/CategoriesPage';
 import WishlistPage from '../views/customer/WishlistPage';
+import OrderDetails from '../views/customer/OrderDetails';
+
 export const CustomerRoutes = (
   <>
     <Route element={<CustomerLayout />}>
       <Route index element={<Dashboard />} />
       <Route path="/contact" element={<ContactSupport />} />
       <Route path="/orders" element={<OrdersPage />} />
+      <Route path="/orders/:id" element={<OrderDetails />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/wishlist" element={<WishlistPage />} />

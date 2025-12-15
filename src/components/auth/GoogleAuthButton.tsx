@@ -22,7 +22,6 @@ const GoogleAuthButton: React.FC = () => {
       <GoogleLogin
         onSuccess={handleSuccess}
         onError={handleError}
-        useOneTap
         width="350"
         shape="rectangular"
         theme="outline"

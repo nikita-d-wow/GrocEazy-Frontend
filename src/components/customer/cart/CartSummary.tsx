@@ -1,8 +1,11 @@
+import { useNavigate } from 'react-router-dom';
+
 interface CartSummaryProps {
   total: number;
 }
 
 export default function CartSummary({ total }: CartSummaryProps) {
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 h-fit sticky top-24 animate-fadeIn">
       <h2 className="text-2xl font-bold text-gray-900">Order Summary</h2>
@@ -27,6 +30,7 @@ export default function CartSummary({ total }: CartSummaryProps) {
       </div>
 
       <button
+        onClick={() => navigate('/checkout')}
         className="
           w-full mt-8 bg-primary text-white font-semibold py-4 
           rounded-2xl text-lg shadow-lg 
