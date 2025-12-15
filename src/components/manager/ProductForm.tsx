@@ -41,7 +41,10 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
     lowStockThreshold: product?.lowStockThreshold || 5,
     price: product?.price || 0,
     isActive: product?.isActive ?? true,
-    categoryId: product?.categoryId || '',
+    categoryId:
+      typeof product?.categoryId === 'object' && product?.categoryId !== null
+        ? (product.categoryId as any)._id
+        : product?.categoryId || '',
     images: product?.images || [],
   });
 
@@ -59,7 +62,9 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
       ...prev,
       [name]:
         type === 'number'
-          ? Number(value)
+          ? value === ''
+            ? ''
+            : Number(value)
           : type === 'checkbox'
             ? (e.target as HTMLInputElement).checked
             : value,
@@ -103,7 +108,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
       }
 
       onClose();
-    } catch (error) {
+    } catch {
       toast.error('Failed to save product');
     }
   };
@@ -115,7 +120,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
       title={product ? 'Edit Product' : 'Add Product'}
       maxWidth="2xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 px-1">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
             label="Product Name"
@@ -129,7 +134,8 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             label="Price (₹)"
             type="number"
             name="price"
-            value={formData.price}
+            value={formData.price ?? ''}
+            placeholder="Enter price"
             onChange={handleChange}
             min="0"
             step="0.01"

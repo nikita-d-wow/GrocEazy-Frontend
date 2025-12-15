@@ -29,3 +29,11 @@ export interface ProductFormData {
   isActive?: boolean;
   categoryId: string;
 }
+
+export interface CustomerProductCardProps {
+  _id: string;
+  name: string;
+  image: string;
+  price: number;
+  stock?: number;
+}
