@@ -4,6 +4,7 @@ import categoryReducer from './reducers/categoryReducer';
 import productReducer from './reducers/productReducer';
 import { authReducer } from './reducers/authReducers';
 import { cartReducer } from './reducers/cartReducer';
+import { wishlistReducer } from './reducers/wishlistReducer';
 // import other reducers as needed (cart, ui, etc.)
 
 const rootReducer = combineReducers({
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   product: productReducer,
   auth: authReducer,
   cart: cartReducer,
+  wishlist: wishlistReducer,
   // add other reducers here
 });
 

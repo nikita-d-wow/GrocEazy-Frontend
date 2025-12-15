@@ -1,6 +1,7 @@
 // src/App.tsx
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 
 import { PublicRoutes } from './routes/PublicRoutes';
 import { CustomerRoutes } from './routes/CustomerRoutes';
@@ -11,21 +12,26 @@ import Unauthorized from './views/auth/Unauthorized';
 
 function App() {
   return (
-    <Routes>
-      {/* PUBLIC ROUTES (Login, Register, Landing, etc.) */}
-      {PublicRoutes}
+    <>
+      {/* Toast container */}
+      <Toaster />
 
-      {/* PROTECTED ROUTES */}
-      {CustomerRoutes}
-      {ManagerRoutes}
-      {AdminRoutes}
+      <Routes>
+        {/* PUBLIC ROUTES */}
+        {PublicRoutes}
 
-      {/* COMMON ROUTES */}
-      <Route path="/unauthorized" element={<Unauthorized />} />
+        {/* PROTECTED ROUTES */}
+        {CustomerRoutes}
+        {ManagerRoutes}
+        {AdminRoutes}
 
-      {/* FALLBACK */}
-      <Route path="*" element={<Unauthorized />} />
-    </Routes>
+        {/* COMMON ROUTES */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
+
+        {/* FALLBACK */}
+        <Route path="*" element={<Unauthorized />} />
+      </Routes>
+    </>
   );
 }
 

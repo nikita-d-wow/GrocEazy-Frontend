@@ -10,7 +10,7 @@ import Checkout from '../views/customer/Checkout';
 import ProductsPage from '../views/customer/products/ProductsPage';
 import ProductDetailsPage from '../views/customer/products/ProductDetailsPage';
 import CategoriesPage from '../views/customer/categories/CategoriesPage';
-
+import WishlistPage from '../views/customer/WishlistPage';
 export const CustomerRoutes = (
   <>
     <Route element={<CustomerLayout />}>
@@ -19,8 +19,7 @@ export const CustomerRoutes = (
       <Route path="/orders" element={<OrdersPage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/checkout" element={<Checkout />} />
-
-      {/* SHOP ROUTES */}
+      <Route path="/wishlist" element={<WishlistPage />} />
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />
       <Route path="/categories" element={<CategoriesPage />} />
