@@ -24,7 +24,10 @@ export const login = (payload: LoginPayload) => {
     dispatch({ type: AUTH_LOGIN_REQUEST });
     try {
       // API call using the axios instance (handles credentials automatically)
-      const { data } = await api.post<ILoginResponse>('/api/auth/login', payload);
+      const { data } = await api.post<ILoginResponse>(
+        '/api/auth/login',
+        payload
+      );
 
       // store accessToken in localStorage settings
       localStorage.setItem('accessToken', data.accessToken);
@@ -67,14 +70,19 @@ export const register = (payload: RegisterPayload) => {
 
 export const logout = () => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
+    // Clear local storage immediately
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+
+    // Dispatch logout to clear Redux state immediately to update UI
+    dispatch({ type: AUTH_LOGOUT });
+
     try {
+      // Attempt server-side logout (optional, best effort)
       await api.post('/api/auth/logout');
     } catch {
       // ignore network error on logout
     }
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('user');
-    dispatch({ type: AUTH_LOGOUT });
   };
 };
 
@@ -83,7 +91,9 @@ export const googleLogin = (token: string) => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
     dispatch({ type: AUTH_LOGIN_REQUEST });
     try {
-      const { data } = await api.post<ILoginResponse>('/api/auth/google', { token });
+      const { data } = await api.post<ILoginResponse>('/api/auth/google', {
+        token,
+      });
 
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('user', JSON.stringify(data.user));
