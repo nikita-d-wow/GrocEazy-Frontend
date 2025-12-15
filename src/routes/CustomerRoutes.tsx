@@ -1,6 +1,6 @@
 // src/routes/CustomerRoutes.tsx
 import { Route } from 'react-router-dom';
-
+import CheckoutAddress from '../views/customer/CheckoutAddress';
 import CustomerLayout from '../layouts/CustomerLayout';
 import Dashboard from '../views/customer/Dashboard';
 import ContactSupport from '../views/customer/ContactSupport';
@@ -22,6 +22,7 @@ export const CustomerRoutes = (
       <Route path="/orders/:id" element={<OrderDetails />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/checkout" element={<Checkout />} />
+      <Route path="/checkout/address" element={<CheckoutAddress />} />
       <Route path="/wishlist" element={<WishlistPage />} />
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />
