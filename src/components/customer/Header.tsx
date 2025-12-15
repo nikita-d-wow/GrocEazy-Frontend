@@ -17,6 +17,8 @@ export default function Header() {
     role === 'admin' ? adminNav : role === 'manager' ? managerNav : customerNav;
 
   const isCustomer = role === 'customer';
+  // Strict check for valid user session
+  const isLoggedIn = user && user.email;
 
   return (
     <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -76,6 +78,18 @@ export default function Header() {
               </Link>
             </>
           )}
+
+          {/* User Profile / Sign In */}
+          {isLoggedIn ? (
+            <UserProfileDropdown />
+          ) : (
+            <Link
+              to="/login"
+              className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+            >
+              Sign In
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -125,9 +139,12 @@ export default function Header() {
             </div>
           )}
 
-          {user ? (
-            <div className="text-sm text-gray-700 font-medium">
-              Hi, {user.name || user.email}
+          {isLoggedIn ? (
+            <div className="pt-2 border-t border-gray-100">
+              <div className="text-sm text-gray-700 font-medium mb-2">
+                Hi, {user.name || user.email}
+              </div>
+              {/* Note: Ideally we want full mobile menu options here */}
             </div>
           ) : (
             <Link

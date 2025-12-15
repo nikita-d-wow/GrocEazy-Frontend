@@ -48,7 +48,8 @@ const UserProfileDropdown: React.FC = () => {
   }
 
   // Get initials or first letter of name/email
-  const displayName = user.name || user.email.split('@')[0];
+  const email = user.email || '';
+  const displayName = user.name || email.split('@')[0] || 'User';
   const initial = displayName.charAt(0).toUpperCase();
 
   return (

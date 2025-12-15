@@ -9,7 +9,7 @@ import { ManagerRoutes } from './routes/ManagerRoutes';
 import { AdminRoutes } from './routes/AdminRoutes';
 
 import Unauthorized from './views/auth/Unauthorized';
-import { Toaster } from 'react-hot-toast';
+//import { Toaster } from 'react-hot-toast';
 function App() {
   return (
     <div>
