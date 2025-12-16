@@ -124,15 +124,6 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
           </div>
         </div>
 
-        {/* Image URL fallback */}
-        <Input
-          label="Or enter Image URL"
-          name="image"
-          value={typeof formData.image === 'string' ? formData.image : ''}
-          onChange={handleChange}
-          placeholder="https://example.com/image.jpg"
-        />
-
         <div className="pt-6 flex justify-end space-x-3 border-t">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel

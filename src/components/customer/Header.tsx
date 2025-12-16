@@ -21,27 +21,26 @@ export default function Header() {
   const isLoggedIn = user && user.email;
 
   return (
-    <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex items-center justify-between">
+    <header className="w-full bg-white/90 backdrop-blur-md border-b border-green-50 sticky top-0 z-50 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <div className="text-2xl">🛒</div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-1">
-            GROC
-            <span className="bg-orange-500 text-white px-1.5 py-0.5 rounded-md">
-              E
-            </span>
-            AZY
+        <Link to="/" className="flex items-center gap-2 group">
+          <div className="text-3xl transition-transform group-hover:scale-110">
+            🥬
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 tracking-tight flex items-center">
+            Groc
+            <span className="text-green-600">Eazy</span>
           </h1>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8 text-gray-700 font-medium">
+        <nav className="hidden md:flex items-center gap-8 text-gray-600 font-medium">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className="hover:text-primary transition-colors"
+              className="hover:text-green-600 hover:bg-green-50 px-3 py-2 rounded-lg transition-all duration-200"
             >
               {item.label}
             </Link>
@@ -51,32 +50,33 @@ export default function Header() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
           {/* Search */}
-          <div className="relative">
+          <div className="relative group">
             <input
               type="text"
-              placeholder="Search products..."
-              className="px-4 py-2 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="Search available products..."
+              className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
             />
-            <Search className="absolute right-3 top-2.5 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
           </div>
 
           {/* Wishlist & Cart (CUSTOMER ONLY) */}
           {isCustomer && (
-            <>
+            <div className="flex items-center gap-2">
               <Link
                 to="/wishlist"
-                className="p-2 rounded-full hover:bg-pink-50 text-pink-600 transition"
+                className="p-2.5 rounded-xl hover:bg-pink-50 text-gray-500 hover:text-pink-500 transition-all duration-200"
               >
                 <Heart className="w-5 h-5" />
               </Link>
 
               <Link
                 to="/cart"
-                className="p-2 rounded-full bg-orange-500 text-white hover:bg-orange-600 transition"
+                className="p-2.5 rounded-xl bg-green-100/50 text-green-700 hover:bg-green-100 hover:scale-105 transition-all duration-200 flex items-center gap-2"
               >
                 <ShoppingCart className="w-5 h-5" />
+                <span className="font-semibold text-sm">Cart</span>
               </Link>
-            </>
+            </div>
           )}
 
           {/* User Profile / Sign In */}
@@ -85,7 +85,7 @@ export default function Header() {
           ) : (
             <Link
               to="/login"
-              className="bg-green-700 hover:bg-green-800 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm hover:shadow-md"
             >
               Sign In
             </Link>
@@ -95,27 +95,31 @@ export default function Header() {
         {/* Mobile Menu Button */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden p-2 border rounded-lg"
+          className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-6 h-6" />
         </button>
       </div>
 
       {/* Mobile Dropdown */}
       {open && (
-        <div className="md:hidden px-6 py-4 bg-white shadow-lg space-y-4">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="w-full px-4 py-2 bg-gray-100 rounded-lg text-sm"
-          />
+        <div className="md:hidden px-4 pt-2 pb-6 bg-white border-t border-gray-100 shadow-xl space-y-4 animate-slideDown">
+          <div className="relative mt-2">
+            <input
+              type="text"
+              placeholder="Search products..."
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-100"
+            />
+            <Search className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
+          </div>
 
-          <div className="flex flex-col gap-4 text-gray-700 font-medium">
+          <div className="flex flex-col gap-2">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setOpen(false)}
+                className="px-4 py-3 rounded-xl hover:bg-green-50 text-gray-700 font-medium transition-colors"
               >
                 {item.label}
               </Link>
@@ -123,16 +127,22 @@ export default function Header() {
           </div>
 
           {isLoggedIn ? (
-            <div className="pt-2 border-t border-gray-100">
-              <div className="text-sm text-gray-700 font-medium mb-2">
-                Hi, {user.name || user.email}
+            <div className="pt-4 border-t border-gray-100">
+              {/* Mobile Profile Summary */}
+              <div className="flex items-center gap-3 px-4 mb-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
+                  {user.name?.[0] || user.email?.[0]}
+                </div>
+                <div>
+                  <div className="font-medium text-gray-900">{user.name}</div>
+                  <div className="text-xs text-gray-500">{user.email}</div>
+                </div>
               </div>
-              {/* Note: Ideally we want full mobile menu options here */}
             </div>
           ) : (
             <Link
               to="/login"
-              className="block text-center bg-green-700 text-white px-6 py-2 rounded-lg font-medium"
+              className="block w-full text-center bg-gray-900 text-white px-6 py-3 rounded-xl font-bold"
             >
               Sign In
             </Link>

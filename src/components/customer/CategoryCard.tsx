@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 export interface CategoryCard {
   text: string;
   path: string;
@@ -5,14 +7,25 @@ export interface CategoryCard {
   bgColor: string;
 }
 
-export default function CategoryCard({ image, text, bgColor }: CategoryCard) {
+export default function CategoryCard({
+  image,
+  text,
+  path,
+  bgColor,
+}: CategoryCard) {
+  const navigate = useNavigate();
+
   return (
     <div
-      style={{ backgroundColor: bgColor }}
-      className="rounded-xl p-4 cursor-pointer hover:scale-105 transition flex flex-col items-center"
+      onClick={() => navigate(path)}
+      className={`rounded-xl p-4 cursor-pointer hover:scale-105 transition flex flex-col items-center shadow-md hover:shadow-lg h-full justify-center ${bgColor}`}
     >
-      <img src={image} alt={text} className="w-16 h-16 object-contain" />
-      <p className="text-gray-800 font-medium mt-3">{text}</p>
+      <img
+        src={image}
+        alt={text}
+        className="w-16 h-16 object-contain mb-3 mix-blend-multiply"
+      />
+      <p className="text-gray-900 font-bold text-center text-sm">{text}</p>
     </div>
   );
 }
