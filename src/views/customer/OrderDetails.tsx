@@ -181,12 +181,12 @@ export default function OrderDetails() {
                         item.product.images?.[0] ||
                         'https://via.placeholder.com/150'
                       }
-                      alt={item.product.name}
+                      alt={item.product.name || 'Product'}
                       className="w-16 h-16 rounded-xl object-cover border border-gray-100"
                     />
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900">
-                        {item.product.name}
+                        {item.product.name || 'Unknown Product'}
                       </h4>
                       <p className="text-sm text-gray-500">
                         Qty: {item.quantity}
