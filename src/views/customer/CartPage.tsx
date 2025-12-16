@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { ShoppingCart } from 'lucide-react';
 
 import EmptyState from '../../components/common/EmptyState';
 import Loader from '../../components/common/Loader';
@@ -14,6 +15,9 @@ import {
   removeCartItem,
 } from '../../redux/actions/cartActions';
 
+// 👉 import wishlist action (example)
+import { addToWishlist } from '../../redux/actions/wishlistActions';
+
 import {
   selectCartItems,
   selectCartLoading,
@@ -21,7 +25,6 @@ import {
 } from '../../redux/selectors/cartSelectors';
 
 import type { AppDispatch } from '../../redux/store';
-import { ShoppingCart } from 'lucide-react';
 
 type QtyAction = 'inc' | 'dec';
 
@@ -61,6 +64,12 @@ export default function CartPage() {
     dispatch(removeCartItem(cartId));
   };
 
+  // ✅ Move single item to wishlist
+  const moveToWishlist = (cartId: string, productId: string) => {
+    dispatch(addToWishlist(productId));
+    dispatch(removeCartItem(cartId));
+  };
+
   if (loading && cartItems.length === 0) {
     return <Loader />;
   }
@@ -76,8 +85,10 @@ export default function CartPage() {
       quantity: item.quantity,
     }));
 
+  const formattedTotal = Number(total).toFixed(2);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-200 px-6 md:px-10 lg:px-24 py-12">
+    <div className="min-h-screen px-4 sm:px-6 lg:px-20 py-8">
       <CartHeader />
 
       {uiCartItems.length === 0 ? (
@@ -87,19 +98,24 @@ export default function CartPage() {
           icon={<ShoppingCart size={48} className="text-primary" />}
         />
       ) : (
-        <div className="mt-6 grid md:grid-cols-3 gap-10">
-          <div className="md:col-span-2 space-y-6">
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LEFT */}
+          <div className="lg:col-span-2 space-y-4 min-w-0">
             {uiCartItems.map((item) => (
               <CartItem
                 key={item._id}
                 item={item}
                 updateQty={updateQty}
                 removeItem={removeItem}
+                moveToWishlist={moveToWishlist}
               />
             ))}
           </div>
 
-          <CartSummary total={total} />
+          {/* RIGHT */}
+          <div className="w-full max-w-full">
+            <CartSummary total={Number(formattedTotal)} />
+          </div>
         </div>
       )}
     </div>

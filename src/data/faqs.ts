@@ -7,21 +7,21 @@ export const faqs: FAQItem[] = [
   {
     question: 'How long does delivery take?',
     answer:
-      'Most orders are delivered within 30–45 minutes depending on your location.',
+      'Delivery times may vary based on location and availability. You will see delivery updates once your order is confirmed.',
   },
   {
     question: 'Can I cancel my order?',
     answer:
-      'Yes, you can cancel before it is shipped. After shipment, cancellation is not possible.',
+      'Order cancellation depends on the current order status. Please contact support as soon as possible for assistance.',
   },
   {
-    question: 'What payment methods do you accept?',
+    question: 'How do I place an order?',
     answer:
-      'We accept UPI, credit/debit cards, net banking, and wallet payments.',
+      'Browse products, add items to your cart, and place the order by providing delivery details. Payment features will be added soon.',
   },
   {
-    question: 'How do I request a refund?',
+    question: 'How can I contact customer support?',
     answer:
-      'Refund requests can be made through the order details page or by contacting support.',
+      'You can reach our support team using the Contact Support page. All your support requests will be visible under My Tickets.',
   },
 ];

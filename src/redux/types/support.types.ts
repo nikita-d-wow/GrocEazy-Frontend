@@ -46,7 +46,7 @@ export interface SupportTicket {
 
 export interface SupportState {
   loading: boolean;
-  tickets: SupportTicket[];
+  myTickets: SupportTicket[];
   error: string | null;
 }
 

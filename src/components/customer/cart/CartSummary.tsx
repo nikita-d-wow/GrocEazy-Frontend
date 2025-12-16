@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 interface CartSummaryProps {
   total: number;
@@ -6,6 +7,7 @@ interface CartSummaryProps {
 
 export default function CartSummary({ total }: CartSummaryProps) {
   const navigate = useNavigate();
+
   return (
     <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 h-fit sticky top-24 animate-fadeIn">
       <h2 className="text-2xl font-bold text-gray-900">Order Summary</h2>
@@ -29,15 +31,23 @@ export default function CartSummary({ total }: CartSummaryProps) {
         </div>
       </div>
 
+      {/* Compact Checkout Button */}
       <button
         onClick={() => navigate('/checkout')}
         className="
-          w-full mt-8 bg-primary text-white font-semibold py-4 
-          rounded-2xl text-lg shadow-lg 
-          hover:bg-primary/90 active:scale-95 transition
+          mt-8 inline-flex items-center gap-2
+          px-6 py-3
+          bg-primary text-white
+          text-sm font-semibold
+          rounded-xl
+          shadow-md
+          hover:bg-primary/90
+          active:scale-95
+          transition
         "
       >
-        Proceed to Checkout →
+        Proceed to Checkout
+        <ArrowRight size={16} />
       </button>
     </div>
   );
