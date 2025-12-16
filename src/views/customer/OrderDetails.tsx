@@ -161,29 +161,43 @@ export default function OrderDetails() {
               <Package size={20} className="text-primary" /> Items
             </h3>
             <div className="space-y-4">
-              {currentOrder.items.map((item) => (
-                <div
-                  key={item.product._id}
-                  className="flex gap-4 border-b border-gray-50 last:border-0 pb-4 last:pb-0"
-                >
-                  <img
-                    src={item.product.images[0]}
-                    alt={item.product.name}
-                    className="w-16 h-16 rounded-xl object-cover border border-gray-100"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">
-                      {item.product.name}
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Qty: {item.quantity}
+              {currentOrder.items.map((item, index) => {
+                // Safe check for missing product data
+                if (!item.product || typeof item.product !== 'object') {
+                  return (
+                    <div key={`missing-${index}`} className="text-red-500 py-2">
+                      Product information missing for this item.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={item.product._id}
+                    className="flex gap-4 border-b border-gray-50 last:border-0 pb-4 last:pb-0"
+                  >
+                    <img
+                      src={
+                        item.product.images?.[0] ||
+                        'https://via.placeholder.com/150'
+                      }
+                      alt={item.product.name || 'Product'}
+                      className="w-16 h-16 rounded-xl object-cover border border-gray-100"
+                    />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">
+                        {item.product.name || 'Unknown Product'}
+                      </h4>
+                      <p className="text-sm text-gray-500">
+                        Qty: {item.quantity}
+                      </p>
+                    </div>
+                    <p className="font-semibold text-gray-900">
+                      ₹{item.unitPrice * item.quantity}
                     </p>
                   </div>
-                  <p className="font-semibold text-gray-900">
-                    ₹{item.unitPrice * item.quantity}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="mt-4 pt-4 border-t flex justify-between items-center">
               <span className="font-medium text-gray-600">Total Amount</span>
@@ -203,16 +217,16 @@ export default function OrderDetails() {
             </h3>
             <address className="not-italic text-sm text-gray-600 space-y-1">
               <p className="font-medium text-gray-900">
-                {currentOrder.shippingAddress.fullName}
+                {currentOrder.shippingAddress?.fullName || 'N/A'}
               </p>
-              <p>{currentOrder.shippingAddress.line1}</p>
+              <p>{currentOrder.shippingAddress?.line1 || ''}</p>
               <p>
-                {currentOrder.shippingAddress.city},{' '}
-                {currentOrder.shippingAddress.state}
+                {currentOrder.shippingAddress?.city || ''},{' '}
+                {currentOrder.shippingAddress?.state || ''}
               </p>
-              <p>{currentOrder.shippingAddress.postalCode}</p>
+              <p>{currentOrder.shippingAddress?.postalCode || ''}</p>
               <p className="mt-2 text-gray-500">
-                Phone: {currentOrder.shippingAddress.phone}
+                Phone: {currentOrder.shippingAddress?.phone || 'N/A'}
               </p>
             </address>
 
