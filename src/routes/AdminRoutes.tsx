@@ -5,6 +5,7 @@ import ProtectedRoute from './ProtectedRoute';
 import AdminLayout from '../layouts/AdminLayout';
 import AdminDashboard from '../views/admin/AdminDashboard';
 import AdminSupportTickets from '../views/admin/TicketsPage';
+import UsersPage from '../views/admin/users/UsersPage';
 
 export const AdminRoutes = (
   <>
@@ -17,6 +18,7 @@ export const AdminRoutes = (
     >
       <Route index element={<AdminDashboard />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/users" element={<UsersPage />} />
       <Route path="/admin/support-tickets" element={<AdminSupportTickets />} />
     </Route>
   </>
