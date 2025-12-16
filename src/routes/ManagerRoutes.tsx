@@ -8,6 +8,8 @@ import ProductManagement from '../views/manager/ProductManagement';
 import CategoryManagement from '../views/manager/CategoryManagement';
 import SupportTickets from '../views/manager/SupportTickets';
 import UsersPage from '../views/admin/users/UsersPage';
+import Analytics from '../views/manager/Analytics';
+import OrdersManagement from '../views/manager/OrdersManagement';
 
 export const ManagerRoutes = (
   <>
@@ -24,8 +26,8 @@ export const ManagerRoutes = (
       <Route path="products" element={<ProductManagement />} />
       <Route path="categories" element={<CategoryManagement />} />
       <Route path="users" element={<UsersPage />} />
-
-      {/* ✅ SUPPORT MANAGEMENT */}
+      <Route path="analytics" element={<Analytics />} />
+      <Route path="orders" element={<OrdersManagement />} />
       <Route path="support" element={<SupportTickets />} />
     </Route>
   </>
