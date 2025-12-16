@@ -33,18 +33,22 @@ export default function CategoriesSection() {
           <p className="text-gray-500">Loading categories...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
-          {visibleCategories.map((cat, index) => (
-            <CategoryCard
-              key={cat._id}
-              text={cat.name}
-              path={`/products?category=${cat._id}`}
-              image={
-                cat.image || `https://ui-avatars.com/api/?name=${cat.name}`
-              }
-              bgColor={categoryBgVariants[index % categoryBgVariants.length]}
-            />
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+          {visibleCategories.map((cat, index) => {
+            const bgClass =
+              categoryBgVariants[index % categoryBgVariants.length];
+            return (
+              <CategoryCard
+                key={cat._id}
+                text={cat.name}
+                path={`/products?category=${cat._id}`}
+                image={
+                  cat.image || `https://ui-avatars.com/api/?name=${cat.name}`
+                }
+                bgColor={bgClass}
+              />
+            );
+          })}
         </div>
       )}
     </section>

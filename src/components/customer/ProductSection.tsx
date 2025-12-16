@@ -3,15 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { fetchProducts } from '../../redux/actions/productActions';
-import { selectProducts } from '../../redux/selectors/productSelectors';
+import {
+  selectProducts,
+  selectProductLoading,
+} from '../../redux/selectors/productSelectors';
 import ProductCard from './ProductCard';
 import Button from '../common/Button';
-import { ArrowRight } from 'lucide-react';
+import Loader from '../common/Loader';
+import EmptyState from '../common/EmptyState';
+import { ArrowRight, PackageX } from 'lucide-react';
 
 export default function ProductsSection() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const products = useSelector(selectProducts);
+  const loading = useSelector(selectProductLoading);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -19,6 +25,15 @@ export default function ProductsSection() {
 
   // Show only first 8 products
   const displayProducts = products.slice(0, 8);
+
+  // Initial loading state (only if no products)
+  if (loading && products.length === 0) {
+    return (
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16 flex justify-center">
+        <Loader size="lg" />
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16">
@@ -39,12 +54,14 @@ export default function ProductsSection() {
       </div>
 
       {products.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-2xl">
-          <p className="text-gray-500">Loading products...</p>
-        </div>
+        <EmptyState
+          title="No Products Found"
+          description="We couldn't find any products at the moment. Please check back later."
+          icon={<PackageX className="w-12 h-12 text-gray-400" />}
+        />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {displayProducts.map((product) => (
+          {displayProducts.map((product, index) => (
             <ProductCard
               key={product._id}
               _id={product._id}
@@ -52,6 +69,7 @@ export default function ProductsSection() {
               price={product.price}
               image={product.images[0] || '/img/placeholder.png'}
               stock={product.stock}
+              index={index}
             />
           ))}
         </div>
