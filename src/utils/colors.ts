@@ -8,3 +8,12 @@ export const categoryBgVariants = [
   'bg-rose-100 hover:bg-rose-200 border-rose-200', // pastel rose
   'bg-cyan-100 hover:bg-cyan-200 border-cyan-200', // pastel cyan
 ];
+
+export const pastel = {
+  indigo: '#c7d2fe',
+  sky: '#bae6fd',
+  amber: '#fde68a',
+  rose: '#fca5a5',
+  emerald: '#bbf7d0',
+  gray: '#e5e7eb',
+};
