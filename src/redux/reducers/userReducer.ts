@@ -49,20 +49,25 @@ export const userReducer = (
     // UPDATE STATUS
     case UPDATE_USER_STATUS_REQUEST:
       return { ...state, loading: true, error: null };
-    case UPDATE_USER_STATUS_SUCCESS:
+    case UPDATE_USER_STATUS_SUCCESS: {
+      // Backend might return { user: ... } or just the user object.
+      // We normalize this here.
+      const updatedUser = (action.payload as any).user || action.payload;
+
       return {
         ...state,
         loading: false,
         // Update user in the list
         users: state.users.map((user) =>
-          user._id === action.payload._id ? action.payload : user
+          user._id === updatedUser._id ? updatedUser : user
         ),
         // Update currentUser if it matches
         currentUser:
-          state.currentUser && state.currentUser._id === action.payload._id
-            ? action.payload
+          state.currentUser && state.currentUser._id === updatedUser._id
+            ? updatedUser
             : state.currentUser,
       };
+    }
     case UPDATE_USER_STATUS_FAILURE:
       return { ...state, loading: false, error: action.payload };
 

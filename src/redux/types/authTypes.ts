@@ -6,6 +6,8 @@ export interface IUser {
   name?: string;
   phone?: string;
   addresses?: IAddress[];
+  hasPassword?: boolean;
+  isActive?: boolean;
 }
 
 export interface IAddress {
@@ -36,7 +38,6 @@ export const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
 export const ADD_ADDRESS_SUCCESS = 'ADD_ADDRESS_SUCCESS';
 export const UPDATE_ADDRESS_SUCCESS = 'UPDATE_ADDRESS_SUCCESS';
 export const DELETE_ADDRESS_SUCCESS = 'DELETE_ADDRESS_SUCCESS';
-
 
 interface AuthLoginRequestAction {
   type: typeof AUTH_LOGIN_REQUEST;
@@ -77,7 +78,6 @@ export type AuthActionTypes =
   | UpdateAddressSuccessAction
   | DeleteAddressSuccessAction;
 
-
 interface UpdateProfileSuccessAction {
   type: typeof UPDATE_PROFILE_SUCCESS;
   payload: IUser; // The complete updated user object or partial? Guide says "merge returned data"
@@ -97,7 +97,6 @@ interface DeleteAddressSuccessAction {
   type: typeof DELETE_ADDRESS_SUCCESS;
   payload: { addressId: string };
 }
-
 
 export interface AuthState {
   loading: boolean;

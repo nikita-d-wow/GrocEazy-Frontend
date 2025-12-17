@@ -16,6 +16,9 @@ import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 
+import { InventoryCharts } from './InventoryCharts';
+import { InventoryAlertsModal } from './InventoryAlertsModal';
+
 const Inventory: FC = () => {
   const dispatch = useAppDispatch();
   const products = useSelector(selectProducts);
@@ -23,12 +26,12 @@ const Inventory: FC = () => {
   const loading = useSelector(selectProductLoading);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAlertsOpen, setIsAlertsOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchProducts());
     dispatch(fetchCategories());
   }, [dispatch]);
-
   const filteredProducts = useMemo(
     () =>
       products.filter(
@@ -39,23 +42,54 @@ const Inventory: FC = () => {
   );
 
   const getStockStatus = (stock: number, threshold: number = 5) => {
-    if (stock === 0) return { label: 'Out of Stock', color: 'text-red-600 bg-red-50', icon: AlertTriangle };
-    if (stock <= threshold) return { label: 'Low Stock', color: 'text-orange-600 bg-orange-50', icon: AlertTriangle };
-    return { label: 'In Stock', color: 'text-green-600 bg-green-50', icon: CheckCircle };
+    if (stock === 0) {
+      return {
+        label: 'Out of Stock',
+        color: 'text-red-600 bg-red-50',
+        icon: AlertTriangle,
+      };
+    }
+    if (stock <= threshold) {
+      return {
+        label: 'Low Stock',
+        color: 'text-orange-600 bg-orange-50',
+        icon: AlertTriangle,
+      };
+    }
+    return {
+      label: 'In Stock',
+      color: 'text-green-600 bg-green-50',
+      icon: CheckCircle,
+    };
   };
 
   if (loading && products.length === 0) {
     return <Loader fullScreen />;
   }
-
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
+      <InventoryAlertsModal
+        isOpen={isAlertsOpen}
+        onClose={() => setIsAlertsOpen(false)}
+      />
+
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-gray-500">Track and monitor product stock levels</p>
+          <p className="text-gray-500">
+            Track and monitor product stock levels
+          </p>
         </div>
+        <button
+          onClick={() => setIsAlertsOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+        >
+          <AlertTriangle size={18} className="text-orange-500" />
+          Stock Alerts
+        </button>
       </div>
+
+      <InventoryCharts products={products} categories={categories} />
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
         <div className="p-4 border-b border-gray-100">
@@ -105,9 +139,14 @@ const Inventory: FC = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {filteredProducts.map((product) => {
-                  const status = getStockStatus(product.stock, product.lowStockThreshold);
+                  const status = getStockStatus(
+                    product.stock,
+                    product.lowStockThreshold
+                  );
                   const StatusIcon = status.icon;
-                  const categoryName = categories.find(c => c._id === product.categoryId)?.name || 'N/A';
+                  const categoryName =
+                    categories.find((c) => c._id === product.categoryId)
+                      ?.name || 'N/A';
 
                   return (
                     <tr
@@ -152,13 +191,17 @@ const Inventory: FC = () => {
                       </td>
 
                       <td className="px-6 py-4">
-                        <span className={`text-sm font-bold ${status.color.split(' ')[0]}`}>
+                        <span
+                          className={`text-sm font-bold ${status.color.split(' ')[0]}`}
+                        >
                           {product.stock}
                         </span>
                       </td>
 
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}
+                        >
                           <StatusIcon size={12} />
                           {status.label}
                         </span>

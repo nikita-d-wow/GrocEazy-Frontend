@@ -15,6 +15,9 @@ import ProfilePage from '../views/customer/ProfilePage';
 import OrderDetails from '../views/customer/OrderDetails';
 import MyTickets from '../views/customer/MyTickets';
 import ProtectedRoute from './ProtectedRoute';
+import SetPassword from '../views/auth/SetPassword';
+import ForgotPassword from '../views/auth/ForgotPassword';
+import ResetPassword from '../views/auth/ResetPassword';
 
 export const CustomerRoutes = (
   <>
@@ -36,11 +39,22 @@ export const CustomerRoutes = (
           </ProtectedRoute>
         }
       />
-
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />
       <Route path="/categories" element={<CategoriesPage />} />
       <Route path="/customer/tickets" element={<MyTickets />} />
     </Route>
+
+    <Route
+      path="/set-password"
+      element={
+        <ProtectedRoute allowedRoles={['customer', 'manager', 'admin']}>
+          <SetPassword />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route path="/forgot-password" element={<ForgotPassword />} />
+    <Route path="/reset-password/:token" element={<ResetPassword />} />
   </>
 );
