@@ -2,24 +2,11 @@ import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../redux/rootReducer';
 import { customerNav, adminNav, managerNav } from '../../utils/navitems';
+import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 
-const Footer = () => {
+export default function Footer() {
   const { user } = useSelector((state: RootState) => state.auth);
   const role = user?.role || 'customer';
-export default function Footer() {
-  return (
-    <footer className="bg-green-50/50 mt-16 border-t border-green-100">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          {/* Brand Column */}
-          <div className="col-span-1 md:col-span-2 space-y-4">
-            <div className="flex items-center gap-2 group w-fit cursor-default">
-              <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex items-center">
-                Groc<span className="text-green-600">Eazy</span>
-              </h2>
-            </div>
-
-  // SAME LOGIC AS HEADER
   const navItems =
     role === 'admin' ? adminNav : role === 'manager' ? managerNav : customerNav;
 
@@ -134,6 +121,4 @@ export default function Footer() {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

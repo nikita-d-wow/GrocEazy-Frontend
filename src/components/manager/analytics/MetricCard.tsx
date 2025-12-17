@@ -15,16 +15,29 @@ export default function MetricCard({
     <div
       className={`
         glass-card p-6
-        bg-gradient-to-br ${bg}
-        flex items-center justify-between
+        relative overflow-hidden group hover:scale-[1.02] transition-transform
       `}
     >
-      <div>
-        <p className="text-sm text-gray-600">{title}</p>
-        <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
-      </div>
+      <div className={`absolute inset-0 opacity-15 bg-gradient-to-br ${bg}`} />
 
-      <div className="p-3 rounded-xl bg-white/40 text-gray-900">{icon}</div>
+      <div className="relative flex items-center justify-between z-10">
+        <div>
+          <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+            {title}
+          </p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
+        </div>
+
+        <div
+          className={`
+            p-3.5 rounded-2xl
+            bg-gradient-to-br ${bg}
+            text-white shadow-sm
+          `}
+        >
+          {icon}
+        </div>
+      </div>
     </div>
   );
 }
