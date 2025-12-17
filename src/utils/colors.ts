@@ -1,12 +1,12 @@
 export const categoryBgVariants = [
-  'bg-green-100 hover:bg-green-200 border-green-200', // pastel green
-  'bg-amber-100 hover:bg-amber-200 border-amber-200', // pastel amber
-  'bg-blue-100 hover:bg-blue-200 border-blue-200', // pastel blue
-  'bg-purple-100 hover:bg-purple-200 border-purple-200', // pastel purple
-  'bg-pink-100 hover:bg-pink-200 border-pink-200', // pastel pink
-  'bg-teal-100 hover:bg-teal-200 border-teal-200', // pastel teal
-  'bg-rose-100 hover:bg-rose-200 border-rose-200', // pastel rose
-  'bg-cyan-100 hover:bg-cyan-200 border-cyan-200', // pastel cyan
+  'bg-green-50 hover:bg-green-100 border-green-100', // lighter pastel green
+  'bg-amber-50 hover:bg-amber-100 border-amber-100', // lighter pastel amber
+  'bg-blue-50 hover:bg-blue-100 border-blue-100', // lighter pastel blue
+  'bg-purple-50 hover:bg-purple-100 border-purple-100', // lighter pastel purple
+  'bg-pink-50 hover:bg-pink-100 border-pink-100', // lighter pastel pink
+  'bg-teal-50 hover:bg-teal-100 border-teal-100', // lighter pastel teal
+  'bg-rose-50 hover:bg-rose-100 border-rose-100', // lighter pastel rose
+  'bg-cyan-50 hover:bg-cyan-100 border-cyan-100', // lighter pastel cyan
 ];
 
 export const pastel = {

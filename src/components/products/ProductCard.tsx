@@ -6,7 +6,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import type { Product } from '../../types/Product';
 import type { AppDispatch } from '../../redux/store';
-import { updateCartQty, addToCart } from '../../redux/actions/cartActions';
+import {
+  updateCartQty,
+  addToCart,
+  removeCartItem,
+} from '../../redux/actions/cartActions';
 import { selectCartItems } from '../../redux/selectors/cartSelectors';
 
 interface ProductCardProps {
@@ -62,7 +66,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       await dispatch(updateCartQty(cartItem._id, cartItem.quantity - 1));
       toast.success('Quantity updated', { icon: '➖' });
     } else {
-      await dispatch(updateCartQty(cartItem._id, 0));
+      await dispatch(removeCartItem(cartItem._id));
       toast('Removed from cart', {
         icon: '🗑️',
       });
@@ -90,23 +94,29 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       {quantity === 0 ? (
         <button
           onClick={handleAddToCart}
-          className="mt-4 w-full border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white py-2 rounded-lg font-semibold transition"
+          className="mt-4 w-full text-green-700 font-bold bg-green-50 py-2 rounded-lg hover:bg-green-100 transition-colors uppercase border border-green-200"
         >
           ADD
         </button>
       ) : (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="mt-4 flex items-center justify-center gap-3 bg-green-600 text-white py-2 rounded-lg"
+          className="mt-4 flex items-center justify-between bg-green-50 rounded-lg px-2 py-1 border border-green-200"
         >
-          <button onClick={handleDecrement}>
-            <Minus size={16} />
+          <button
+            onClick={handleDecrement}
+            className="w-8 h-8 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50"
+          >
+            <Minus size={16} strokeWidth={3} />
           </button>
 
-          <span className="font-bold">{quantity}</span>
+          <span className="font-bold text-green-700">{quantity}</span>
 
-          <button onClick={handleIncrement}>
-            <Plus size={16} />
+          <button
+            onClick={handleIncrement}
+            className="w-8 h-8 flex items-center justify-center bg-green-600 rounded text-white shadow-sm hover:bg-green-700"
+          >
+            <Plus size={16} strokeWidth={3} />
           </button>
         </div>
       )}

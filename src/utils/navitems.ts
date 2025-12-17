@@ -1,8 +1,6 @@
 export const customerNav = [
   { label: 'Home', path: '/' },
   { label: 'Shop', path: '/products' },
-  { label: 'Wishlist', path: '/wishlist', icon: 'heart' },
-  { label: 'Cart', path: '/cart', icon: 'cart' },
   { label: 'Contact', path: '/contact' },
 ];
 

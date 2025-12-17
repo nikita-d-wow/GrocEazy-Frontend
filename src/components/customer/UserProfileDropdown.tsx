@@ -48,8 +48,8 @@ const UserProfileDropdown: React.FC = () => {
   }
 
   // Get initials or first letter of name/email
-  const email = user.email || '';
-  const displayName = user.name || email.split('@')[0] || 'User';
+  // Get initials or first letter of name/email
+  const displayName = user.name || user.email?.split('@')[0] || 'User';
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -74,9 +74,8 @@ const UserProfileDropdown: React.FC = () => {
         <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="px-4 py-2 border-b border-gray-100 mb-1">
             <p className="text-sm font-semibold text-gray-900 truncate">
-              {user.name || 'User'}
+              {user.name || user.email?.split('@')[0] || 'User'}
             </p>
-            <p className="text-xs text-gray-500 truncate">{user.email}</p>
           </div>
 
           {user.role === 'admin' && (

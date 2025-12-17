@@ -7,6 +7,16 @@ export const selectProducts = createSelector(
   (products) => products ?? []
 );
 
+export const selectSimilarProducts = createSelector(
+  [(state: RootState) => state.product.similarProducts],
+  (products) => products ?? []
+);
+
+export const selectTopProducts = createSelector(
+  [(state: RootState) => state.product.topProducts],
+  (products) => products ?? []
+);
+
 export const selectProductLoading = (state: RootState) => state.product.loading;
 
 export const selectProductError = (state: RootState) => state.product.error;
