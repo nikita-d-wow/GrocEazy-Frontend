@@ -47,6 +47,8 @@ export interface SupportTicket {
 export interface SupportState {
   loading: boolean;
   myTickets: SupportTicket[];
+  tickets: SupportTicket[]; // ✅ admin / manager tickets
+  managers: IUser[]; // ✅ admin only
   error: string | null;
 }
 

@@ -73,7 +73,10 @@ export const fetchAllSupportTickets = () => async (dispatch: AppDispatch) => {
 
     dispatch({
       type: SUPPORT_FETCH_ALL_SUCCESS,
-      payload: data.tickets as SupportTicket[],
+      payload: {
+        tickets: data.tickets,
+        managers: data.managers ?? [],
+      },
     });
   } catch {
     dispatch({
@@ -98,32 +101,33 @@ export const updateSupportTicketStatus =
     }
   };
 
-/* ===== ASSIGN TO ME (ADMIN / MANAGER) ===== */
+/* ===== ASSIGN MANAGER (ADMIN) ===== */
 
-export const assignTicketToMe =
-  (ticketId: string) => async (dispatch: AppDispatch) => {
+export const assignSupportTicketManager =
+  (ticketId: string, managerId: string) => async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_ASSIGN_MANAGER_REQUEST });
 
     try {
-      // backend should read managerId from token
-      await api.patch(`/api/support/${ticketId}/assign`);
+      await api.patch(`/api/support/${ticketId}/assign`, { managerId });
       dispatch(fetchAllSupportTickets());
     } catch {
       dispatch({
         type: SUPPORT_ASSIGN_MANAGER_FAILURE,
-        payload: 'Failed to assign ticket',
+        payload: 'Failed to assign manager',
       });
     }
   };
 
-/* ===== UNASSIGN TICKET ===== */
+/* ===== UNASSIGN ===== */
 
 export const unassignTicket =
   (ticketId: string) => async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_ASSIGN_MANAGER_REQUEST });
 
     try {
-      await api.patch(`/api/support/${ticketId}/unassign`);
+      await api.patch(`/api/support/${ticketId}/assign`, {
+        managerId: null,
+      });
       dispatch(fetchAllSupportTickets());
     } catch {
       dispatch({
