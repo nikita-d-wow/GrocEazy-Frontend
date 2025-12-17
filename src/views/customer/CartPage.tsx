@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ShoppingCart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import EmptyState from '../../components/common/EmptyState';
 import Loader from '../../components/common/Loader';
@@ -25,6 +26,7 @@ import {
 } from '../../redux/selectors/cartSelectors';
 
 import type { AppDispatch } from '../../redux/store';
+import type { RootState } from '../../redux/rootReducer';
 
 type QtyAction = 'inc' | 'dec';
 
@@ -39,14 +41,21 @@ interface CartItemUI {
 
 export default function CartPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  // Add auth selector
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const loading = useSelector(selectCartLoading);
   const cartItems = useSelector(selectCartItems);
   const total = useSelector(selectCartTotal);
 
   useEffect(() => {
-    dispatch(fetchCart());
-  }, [dispatch]);
+    // Only fetch if user exists
+    if (user) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, user]);
 
   const updateQty = (cartId: string, type: QtyAction) => {
     const item = cartItems.find((i) => i._id === cartId);
@@ -69,6 +78,23 @@ export default function CartPage() {
     dispatch(addToWishlist(productId));
     dispatch(removeCartItem(cartId));
   };
+
+  // Show login query if not logged in
+  if (!user) {
+    return (
+      <div className="min-h-screen px-4 py-8">
+        <EmptyState
+          title="Please Log In"
+          description="You need to be logged in to view your cart."
+          icon={<ShoppingCart size={48} className="text-gray-400" />}
+          action={{
+            label: 'Sign In',
+            onClick: () => navigate('/login'),
+          }}
+        />
+      </div>
+    );
+  }
 
   if (loading && cartItems.length === 0) {
     return <Loader />;
