@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 
 import { fetchWishlist } from '../../redux/actions/wishlistActions';
@@ -15,14 +16,36 @@ import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import WishlistGrid from '../../components/customer/wishlist/WishlistGrid';
 
+import type { RootState } from '../../redux/rootReducer';
+
 export default function WishlistPage() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const items = useSelector(selectWishlistItems);
   const loading = useSelector(selectWishlistLoading);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    dispatch(fetchWishlist());
-  }, [dispatch]);
+    if (user) {
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, user]);
+
+  if (!user) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center px-6">
+        <EmptyState
+          title="Please Log In"
+          description="You need to be logged in to view your wishlist."
+          icon={<Heart size={48} className="text-gray-400" />}
+          action={{
+            label: 'Sign In',
+            onClick: () => navigate('/login'),
+          }}
+        />
+      </div>
+    );
+  }
 
   if (loading) {
     return <Loader />;
