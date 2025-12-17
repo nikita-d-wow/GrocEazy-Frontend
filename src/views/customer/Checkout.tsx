@@ -38,7 +38,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-white to-primary/20 p-6 sm:p-12">
+    <div className="min-h-screen  p-6 sm:p-12">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
@@ -82,7 +82,7 @@ const Checkout = () => {
           </motion.div>
 
           {/* PAYMENT */}
-          <div className="backdrop-blur-xl bg-white/50 border border-white/30 rounded-3xl shadow-xl p-6">
+          <div className="rounded-3xl shadow-xl p-6">
             <h3 className="font-semibold text-xl mb-4 flex items-center gap-2">
               <CreditCard /> Payment Method
             </h3>
@@ -108,7 +108,7 @@ const Checkout = () => {
         </div>
 
         {/* RIGHT */}
-        <div className="backdrop-blur-xl bg-white/50 border border-white/30 rounded-3xl shadow-xl p-6 h-fit">
+        <div className=" rounded-3xl shadow-xl p-6 h-fit">
           <h3 className="font-semibold text-xl mb-6">Order Summary</h3>
 
           <div className="flex justify-between mb-3 text-gray-700">
