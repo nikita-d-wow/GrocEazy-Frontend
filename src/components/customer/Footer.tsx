@@ -16,14 +16,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand Column */}
           <div className="col-span-1 md:col-span-2 space-y-4">
-            <Link to="/" className="flex items-center gap-2 group w-fit">
-              <div className="text-3xl transition-transform group-hover:scale-110">
-                🥬
-              </div>
+            <div className="flex items-center gap-2 group w-fit cursor-default">
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex items-center">
                 Groc<span className="text-green-600">Eazy</span>
               </h2>
-            </Link>
+            </div>
 
             <p className="text-gray-600 leading-relaxed max-w-sm">
               Fresh groceries delivered to your doorstep in minutes. We partner
@@ -32,30 +29,18 @@ export default function Footer() {
             </p>
 
             <div className="flex gap-4 pt-2">
-              <a
-                href="#"
-                className="p-2 bg-white rounded-full text-gray-500 hover:text-green-600 hover:shadow-md transition-all"
-              >
+              <span className="p-2 bg-white rounded-full text-gray-500 hover:text-green-600 hover:shadow-md transition-all cursor-default">
                 <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="p-2 bg-white rounded-full text-gray-500 hover:text-blue-500 hover:shadow-md transition-all"
-              >
+              </span>
+              <span className="p-2 bg-white rounded-full text-gray-500 hover:text-blue-500 hover:shadow-md transition-all cursor-default">
                 <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="p-2 bg-white rounded-full text-gray-500 hover:text-blue-600 hover:shadow-md transition-all"
-              >
+              </span>
+              <span className="p-2 bg-white rounded-full text-gray-500 hover:text-blue-600 hover:shadow-md transition-all cursor-default">
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="p-2 bg-white rounded-full text-gray-500 hover:text-red-600 hover:shadow-md transition-all"
-              >
+              </span>
+              <span className="p-2 bg-white rounded-full text-gray-500 hover:text-red-600 hover:shadow-md transition-all cursor-default">
                 <Youtube className="w-5 h-5" />
-              </a>
+              </span>
             </div>
           </div>
 
@@ -81,14 +66,7 @@ export default function Footer() {
                   All Products
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/categories"
-                  className="text-gray-600 hover:text-green-600 hover:translate-x-1 block transition-all w-fit"
-                >
-                  Categories
-                </Link>
-              </li>
+              <li></li>
               <li>
                 <Link
                   to="/orders"
@@ -131,12 +109,12 @@ export default function Footer() {
             © {new Date().getFullYear()} GrocEazy. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm text-gray-500">
-            <a href="#" className="hover:text-green-600">
+            <span className="cursor-default hover:text-green-600">
               Privacy Policy
-            </a>
-            <a href="#" className="hover:text-green-600">
+            </span>
+            <span className="cursor-default hover:text-green-600">
               Terms of Service
-            </a>
+            </span>
           </div>
         </div>
       </div>

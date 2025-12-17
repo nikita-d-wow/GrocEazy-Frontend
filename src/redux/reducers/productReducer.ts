@@ -3,12 +3,16 @@ import type { Product } from '../../types/Product';
 
 interface ProductState {
   products: Product[];
+  similarProducts: Product[];
+  topProducts: Product[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: ProductState = {
   products: [],
+  similarProducts: [],
+  topProducts: [],
   loading: false,
   error: null,
 };
@@ -43,6 +47,12 @@ const productSlice = createSlice({
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
+    setSimilarProducts(state, action: PayloadAction<Product[]>) {
+      state.similarProducts = action.payload;
+    },
+    setTopProducts(state, action: PayloadAction<Product[]>) {
+      state.topProducts = action.payload;
+    },
   },
 });
 
@@ -53,6 +63,8 @@ export const {
   deleteProduct,
   setLoading,
   setError,
+  setSimilarProducts,
+  setTopProducts,
 } = productSlice.actions;
 
 export default productSlice.reducer;

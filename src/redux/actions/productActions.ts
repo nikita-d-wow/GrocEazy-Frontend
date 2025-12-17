@@ -1,5 +1,6 @@
 import type { AppDispatch } from '../store';
 import type { Product, ProductFormData } from '../../types/Product';
+import toast from 'react-hot-toast';
 import * as productApi from '../../services/productApi';
 import {
   setProducts,
@@ -8,6 +9,8 @@ import {
   addProduct as addProductAction,
   updateProduct as updateProductAction,
   deleteProduct as deleteProductAction,
+  setSimilarProducts,
+  setTopProducts,
 } from '../reducers/productReducer';
 
 /**
@@ -101,6 +104,37 @@ export const deleteProduct = (id: string) => async (dispatch: AppDispatch) => {
       setError(error.response?.data?.message || 'Failed to delete product')
     );
     throw error;
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+/**
+ * Fetch similar products
+ */
+export const fetchSimilarProducts =
+  (id: string) => async (dispatch: AppDispatch) => {
+    dispatch(setLoading(true));
+    try {
+      const products = await productApi.getSimilarProducts(id);
+      dispatch(setSimilarProducts(products));
+    } catch (error: any) {
+      toast.error('Error fetching similar products:', error);
+      // Don't set main error state to avoid blocking main UI
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+/**
+ * Fetch top products
+ */
+export const fetchTopProducts = () => async (dispatch: AppDispatch) => {
+  dispatch(setLoading(true));
+  try {
+    const products = await productApi.getTopProducts();
+    dispatch(setTopProducts(products));
+  } catch (error: any) {
+    toast.error('Error fetching top products:', error);
   } finally {
     dispatch(setLoading(false));
   }

@@ -5,6 +5,7 @@ import ProductFilters from '../../../components/products/ProductFilters';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
 import { fetchProducts } from '../../../redux/actions/productActions';
+import { fetchWishlist } from '../../../redux/actions/wishlistActions';
 import type { Product } from '../../../types/Product';
 import MobileCategorySidebar from '../../../components/products/MobileCategorySidebar';
 import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
@@ -14,12 +15,15 @@ const ProductsPage: FC = () => {
   const { products, loading, error } = useSelector(
     (state: any) => state.product
   );
+  const { user } = useSelector((state: any) => state.auth);
 
   const [filters, setFilters] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const categoryParam = params.get('category');
+    const searchParam = params.get('search');
     return {
       selectedCategory: categoryParam || null,
+      searchQuery: searchParam || '',
       priceRange: [0, 1000] as [number, number],
       sortBy: 'featured',
     };
@@ -38,13 +42,23 @@ const ProductsPage: FC = () => {
     } else {
       params.delete('category');
     }
+
+    if (filters.searchQuery) {
+      params.set('search', filters.searchQuery);
+    } else {
+      params.delete('search');
+    }
+
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, '', newUrl);
-  }, [filters.selectedCategory]);
+  }, [filters.selectedCategory, filters.searchQuery]);
 
   useEffect(() => {
     dispatch(fetchProducts());
-  }, [dispatch]);
+    if (user) {
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, user]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -83,8 +97,19 @@ const ProductsPage: FC = () => {
           typeof p.categoryId === 'object' && p.categoryId !== null
             ? (p.categoryId as any)._id
             : p.categoryId;
-        return productCategoryId === filters.selectedCategory;
+        // Ensure string comparison
+        return String(productCategoryId) === String(filters.selectedCategory);
       });
+    }
+
+    // Filter by Search Query
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase();
+      result = result.filter(
+        (p: Product) =>
+          p.name.toLowerCase().includes(query) ||
+          p.description?.toLowerCase().includes(query)
+      );
     }
 
     // Filter by Price
@@ -137,14 +162,16 @@ const ProductsPage: FC = () => {
         </div>
         <div className="mt-4 md:mt-0">
           <span className="text-gray-600 font-medium">
-            {filteredProducts.length} results found
+            {filteredProducts.length === 0 && filters.searchQuery
+              ? 'No products available'
+              : `${filteredProducts.length} results found`}
           </span>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 relative items-start">
-        {/* Mobile Split View Sidebar */}
-        <div className="lg:hidden fixed left-0 top-16 bottom-0 z-40 bg-white border-r border-gray-100 shadow-sm w-24">
+        {/* Mobile Category Sidebar (Horizontal Scroll) */}
+        <div className="lg:hidden w-full overflow-x-auto pb-4 -mt-4 bg-white sticky top-16 z-30 border-b border-gray-100 no-scrollbar">
           <MobileCategorySidebar
             selectedCategory={filters.selectedCategory}
             onSelectCategory={(id) =>
@@ -159,7 +186,7 @@ const ProductsPage: FC = () => {
         </aside>
 
         {/* Product Grid */}
-        <main className="flex-1 w-full pl-32 pr-2 lg:pl-0 lg:pr-0">
+        <main className="flex-1 w-full">
           {' '}
           {/* pl-32 for extra sidebar offset */}
           {loading && products.length === 0 ? (

@@ -9,7 +9,7 @@ import CartPage from '../views/customer/CartPage';
 import Checkout from '../views/customer/Checkout';
 import ProductsPage from '../views/customer/products/ProductsPage';
 import ProductDetailsPage from '../views/customer/products/ProductDetailsPage';
-import CategoriesPage from '../views/customer/categories/CategoriesPage';
+
 import WishlistPage from '../views/customer/WishlistPage';
 import ProfilePage from '../views/customer/ProfilePage';
 import OrderDetails from '../views/customer/OrderDetails';
@@ -39,7 +39,7 @@ export const CustomerRoutes = (
 
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />
-      <Route path="/categories" element={<CategoriesPage />} />
+
       <Route path="/customer/tickets" element={<MyTickets />} />
     </Route>
   </>

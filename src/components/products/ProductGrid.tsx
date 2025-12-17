@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import ProductCard from './ProductCard';
+import ProductCard from '../customer/ProductCard';
 import type { Product } from '../../types/Product';
 
 interface Props {
@@ -17,8 +17,16 @@ const ProductGrid: FC<Props> = ({ products }) => {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {products.map((product) => (
-        <ProductCard key={product._id} product={product} />
+      {products.map((product, index) => (
+        <ProductCard
+          key={product._id}
+          _id={product._id}
+          name={product.name}
+          price={product.price}
+          image={product.images[0]}
+          stock={product.stock}
+          index={index}
+        />
       ))}
     </div>
   );
