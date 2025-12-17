@@ -70,7 +70,13 @@ export const clearCart = () => {
 };
 
 export const addToCart = (productId: string, quantity = 1) => {
-  return async (dispatch: AppDispatch) => {
+  return async (dispatch: AppDispatch, getState: any) => {
+    const { auth } = getState();
+    if (!auth.user) {
+      toast.error('Please log in to add items to cart');
+      return;
+    }
+
     try {
       await api.post('/api/cart', {
         productId,
