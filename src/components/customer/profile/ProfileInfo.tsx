@@ -1,0 +1,114 @@
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { User, Phone, Save } from 'lucide-react';
+
+import type { AppDispatch } from '../../../redux/store';
+import type { IUser } from '../../../redux/types/authTypes';
+import { updateProfile } from '../../../redux/actions/profileActions';
+
+interface ProfileInfoProps {
+    user: IUser;
+}
+
+export default function ProfileInfo({ user }: ProfileInfoProps) {
+    const dispatch = useDispatch<AppDispatch>();
+    const [formData, setFormData] = useState({
+        name: user.name || '',
+        phone: user.phone || '',
+    });
+    const [isSaving, setIsSaving] = useState(false);
+    const [message, setMessage] = useState<{
+        type: 'success' | 'error';
+        text: string;
+    } | null>(null);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        setMessage(null);
+
+        try {
+            await dispatch(updateProfile(formData));
+            setMessage({ type: 'success', text: 'Profile updated successfully!' });
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Failed to update profile.' });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    return (
+        <div className="max-w-xl">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Full Name
+                    </label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <User size={18} className="text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-sm"
+                            placeholder="Your full name"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone Number
+                    </label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Phone size={18} className="text-gray-400" />
+                        </div>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-sm"
+                            placeholder="+1 234 567 8900"
+                        />
+                    </div>
+                </div>
+
+                {message && (
+                    <div
+                        className={`p-3 rounded-lg text-sm ${message.type === 'success'
+                                ? 'bg-green-50 text-green-700'
+                                : 'bg-red-50 text-red-700'
+                            }`}
+                    >
+                        {message.text}
+                    </div>
+                )}
+
+                <div className="pt-2">
+                    <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSaving ? (
+                            <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <Save size={18} />
+                        )}
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+}

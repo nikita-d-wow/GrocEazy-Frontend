@@ -13,10 +13,11 @@ export const adminNav = [
 ];
 
 export const managerNav = [
-  { label: 'Dashboard', path: '/manager' }, // Maps to Analytics
+  { label: 'Dashboard', path: '/manager' },
+  { label: 'Analytics', path: '/manager/analytics' },
   { label: 'Inventory', path: '/manager/inventory' },
-  { label: 'Orders', path: '/manager/orders' },
   { label: 'Products', path: '/manager/products' },
   { label: 'Categories', path: '/manager/categories' },
-  { label: 'Tickets', path: '/manager/support' },
+  { label: 'Orders', path: '/manager/orders' },
+  { label: 'Support', path: '/manager/support' },
 ];
