@@ -7,13 +7,25 @@ import { ChevronRight, Minus, Plus, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
-import { fetchProducts } from '../../../redux/actions/productActions';
-import { addToCart, updateCartQty } from '../../../redux/actions/cartActions';
+import {
+  fetchProducts,
+  fetchSimilarProducts,
+  fetchTopProducts,
+} from '../../../redux/actions/productActions';
+import {
+  addToCart,
+  updateCartQty,
+  removeCartItem,
+} from '../../../redux/actions/cartActions';
 
-import { selectProducts } from '../../../redux/selectors/productSelectors';
+import {
+  selectProducts,
+  selectSimilarProducts,
+  selectTopProducts,
+} from '../../../redux/selectors/productSelectors';
 import { selectCartItems } from '../../../redux/selectors/cartSelectors';
 
-import ProductCard from '../../../components/products/ProductCard';
+import ProductCard from '../../../components/customer/ProductCard';
 import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
 
 const ProductDetailsPage: FC = () => {
@@ -21,12 +33,18 @@ const ProductDetailsPage: FC = () => {
   const dispatch = useAppDispatch();
 
   const products = useSelector(selectProducts);
+  const similarProducts = useSelector(selectSimilarProducts);
+  const topProducts = useSelector(selectTopProducts);
   const cartItems = useSelector(selectCartItems);
 
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
     dispatch(fetchProducts());
+    if (id) {
+      dispatch(fetchSimilarProducts(id));
+    }
+    dispatch(fetchTopProducts());
     window.scrollTo(0, 0);
   }, [dispatch, id]);
 
@@ -51,14 +69,20 @@ const ProductDetailsPage: FC = () => {
   };
 
   const incrementCart = () => {
-    if (product) {
-      dispatch(updateCartQty(product._id, cartQuantity + 1));
+    if (cartItem) {
+      dispatch(updateCartQty(cartItem._id, cartQuantity + 1));
+    } else if (product) {
+      dispatch(addToCart(product._id, 1));
     }
   };
 
   const decrementCart = () => {
-    if (product) {
-      dispatch(updateCartQty(product._id, cartQuantity - 1));
+    if (cartItem) {
+      if (cartQuantity === 1) {
+        dispatch(removeCartItem(cartItem._id));
+      } else {
+        dispatch(updateCartQty(cartItem._id, cartQuantity - 1));
+      }
     }
   };
 
@@ -76,15 +100,8 @@ const ProductDetailsPage: FC = () => {
       ? (product.categoryId as any).name
       : 'Groceries';
 
-  // Recommendations Logic
-  const similarProducts = products
-    .filter((p) => p.categoryId === product.categoryId && p._id !== product._id)
-    .slice(0, 6);
-
-  // Simulating "Top 10" by just taking top products excluding current
-  const topProducts = products
-    .filter((p) => p._id !== product._id && p.categoryId !== product.categoryId)
-    .slice(0, 10);
+  // Recommendations Logic is now handled by Redux / API fetch
+  // const similarProducts and const topProducts are selected from store above
 
   return (
     <div className="bg-gray-50 min-h-screen pb-24 font-sans text-gray-900">
@@ -272,13 +289,21 @@ const ProductDetailsPage: FC = () => {
 
         {/* Similar Products */}
         {similarProducts.length > 0 && (
-          <div className="mt-16 border-t pt-10">
+          <div className="mt-16">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Similar Products
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {similarProducts.map((p) => (
-                <ProductCard key={p._id} product={p} />
+              {similarProducts.map((p, idx) => (
+                <ProductCard
+                  key={p._id}
+                  _id={p._id}
+                  name={p.name}
+                  image={p.images[0]}
+                  price={p.price}
+                  stock={p.stock}
+                  index={idx}
+                />
               ))}
             </div>
           </div>
@@ -291,8 +316,16 @@ const ProductDetailsPage: FC = () => {
               Top 10 Products
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {topProducts.map((p) => (
-                <ProductCard key={p._id} product={p} />
+              {topProducts.map((p, idx) => (
+                <ProductCard
+                  key={p._id}
+                  _id={p._id}
+                  name={p.name}
+                  image={p.images[0]}
+                  price={p.price}
+                  stock={p.stock}
+                  index={idx}
+                />
               ))}
             </div>
           </div>

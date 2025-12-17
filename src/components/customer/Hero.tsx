@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
-import banner1 from '../../assets/banner_grocery_1.png';
+import banner1 from '../../assets/banner_veggies.jpg';
 import banner2 from '../../assets/banner_grocery_2.png';
 import Button from '../common/Button';
 
@@ -48,8 +48,8 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="py-6 px-4 sm:px-6 lg:px-12">
-      <div className="relative max-w-7xl mx-auto h-[220px] sm:h-[300px] md:h-[380px] rounded-3xl overflow-hidden shadow-xl group">
+    <section className="py-4 px-3 sm:py-6 sm:px-6 lg:px-12">
+      <div className="relative max-w-7xl mx-auto h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-md sm:shadow-xl group">
         {/* Slides */}
         {SLIDES.map((slide, index) => (
           <div
@@ -71,24 +71,24 @@ export default function Hero() {
             ></div>
 
             {/* Content */}
-            <div className="relative h-full flex flex-col justify-center px-8 sm:px-16 lg:px-24 max-w-2xl">
+            <div className="relative h-full flex flex-col justify-center px-6 sm:px-16 lg:px-24 max-w-2xl">
               <div
                 className={`w-fit px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border backdrop-blur-md ${slide.tagColor}`}
               >
                 {slide.tag}
               </div>
 
-              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg mb-3">
+              <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg mb-2 sm:mb-3">
                 {slide.title}
               </h1>
 
-              <p className="text-gray-200 text-sm sm:text-lg mb-6 max-w-md font-medium">
+              <p className="text-gray-200 text-xs xs:text-sm sm:text-lg mb-4 sm:mb-6 max-w-md font-medium line-clamp-2 sm:line-clamp-none">
                 {slide.subtitle}
               </p>
 
               <Button
                 onClick={() => navigate('/products')}
-                className="w-fit !rounded-full !px-8 shadow-lg hover:shadow-xl hover:scale-105 transition-all text-sm sm:text-base"
+                className="w-fit !rounded-full !px-8 shadow-sm hover:shadow-md hover:scale-105 transition-all text-sm sm:text-base bg-green-700 hover:bg-green-800 border-none text-white font-semibold"
                 size="lg"
                 rightIcon={<ChevronRight className="w-4 h-4" />}
               >

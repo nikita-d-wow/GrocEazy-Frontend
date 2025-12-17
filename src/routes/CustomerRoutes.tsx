@@ -9,10 +9,12 @@ import CartPage from '../views/customer/CartPage';
 import Checkout from '../views/customer/Checkout';
 import ProductsPage from '../views/customer/products/ProductsPage';
 import ProductDetailsPage from '../views/customer/products/ProductDetailsPage';
-import CategoriesPage from '../views/customer/categories/CategoriesPage';
+
 import WishlistPage from '../views/customer/WishlistPage';
+import ProfilePage from '../views/customer/ProfilePage';
 import OrderDetails from '../views/customer/OrderDetails';
 import MyTickets from '../views/customer/MyTickets';
+import ProtectedRoute from './ProtectedRoute';
 
 export const CustomerRoutes = (
   <>
@@ -26,10 +28,18 @@ export const CustomerRoutes = (
       <Route path="/checkout/address" element={<CheckoutAddress />} />
 
       <Route path="/wishlist" element={<WishlistPage />} />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route path="/products" element={<ProductsPage />} />
       <Route path="/products/:id" element={<ProductDetailsPage />} />
-      <Route path="/categories" element={<CategoriesPage />} />
+
       <Route path="/customer/tickets" element={<MyTickets />} />
     </Route>
   </>
