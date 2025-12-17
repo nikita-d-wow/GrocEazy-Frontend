@@ -25,7 +25,6 @@ export const ManagerRoutes = (
 
       <Route path="products" element={<ProductManagement />} />
       <Route path="categories" element={<CategoryManagement />} />
-      <Route path="users" element={<UsersPage />} />
       <Route path="analytics" element={<Analytics />} />
       <Route path="orders" element={<OrdersManagement />} />
       <Route path="support" element={<SupportTickets />} />
