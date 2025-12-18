@@ -8,6 +8,12 @@ import {
   AUTH_REGISTER_REQUEST,
   AUTH_REGISTER_SUCCESS,
   AUTH_REGISTER_FAILURE,
+  AUTH_FORGOT_PASSWORD_REQUEST,
+  AUTH_FORGOT_PASSWORD_SUCCESS,
+  AUTH_FORGOT_PASSWORD_FAILURE,
+  AUTH_RESET_PASSWORD_REQUEST,
+  AUTH_RESET_PASSWORD_SUCCESS,
+  AUTH_RESET_PASSWORD_FAILURE,
 } from '../types/authTypes';
 import type {
   AuthActionTypes,
@@ -109,6 +115,42 @@ export const googleLogin = (token: string) => {
         type: AUTH_LOGIN_FAILURE,
         payload: { error: errorMessage },
       });
+    }
+  };
+};
+
+export const forgotPassword = (email: string) => {
+  return async (dispatch: Dispatch<AuthActionTypes>) => {
+    dispatch({ type: AUTH_FORGOT_PASSWORD_REQUEST });
+    try {
+      await api.post('/api/auth/forgot-password', { email });
+      dispatch({ type: AUTH_FORGOT_PASSWORD_SUCCESS });
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Forgot password failed';
+      dispatch({
+        type: AUTH_FORGOT_PASSWORD_FAILURE,
+        payload: { error: errorMessage },
+      });
+      throw err;
+    }
+  };
+};
+
+export const resetPassword = (token: string, password: string) => {
+  return async (dispatch: Dispatch<AuthActionTypes>) => {
+    dispatch({ type: AUTH_RESET_PASSWORD_REQUEST });
+    try {
+      await api.post('/api/auth/reset-password', { token, password });
+      dispatch({ type: AUTH_RESET_PASSWORD_SUCCESS });
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message || err.message || 'Reset password failed';
+      dispatch({
+        type: AUTH_RESET_PASSWORD_FAILURE,
+        payload: { error: errorMessage },
+      });
+      throw err;
     }
   };
 };

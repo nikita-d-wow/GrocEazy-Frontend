@@ -7,6 +7,12 @@ import {
   AUTH_REGISTER_REQUEST,
   AUTH_REGISTER_SUCCESS,
   AUTH_REGISTER_FAILURE,
+  AUTH_FORGOT_PASSWORD_REQUEST,
+  AUTH_FORGOT_PASSWORD_SUCCESS,
+  AUTH_FORGOT_PASSWORD_FAILURE,
+  AUTH_RESET_PASSWORD_REQUEST,
+  AUTH_RESET_PASSWORD_SUCCESS,
+  AUTH_RESET_PASSWORD_FAILURE,
 } from '../types/authTypes';
 
 import type { AuthState, AuthActionTypes } from '../types/authTypes';
@@ -47,6 +53,15 @@ export function authReducer(
     case AUTH_REGISTER_SUCCESS:
       return { ...state, loading: false, error: null };
     case AUTH_REGISTER_FAILURE:
+      return { ...state, loading: false, error: action.payload.error };
+    case AUTH_FORGOT_PASSWORD_REQUEST:
+    case AUTH_RESET_PASSWORD_REQUEST:
+      return { ...state, loading: true, error: null };
+    case AUTH_FORGOT_PASSWORD_SUCCESS:
+    case AUTH_RESET_PASSWORD_SUCCESS:
+      return { ...state, loading: false, error: null };
+    case AUTH_FORGOT_PASSWORD_FAILURE:
+    case AUTH_RESET_PASSWORD_FAILURE:
       return { ...state, loading: false, error: action.payload.error };
     case 'UPDATE_PROFILE_SUCCESS':
       return {

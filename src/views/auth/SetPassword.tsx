@@ -9,6 +9,7 @@ import api from '../../services/api';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { fetchUserProfile } from '../../redux/actions/profileActions';
 import { logout } from '../../redux/actions/authActions';
+import { UPDATE_PROFILE_SUCCESS } from '../../redux/types/authTypes';
 
 const passwordSchema = z
   .object({
@@ -41,6 +42,12 @@ export default function SetPassword() {
     setLoading(true);
     try {
       await api.post('/api/auth/set-password', { password: data.password });
+
+      // Manually update local state to ensure hasPassword is true immediately
+      dispatch({
+        type: UPDATE_PROFILE_SUCCESS,
+        payload: { hasPassword: true },
+      });
 
       // Update local profile to reflect that password is set
       await dispatch(fetchUserProfile());

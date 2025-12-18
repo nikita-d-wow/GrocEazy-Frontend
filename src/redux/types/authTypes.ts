@@ -34,6 +34,14 @@ export const AUTH_REGISTER_REQUEST = 'AUTH_REGISTER_REQUEST';
 export const AUTH_REGISTER_SUCCESS = 'AUTH_REGISTER_SUCCESS';
 export const AUTH_REGISTER_FAILURE = 'AUTH_REGISTER_FAILURE';
 
+export const AUTH_FORGOT_PASSWORD_REQUEST = 'AUTH_FORGOT_PASSWORD_REQUEST';
+export const AUTH_FORGOT_PASSWORD_SUCCESS = 'AUTH_FORGOT_PASSWORD_SUCCESS';
+export const AUTH_FORGOT_PASSWORD_FAILURE = 'AUTH_FORGOT_PASSWORD_FAILURE';
+
+export const AUTH_RESET_PASSWORD_REQUEST = 'AUTH_RESET_PASSWORD_REQUEST';
+export const AUTH_RESET_PASSWORD_SUCCESS = 'AUTH_RESET_PASSWORD_SUCCESS';
+export const AUTH_RESET_PASSWORD_FAILURE = 'AUTH_RESET_PASSWORD_FAILURE';
+
 export const UPDATE_PROFILE_SUCCESS = 'UPDATE_PROFILE_SUCCESS';
 export const ADD_ADDRESS_SUCCESS = 'ADD_ADDRESS_SUCCESS';
 export const UPDATE_ADDRESS_SUCCESS = 'UPDATE_ADDRESS_SUCCESS';
@@ -65,6 +73,28 @@ interface AuthRegisterFailureAction {
   payload: { error: string };
 }
 
+interface AuthForgotPasswordRequestAction {
+  type: typeof AUTH_FORGOT_PASSWORD_REQUEST;
+}
+interface AuthForgotPasswordSuccessAction {
+  type: typeof AUTH_FORGOT_PASSWORD_SUCCESS;
+}
+interface AuthForgotPasswordFailureAction {
+  type: typeof AUTH_FORGOT_PASSWORD_FAILURE;
+  payload: { error: string };
+}
+
+interface AuthResetPasswordRequestAction {
+  type: typeof AUTH_RESET_PASSWORD_REQUEST;
+}
+interface AuthResetPasswordSuccessAction {
+  type: typeof AUTH_RESET_PASSWORD_SUCCESS;
+}
+interface AuthResetPasswordFailureAction {
+  type: typeof AUTH_RESET_PASSWORD_FAILURE;
+  payload: { error: string };
+}
+
 export type AuthActionTypes =
   | AuthLoginRequestAction
   | AuthLoginSuccessAction
@@ -73,6 +103,12 @@ export type AuthActionTypes =
   | AuthRegisterRequestAction
   | AuthRegisterSuccessAction
   | AuthRegisterFailureAction
+  | AuthForgotPasswordRequestAction
+  | AuthForgotPasswordSuccessAction
+  | AuthForgotPasswordFailureAction
+  | AuthResetPasswordRequestAction
+  | AuthResetPasswordSuccessAction
+  | AuthResetPasswordFailureAction
   | UpdateProfileSuccessAction
   | AddAddressSuccessAction
   | UpdateAddressSuccessAction
