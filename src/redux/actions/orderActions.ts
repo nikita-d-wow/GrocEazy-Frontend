@@ -63,7 +63,7 @@ export const createOrder = (payload: CreateOrderPayload, navigate: any) => {
       const { data } = await api.post<Order>('/api/orders', payload);
       dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
       dispatch(clearCart());
-      navigate(`/orders/${data._id}`);
+      navigate('/orders');
     } catch (error: any) {
       dispatch({
         type: CREATE_ORDER_FAILURE,

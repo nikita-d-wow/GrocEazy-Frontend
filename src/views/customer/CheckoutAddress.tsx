@@ -1,19 +1,23 @@
 import { useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { MapPin, Plus, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
 import type { IAddress } from '../../redux/types/authTypes';
+import { createOrder } from '../../redux/actions/orderActions';
+import type { AppDispatch } from '../../redux/store';
 
 const EMPTY_ADDRESSES: IAddress[] = [];
 
 const CheckoutAddress = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
   const { user } = useSelector((state: RootState) => state.auth);
+  const { items: cartItems } = useSelector((state: RootState) => state.cart);
 
   /* ---------------- SAFE NORMALIZATION ---------------- */
-  // Use a stable empty array to prevent dependency changes on every render
   const addresses: IAddress[] = user?.addresses ?? EMPTY_ADDRESSES;
 
   const defaultAddressId = useMemo(
@@ -31,6 +35,24 @@ const CheckoutAddress = () => {
     return null;
   }
 
+  const handlePlaceOrder = () => {
+    if (!selectedAddress) {
+      return;
+    }
+
+    const payload = {
+      items: cartItems.map((item) => ({
+        productId: item.product._id,
+        quantity: item.quantity,
+        unitPrice: item.product.price,
+      })),
+      address: selectedAddress,
+      paymentMethod: 'cod' as const,
+    };
+
+    dispatch(createOrder(payload, navigate));
+  };
+
   /* ---------------- RENDER ---------------- */
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -38,15 +60,13 @@ const CheckoutAddress = () => {
       <header className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900">Delivery Address</h1>
         <p className="text-gray-500 mt-2 max-w-2xl">
-          Select the address where you want your order delivered. You can manage
-          your saved addresses from your profile.
+          Select the address where you want your order delivered.
         </p>
       </header>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* ================= LEFT: ADDRESS LIST ================= */}
+        {/* ================= LEFT ================= */}
         <section className="lg:col-span-2 space-y-6">
-          {/* ADD ADDRESS CTA */}
           <div className="flex justify-end">
             <button
               onClick={() => navigate('/profile?tab=address')}
@@ -59,25 +79,15 @@ const CheckoutAddress = () => {
             </button>
           </div>
 
-          {/* EMPTY STATE */}
           {addresses.length === 0 && (
             <div className="border border-dashed border-gray-300 rounded-xl p-10 text-center bg-white">
               <MapPin size={36} className="mx-auto text-gray-400 mb-4" />
               <p className="text-gray-600 mb-4">
                 You don’t have any saved addresses yet.
               </p>
-              <button
-                onClick={() => navigate('/profile?tab=address')}
-                className="inline-flex items-center gap-2 px-4 py-2
-                           bg-primary text-white rounded-lg"
-              >
-                <Plus size={16} />
-                Add Address
-              </button>
             </div>
           )}
 
-          {/* ADDRESS CARDS */}
           {addresses.length > 0 && (
             <div className="grid md:grid-cols-2 gap-6">
               {addresses.map((address) => {
@@ -99,27 +109,13 @@ const CheckoutAddress = () => {
                         <p className="text-sm text-gray-800">
                           {address.street}
                         </p>
-
                         <p className="text-sm text-gray-600">
                           {address.city}, {address.state}
                         </p>
-
-                        {address.isDefault && (
-                          <span
-                            className="inline-block mt-2 text-xs
-                                           bg-primary-light text-primary-dark
-                                           px-2.5 py-1 rounded-full"
-                          >
-                            Default Address
-                          </span>
-                        )}
                       </div>
 
                       {isSelected && (
-                        <CheckCircle
-                          size={20}
-                          className="text-primary shrink-0"
-                        />
+                        <CheckCircle size={20} className="text-primary" />
                       )}
                     </div>
                   </div>
@@ -129,7 +125,7 @@ const CheckoutAddress = () => {
           )}
         </section>
 
-        {/* ================= RIGHT: SUMMARY ================= */}
+        {/* ================= RIGHT ================= */}
         <aside className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit">
           <h2 className="text-lg font-bold text-gray-900 mb-4">
             Order Summary
@@ -140,33 +136,15 @@ const CheckoutAddress = () => {
               <span>Payment Method</span>
               <span className="font-medium">Cash on Delivery</span>
             </div>
-
             <div className="flex justify-between">
-              <span>Delivery Type</span>
-              <span className="font-medium">Standard Delivery</span>
+              <span>Total Items</span>
+              <span className="font-medium">{cartItems.length}</span>
             </div>
           </div>
 
-          <div className="mt-6 border-t border-gray-100 pt-4">
-            <p className="text-sm text-gray-600 mb-1">Delivering to</p>
-
-            {selectedAddress ? (
-              <p className="text-sm text-gray-800">
-                {selectedAddress.street}, {selectedAddress.city},{' '}
-                {selectedAddress.state}
-              </p>
-            ) : (
-              <p className="text-sm text-gray-500">No address selected</p>
-            )}
-          </div>
-
           <button
-            disabled={!selectedAddressId}
-            onClick={() =>
-              navigate('/order/place', {
-                state: { addressId: selectedAddressId },
-              })
-            }
+            disabled={!selectedAddressId || cartItems.length === 0}
+            onClick={handlePlaceOrder}
             className="mt-6 w-full bg-primary text-white
                        py-3 rounded-lg font-medium
                        hover:bg-primary-dark transition
