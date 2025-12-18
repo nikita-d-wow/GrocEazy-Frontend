@@ -8,6 +8,8 @@ import type { IAddress } from '../../redux/types/authTypes';
 import { createOrder } from '../../redux/actions/orderActions';
 import type { AppDispatch } from '../../redux/store';
 import toast from 'react-hot-toast';
+import type { Address } from '../../redux/types/orderTypes';
+// import AddressManager from '../../components/customer/profile/AddressManager';
 
 const EMPTY_ADDRESSES: IAddress[] = [];
 
@@ -41,16 +43,19 @@ const CheckoutAddress = () => {
       return;
     }
 
-    // 🔥 REQUIRED: Order schema needs phone
     if (!user.phone || user.phone.trim() === '') {
       alert('Please add your phone number in profile to place an order.');
       navigate('/profile');
       return;
     }
 
-    const address = {
+    if (!user.name) {
+      throw new Error('User name is required to place an order');
+    }
+
+    const address: Address = {
       fullName: user.name,
-      phone: user.phone, // ✅ now guaranteed
+      phone: user.phone,
       line1: selectedAddress.street,
       city: selectedAddress.city,
       state: selectedAddress.state,
@@ -65,12 +70,13 @@ const CheckoutAddress = () => {
             quantity: item.quantity,
             unitPrice: item.product.price,
           })),
-          address,
+          address, // ✅ value, correctly typed
           paymentMethod: 'cod',
         },
         navigate
       )
     );
+
     toast.success('Order placed successfully');
   };
 

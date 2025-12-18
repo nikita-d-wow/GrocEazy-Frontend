@@ -1,5 +1,5 @@
 import type { AppDispatch } from '../store';
-import type { Category, CategoryFormData } from '../../types/Category';
+import type { CategoryFormData } from '../../types/Category';
 import * as categoryApi from '../../services/categoryApi';
 import {
   setCategories,

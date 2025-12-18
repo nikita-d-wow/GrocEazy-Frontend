@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
-import { categoryBgVariants } from '../../utils/colors';
+// import { categoryBgVariants } from '../../utils/colors';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
   addToCart,
@@ -29,7 +29,7 @@ export default function ProductCard({
   image,
   price,
   stock,
-  index = 0,
+  // index = 0,
 }: Props) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

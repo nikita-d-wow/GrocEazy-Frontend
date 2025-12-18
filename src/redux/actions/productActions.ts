@@ -1,5 +1,5 @@
 import type { AppDispatch } from '../store';
-import type { Product, ProductFormData } from '../../types/Product';
+import type { ProductFormData } from '../../types/Product';
 import toast from 'react-hot-toast';
 import * as productApi from '../../services/productApi';
 import {

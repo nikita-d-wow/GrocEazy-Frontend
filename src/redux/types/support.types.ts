@@ -40,15 +40,21 @@ export interface SupportTicket {
   status: TicketStatus;
   createdAt: string;
 
-  user?: IUser; // ✅ NOT userId
-  assignedManager?: IUser; // ✅ NOT assignedManagerId
+  user?: IUser;
+  assignedManager?: IUser;
+}
+
+// ✅ FETCH ALL RESPONSE SHAPE
+export interface SupportFetchAllPayload {
+  tickets: SupportTicket[];
+  managers: IUser[];
 }
 
 export interface SupportState {
   loading: boolean;
   myTickets: SupportTicket[];
-  tickets: SupportTicket[]; // ✅ admin / manager tickets
-  managers: IUser[]; // ✅ admin only
+  tickets: SupportTicket[];
+  managers: IUser[];
   error: string | null;
 }
 
@@ -61,7 +67,10 @@ export type SupportActionTypes =
   | { type: typeof SUPPORT_FETCH_MY_SUCCESS; payload: SupportTicket[] }
   | { type: typeof SUPPORT_FETCH_MY_FAILURE; payload: string }
   | { type: typeof SUPPORT_FETCH_ALL_REQUEST }
-  | { type: typeof SUPPORT_FETCH_ALL_SUCCESS; payload: SupportTicket[] }
+  | {
+      type: typeof SUPPORT_FETCH_ALL_SUCCESS;
+      payload: SupportFetchAllPayload;
+    }
   | { type: typeof SUPPORT_FETCH_ALL_FAILURE; payload: string }
   | { type: typeof SUPPORT_UPDATE_STATUS_REQUEST }
   | { type: typeof SUPPORT_UPDATE_STATUS_SUCCESS; payload: SupportTicket }

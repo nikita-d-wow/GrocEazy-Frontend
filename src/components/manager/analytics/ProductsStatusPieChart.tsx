@@ -35,7 +35,7 @@ export default function ProductStatusPieChart({
                 padding: 18,
                 font: {
                   size: 12,
-                  weight: '600',
+                  weight: 600,
                 },
               },
             },
