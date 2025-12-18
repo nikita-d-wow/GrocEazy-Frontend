@@ -8,7 +8,7 @@ import TicketFooter from './TicketFooter';
 interface Props {
   ticket: SupportTicket;
   updating: boolean;
-  onStatusChange: (status: TicketStatus) => void;
+  onStatusChange: (_status: TicketStatus) => void;
 }
 
 export default function TicketCard({
@@ -20,18 +20,18 @@ export default function TicketCard({
     <div
       className="
         group relative overflow-hidden
-        rounded-2xl border border-white/40
-        bg-white/60 backdrop-blur-xl
-        p-6 shadow-lg
+        rounded-2xl border border-white/50
+        bg-white/70 backdrop-blur-xl
+        p-6 shadow-sm hover:shadow-xl
         transition-all duration-300
-        hover:-translate-y-1 hover:shadow-2xl
+        hover:-translate-y-1
       "
     >
       <div
         className="
           absolute inset-0 opacity-0 group-hover:opacity-100
-          bg-gradient-to-r from-primary/10 to-cyan-200/10
-          transition
+          bg-gradient-to-r from-violet-100/50 via-fuchsia-100/50 to-pink-100/50
+          transition duration-500
         "
       />
 

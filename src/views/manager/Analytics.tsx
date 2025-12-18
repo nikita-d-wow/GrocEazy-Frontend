@@ -45,7 +45,7 @@ export default function Analytics() {
   const analytics = useMemo(() => buildAnalytics(products), [products]);
 
   return (
-    <div className="min-h-screen px-6 lg:px-10 py-10 space-y-12">
+    <div className="min-h-screen px-8 sm:px-12 lg:px-32 py-12 space-y-12">
       {/* HEADER */}
       <div>
         <h1 className="text-3xl font-extrabold text-gray-900">

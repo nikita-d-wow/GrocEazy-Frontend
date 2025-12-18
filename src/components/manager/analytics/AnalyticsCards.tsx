@@ -24,25 +24,25 @@ export default function AnalyticsCards({
         title="Inventory Value"
         value={`₹${analytics.revenue.toLocaleString()}`}
         icon={<IndianRupee />}
-        bg="from-indigo-100 to-indigo-200"
+        bg="from-violet-500 to-purple-600"
       />
       <MetricCard
         title="Active Products"
         value={analytics.activeProducts}
         icon={<CheckCircle2 />}
-        bg="from-sky-100 to-sky-200"
+        bg="from-blue-500 to-cyan-400"
       />
       <MetricCard
         title="Low Stock"
         value={analytics.lowStock}
         icon={<AlertTriangle />}
-        bg="from-amber-100 to-amber-200"
+        bg="from-amber-400 to-orange-500"
       />
       <MetricCard
         title="Out of Stock"
         value={analytics.outOfStock}
         icon={<Package />}
-        bg="from-rose-100 to-rose-200"
+        bg="from-rose-500 to-red-600"
       />
     </div>
   );

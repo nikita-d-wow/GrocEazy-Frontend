@@ -57,23 +57,35 @@ export default function ManagerSupportTickets() {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="flex items-center gap-3 mb-10">
-          <Ticket className="text-primary" />
-          <h1 className="text-3xl font-semibold tracking-tight">
-            My Assigned Tickets
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-fuchsia-50 to-pink-50">
+      <div className="w-[95%] lg:w-[90%] mx-auto py-12">
+        <div className="flex items-center gap-4 mb-12">
+          <div className="p-3 bg-white rounded-2xl shadow-sm text-primary">
+            <Ticket size={28} />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              My Assigned Tickets
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Manage and resolve your customer support requests
+            </p>
+          </div>
         </div>
 
-        <div className="space-y-6">
-          {tickets.map((ticket) => (
-            <TicketCard
+        <div className="grid grid-cols-1 gap-6">
+          {tickets.map((ticket, index) => (
+            <div
               key={ticket._id}
-              ticket={ticket}
-              updating={updatingId === ticket._id}
-              onStatusChange={(status) => updateStatus(ticket._id, status)}
-            />
+              className="animate-slideUp"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <TicketCard
+                ticket={ticket}
+                updating={updatingId === ticket._id}
+                onStatusChange={(status) => updateStatus(ticket._id, status)}
+              />
+            </div>
           ))}
         </div>
       </div>

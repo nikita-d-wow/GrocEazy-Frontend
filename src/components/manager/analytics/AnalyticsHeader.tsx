@@ -14,19 +14,19 @@ export default function AnalyticsHeader() {
         <div className="flex items-center gap-3">
           <div
             className="
-              p-2 rounded-xl
-              bg-indigo-100 text-indigo-600
+              p-3 rounded-2xl shadow-sm
+              bg-white text-indigo-600 border border-indigo-100
             "
           >
-            <BarChart3 size={22} />
+            <BarChart3 size={24} />
           </div>
 
-          <h1 className="text-3xl font-extrabold text-gray-900">
+          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
             Manager Analytics
           </h1>
         </div>
 
-        <p className="text-gray-500 mt-2 max-w-xl">
+        <p className="text-gray-500 mt-3 max-w-xl text-lg leading-relaxed">
           Monitor revenue trends, inventory health, and overall product
           performance in real time.
         </p>

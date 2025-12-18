@@ -10,7 +10,7 @@
 }
 
 @theme {
-  --color-primary: #5ba65f; /* main brand green */
+  --color-primary: #16a34a; /* main brand green */
   --color-primary-dark: #3e8e41; /* hover green */
   --color-primary-light: #e7f5e9; /* soft background */
   --color-accent-yellow: #f8e9a1; /* offers / sale */
@@ -65,5 +65,9 @@
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-lg border border-white/50 shadow-lg rounded-2xl transition duration-300;
   }
 }

@@ -1,155 +1,158 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { MapPin, Phone, User, Home, Loader2 } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useMemo, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { MapPin, Plus, CheckCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
-import type { OrderActionTypes, Address } from '../../redux/types/orderTypes';
+import type { IAddress } from '../../redux/types/authTypes';
 import { createOrder } from '../../redux/actions/orderActions';
-import type { ThunkDispatch } from 'redux-thunk';
+import type { AppDispatch } from '../../redux/store';
+
+const EMPTY_ADDRESSES: IAddress[] = [];
 
 const CheckoutAddress = () => {
-  const dispatch =
-    useDispatch<ThunkDispatch<RootState, any, OrderActionTypes>>();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const location = useLocation();
 
+  const { user } = useSelector((state: RootState) => state.auth);
   const { items: cartItems } = useSelector((state: RootState) => state.cart);
-  const { loading } = useSelector((state: RootState) => state.order);
 
-  const paymentMethod: 'cod' | 'online' =
-    location.state?.paymentMethod || 'cod';
+  /* ---------------- SAFE NORMALIZATION ---------------- */
+  const addresses: IAddress[] = user?.addresses ?? EMPTY_ADDRESSES;
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Address>();
+  const defaultAddressId = useMemo(
+    () => addresses.find((a) => a.isDefault)?._id ?? null,
+    [addresses]
+  );
 
-  const onSubmit = (address: Address) => {
-    dispatch(
-      createOrder(
-        {
-          items: cartItems.map((item) => ({
-            productId: item.product._id,
-            quantity: item.quantity,
-            unitPrice: item.product.price,
-          })),
-          address,
-          paymentMethod,
-        },
-        navigate
-      )
-    );
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    defaultAddressId
+  );
+
+  const selectedAddress = addresses.find((a) => a._id === selectedAddressId);
+
+  if (!user) {
+    return null;
+  }
+
+  const handlePlaceOrder = () => {
+    if (!selectedAddress) {
+      return;
+    }
+
+    const payload = {
+      items: cartItems.map((item) => ({
+        productId: item.product._id,
+        quantity: item.quantity,
+        unitPrice: item.product.price,
+      })),
+      address: selectedAddress,
+      paymentMethod: 'cod' as const,
+    };
+
+    dispatch(createOrder(payload, navigate));
   };
 
+  /* ---------------- RENDER ---------------- */
   return (
-    <div className="min-h-screen p-6 flex items-center justify-center">
-      <div className="max-w-4xl w-full">
-        {/* HEADER */}
-        <div className="flex items-center gap-3 mb-10">
-          <div className="p-3 rounded-2xl bg-primary/90 text-white shadow-xl backdrop-blur">
-            <MapPin />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* PAGE HEADER */}
+      <header className="mb-10">
+        <h1 className="text-3xl font-bold text-gray-900">Delivery Address</h1>
+        <p className="text-gray-500 mt-2 max-w-2xl">
+          Select the address where you want your order delivered.
+        </p>
+      </header>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* ================= LEFT ================= */}
+        <section className="lg:col-span-2 space-y-6">
+          <div className="flex justify-end">
+            <button
+              onClick={() => navigate('/profile?tab=address')}
+              className="inline-flex items-center gap-2 px-4 py-2
+                         bg-primary text-white text-sm font-medium
+                         rounded-lg hover:bg-primary-dark transition"
+            >
+              <Plus size={16} />
+              Add New Address
+            </button>
           </div>
-          <h2 className="text-3xl font-bold text-gray-800">
-            Add Delivery Address
+
+          {addresses.length === 0 && (
+            <div className="border border-dashed border-gray-300 rounded-xl p-10 text-center bg-white">
+              <MapPin size={36} className="mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-600 mb-4">
+                You don’t have any saved addresses yet.
+              </p>
+            </div>
+          )}
+
+          {addresses.length > 0 && (
+            <div className="grid md:grid-cols-2 gap-6">
+              {addresses.map((address) => {
+                const isSelected = selectedAddressId === address._id;
+
+                return (
+                  <div
+                    key={address._id}
+                    onClick={() => setSelectedAddressId(address._id ?? null)}
+                    className={`cursor-pointer rounded-xl border p-5 transition
+                      ${
+                        isSelected
+                          ? 'border-primary bg-primary-light'
+                          : 'border-gray-200 bg-white hover:bg-gray-50'
+                      }`}
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-800">
+                          {address.street}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {address.city}, {address.state}
+                        </p>
+                      </div>
+
+                      {isSelected && (
+                        <CheckCircle size={20} className="text-primary" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* ================= RIGHT ================= */}
+        <aside className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">
+            Order Summary
           </h2>
-        </div>
 
-        {/* GLASS CARD */}
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="backdrop-blur-2xl bg-white/40 rounded-3xl shadow-2xl p-8"
-        >
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* FULL NAME */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                <User size={15} /> Full Name
-              </label>
-              <input
-                {...register('fullName', { required: true })}
-                className="w-full px-4 py-3 rounded-xl bg-white/60 backdrop-blur focus:ring-2 focus:ring-primary/40 outline-none"
-                placeholder="John Doe"
-              />
-              {errors.fullName && (
-                <p className="text-xs text-red-500 mt-1">
-                  Full name is required
-                </p>
-              )}
+          <div className="space-y-3 text-sm text-gray-700">
+            <div className="flex justify-between">
+              <span>Payment Method</span>
+              <span className="font-medium">Cash on Delivery</span>
             </div>
-
-            {/* PHONE */}
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                <Phone size={15} /> Phone Number
-              </label>
-              <input
-                {...register('phone', { required: true })}
-                className="w-full px-4 py-3 rounded-xl bg-white/60 backdrop-blur focus:ring-2 focus:ring-primary/40 outline-none"
-                placeholder="9876543210"
-              />
-              {errors.phone && (
-                <p className="text-xs text-red-500 mt-1">
-                  Phone number is required
-                </p>
-              )}
+            <div className="flex justify-between">
+              <span>Total Items</span>
+              <span className="font-medium">{cartItems.length}</span>
             </div>
-
-            {/* ADDRESS */}
-            <div className="md:col-span-2">
-              <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                <Home size={15} /> Address
-              </label>
-              <input
-                {...register('line1', { required: true })}
-                className="w-full px-4 py-3 rounded-xl bg-white/60 backdrop-blur focus:ring-2 focus:ring-primary/40 outline-none"
-                placeholder="House no, Street, Area"
-              />
-            </div>
-
-            {/* CITY */}
-            <input
-              {...register('city', { required: true })}
-              className="px-4 py-3 rounded-xl bg-white/60 backdrop-blur focus:ring-2 focus:ring-primary/40 outline-none"
-              placeholder="City"
-            />
-
-            {/* STATE */}
-            <input
-              {...register('state', { required: true })}
-              className="px-4 py-3 rounded-xl bg-white/60 backdrop-blur focus:ring-2 focus:ring-primary/40 outline-none"
-              placeholder="State"
-            />
-
-            {/* PIN */}
-            <input
-              {...register('postalCode', { required: true })}
-              className="px-4 py-3 rounded-xl bg-white/60 backdrop-blur focus:ring-2 focus:ring-primary/40 outline-none"
-              placeholder="Postal Code"
-            />
           </div>
 
-          {/* ACTION BUTTONS */}
-          <div className="mt-10 flex flex-col sm:flex-row gap-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 bg-primary text-white py-4 rounded-2xl font-semibold shadow-xl shadow-primary/40 hover:opacity-95 transition flex items-center justify-center gap-3"
-            >
-              {loading && <Loader2 className="animate-spin" />}
-              Add This Address
-            </button>
-
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="flex-1 bg-white/60 backdrop-blur text-gray-700 py-4 rounded-2xl font-medium hover:bg-white/80 transition"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+          <button
+            disabled={!selectedAddressId || cartItems.length === 0}
+            onClick={handlePlaceOrder}
+            className="mt-6 w-full bg-primary text-white
+                       py-3 rounded-lg font-medium
+                       hover:bg-primary-dark transition
+                       disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Place Order
+          </button>
+        </aside>
       </div>
     </div>
   );
