@@ -9,6 +9,7 @@ import PriceRangeSlider from '../common/PriceRangeSlider';
 
 interface FilterState {
   selectedCategory: string | null;
+  searchQuery: string;
   priceRange: [number, number];
   sortBy: string;
 }

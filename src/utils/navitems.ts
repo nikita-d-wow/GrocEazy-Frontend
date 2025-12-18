@@ -12,7 +12,6 @@ export const adminNav = [
 
 export const managerNav = [
   { label: 'Dashboard', path: '/manager' },
-  { label: 'Analytics', path: '/manager/analytics' },
   { label: 'Inventory', path: '/manager/inventory' },
   { label: 'Products', path: '/manager/products' },
   { label: 'Categories', path: '/manager/categories' },

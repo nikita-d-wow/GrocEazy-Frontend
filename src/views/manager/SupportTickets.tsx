@@ -58,7 +58,7 @@ export default function ManagerSupportTickets() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-violet-50 via-fuchsia-50 to-pink-50">
-      <div className="w-[95%] lg:w-[90%] mx-auto py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center gap-4 mb-12">
           <div className="p-3 bg-white rounded-2xl shadow-sm text-primary">
             <Ticket size={28} />

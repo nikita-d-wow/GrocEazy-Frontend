@@ -9,16 +9,19 @@ import { fetchWishlist } from '../../../redux/actions/wishlistActions';
 import type { Product } from '../../../types/Product';
 import MobileCategorySidebar from '../../../components/products/MobileCategorySidebar';
 import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
+import { useLocation } from 'react-router-dom';
+import type { RootState } from '../../../redux/store';
 
 const ProductsPage: FC = () => {
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const { products, loading, error } = useSelector(
-    (state: any) => state.product
+    (state: RootState) => state.product
   );
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [filters, setFilters] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const categoryParam = params.get('category');
     const searchParam = params.get('search');
     return {
@@ -34,24 +37,67 @@ const ProductsPage: FC = () => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Update URL when category filter changes
+  // Sync state with URL changes (for search/category from Header/Global nav)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (filters.selectedCategory) {
-      params.set('category', filters.selectedCategory);
-    } else {
-      params.delete('category');
+    const params = new URLSearchParams(location.search);
+    const categoryParam = params.get('category') || null;
+    const searchParam = params.get('search') || '';
+
+    // Only update if state is actually different to avoid cascading renders
+    if (
+      filters.selectedCategory !== categoryParam ||
+      filters.searchQuery !== searchParam
+    ) {
+      // Use setTimeout to move the state update out of the effect's synchronous execution
+      // to avoid react-hooks/set-state-in-effect warnings and cascading renders
+      const timer = setTimeout(() => {
+        setFilters((prev) => ({
+          ...prev,
+          selectedCategory: categoryParam,
+          searchQuery: searchParam,
+        }));
+        setDisplayCount(20);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [location.search, filters.selectedCategory, filters.searchQuery]);
+
+  // Update URL when filters change internally (e.g. Price, Sort)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    // Only update URL if state is actually different from current URL
+    // to avoid infinite loops since we also have a listener above
+    let changed = false;
+
+    if (filters.selectedCategory !== (params.get('category') || null)) {
+      if (filters.selectedCategory) {
+        params.set('category', filters.selectedCategory);
+      } else {
+        params.delete('category');
+      }
+      changed = true;
     }
 
-    if (filters.searchQuery) {
-      params.set('search', filters.searchQuery);
-    } else {
-      params.delete('search');
+    if (filters.searchQuery !== (params.get('search') || '')) {
+      if (filters.searchQuery) {
+        params.set('search', filters.searchQuery);
+      } else {
+        params.delete('search');
+      }
+      changed = true;
     }
 
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState(null, '', newUrl);
-  }, [filters.selectedCategory, filters.searchQuery]);
+    if (changed) {
+      const newUrl = `${location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [
+    filters.selectedCategory,
+    filters.searchQuery,
+    location.pathname,
+    location.search,
+  ]);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -62,6 +108,8 @@ const ProductsPage: FC = () => {
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
+    const observerTarget = loadMoreRef.current;
+
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isLoadingMore && !loading) {
@@ -76,19 +124,19 @@ const ProductsPage: FC = () => {
       { threshold: 0.1, rootMargin: '100px' }
     );
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+    if (observerTarget) {
+      observer.observe(observerTarget);
     }
 
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
+      if (observerTarget) {
+        observer.unobserve(observerTarget);
       }
     };
   }, [isLoadingMore, loading]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result = products.filter((p: Product) => p.isActive !== false);
 
     // Filter by Category
     if (filters.selectedCategory) {
@@ -105,11 +153,11 @@ const ProductsPage: FC = () => {
     // Filter by Search Query
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase();
-      result = result.filter(
-        (p: Product) =>
-          p.name.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query)
-      );
+      result = result.filter((p: Product) => {
+        const nameMatch = p.name.toLowerCase().includes(query);
+        const descMatch = p.description?.toLowerCase().includes(query);
+        return nameMatch || descMatch;
+      });
     }
 
     // Filter by Price
@@ -120,17 +168,17 @@ const ProductsPage: FC = () => {
 
     // Sort
     if (filters.sortBy === 'price_asc') {
-      result.sort((a, b) => a.price - b.price);
+      result.sort((a: Product, b: Product) => a.price - b.price);
     } else if (filters.sortBy === 'price_desc') {
-      result.sort((a, b) => b.price - a.price);
+      result.sort((a: Product, b: Product) => b.price - a.price);
     } else if (filters.sortBy === 'newest') {
       result.reverse();
     } else if (filters.sortBy === 'deals') {
       // Sort by featured for now (can be enhanced with discount field later)
-      result.sort((a, b) => (a.price < b.price ? -1 : 1));
+      result.sort((a: Product, b: Product) => (a.price < b.price ? -1 : 1));
     } else if (filters.sortBy === 'rating') {
       // Sort by rating when available (placeholder for now)
-      result.sort((a, b) => (b.price > a.price ? -1 : 1));
+      result.sort((a: Product, b: Product) => (b.price > a.price ? -1 : 1));
     }
     // 'featured' is default/original order
 
@@ -142,7 +190,12 @@ const ProductsPage: FC = () => {
   const hasMore = displayCount < filteredProducts.length;
 
   // Wrapper to reset display count when filters change
-  const handleSetFilters = (newFilters: any) => {
+  const handleSetFilters = (newFilters: {
+    selectedCategory: string | null;
+    searchQuery: string;
+    priceRange: [number, number];
+    sortBy: string;
+  }) => {
     setFilters(newFilters);
     setDisplayCount(20);
   };
@@ -171,7 +224,7 @@ const ProductsPage: FC = () => {
 
       <div className="flex flex-col lg:flex-row gap-8 relative items-start">
         {/* Mobile Category Sidebar (Horizontal Scroll) */}
-        <div className="lg:hidden w-full overflow-x-auto pb-4 -mt-4 bg-white sticky top-16 z-30 border-b border-gray-100 no-scrollbar">
+        <div className="lg:hidden w-full overflow-x-auto pb-4 bg-white sticky top-[72px] z-30 border-b border-gray-100 no-scrollbar">
           <MobileCategorySidebar
             selectedCategory={filters.selectedCategory}
             onSelectCategory={(id) =>
@@ -205,11 +258,13 @@ const ProductsPage: FC = () => {
                 <h2 className="text-lg font-bold">
                   {filters.selectedCategory
                     ? (
-                        products.find(
-                          (p: Product) =>
-                            (p.categoryId as any)._id ===
-                            filters.selectedCategory
-                        )?.categoryId as any
+                        products.find((p: Product) => {
+                          const catId =
+                            typeof p.categoryId === 'object'
+                              ? (p.categoryId as any)._id
+                              : p.categoryId;
+                          return String(catId) === filters.selectedCategory;
+                        })?.categoryId as any
                       )?.name
                     : 'All Products'}
                 </h2>
@@ -222,12 +277,12 @@ const ProductsPage: FC = () => {
 
               {/* Infinite Scroll Trigger & Loading Indicator */}
               {hasMore && (
-                <div ref={loadMoreRef} className="py-8 text-center">
+                <div ref={loadMoreRef} className="py-12 text-center">
                   {isLoadingMore && (
-                    <div className="flex justify-center items-center gap-3">
-                      <div className="w-6 h-6 border-3 border-green-600 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-gray-600 font-medium">
-                        Loading more products...
+                    <div className="flex flex-col justify-center items-center gap-2">
+                      <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
+                      <span className="text-gray-500 font-medium text-sm">
+                        Discovering more products...
                       </span>
                     </div>
                   )}

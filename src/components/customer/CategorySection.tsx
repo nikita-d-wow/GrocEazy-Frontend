@@ -16,7 +16,7 @@ export default function CategoriesSection() {
 
   // Filter out deleted categories
   const visibleCategories = categories
-    .filter((cat) => !cat.isDeleted)
+    .filter((cat) => !cat.isDeleted && cat.isActive !== false)
     .slice(0, 8); // Show max 8 categories
 
   return (
@@ -33,7 +33,7 @@ export default function CategoriesSection() {
           <p className="text-gray-500">Loading categories...</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-6">
           {visibleCategories.map((cat, index) => {
             const bgClass =
               categoryBgVariants[index % categoryBgVariants.length];

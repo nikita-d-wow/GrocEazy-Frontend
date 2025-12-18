@@ -24,7 +24,9 @@ export default function ProductsSection() {
   }, [dispatch]);
 
   // Show only first 8 products
-  const displayProducts = products.slice(0, 8);
+  const displayProducts = products
+    .filter((p: any) => p.isActive !== false)
+    .slice(0, 8);
 
   // Initial loading state (only if no products)
   if (loading && products.length === 0) {
@@ -60,7 +62,7 @@ export default function ProductsSection() {
           icon={<PackageX className="w-12 h-12 text-gray-400" />}
         />
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
           {displayProducts.map((product, index) => (
             <ProductCard
               key={product._id}

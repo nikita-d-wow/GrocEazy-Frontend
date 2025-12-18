@@ -1,5 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import type { RootState } from '../../redux/store';
+import type { CartItem } from '../../redux/types/cartTypes';
 import React from 'react';
+import { motion } from 'framer-motion';
 // import { categoryBgVariants } from '../../utils/colors';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
@@ -14,7 +17,6 @@ import {
 import { selectWishlistItems } from '../../redux/selectors/wishlistSelectors';
 import { useSelector } from 'react-redux';
 import { Plus, Minus, Heart } from 'lucide-react';
-import type { RootState } from '../../redux/rootReducer';
 import toast from 'react-hot-toast';
 
 import type { CustomerProductCardProps } from '../../types/Product';
@@ -29,7 +31,7 @@ export default function ProductCard({
   image,
   price,
   stock,
-  // index = 0,
+  index = 0,
 }: Props) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -38,7 +40,8 @@ export default function ProductCard({
   const { user } = useSelector((state: RootState) => state.auth);
 
   const cartItem = items.find(
-    (item: any) => item.product?._id === _id || item.product === _id
+    (item: CartItem) =>
+      item.product?._id === _id || (item.product as any) === _id
   );
   const quantity = cartItem ? cartItem.quantity : 0;
 
@@ -57,12 +60,16 @@ export default function ProductCard({
       toast.success('Removed from wishlist');
     } else {
       await dispatch(addToWishlist(_id));
-      toast.success('Added to wishlist');
+      toast.success('Added from wishlist');
     }
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.03, duration: 0.3 }}
+      whileHover={{ y: -5 }}
       onClick={() => navigate(`/products/${_id}`)}
       className="bg-white rounded-2xl p-4 shadow-md hover:shadow-xl transition-all cursor-pointer group h-full flex flex-col"
     >
@@ -105,11 +112,18 @@ export default function ProductCard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                dispatch(addToCart(_id, 1));
+                if (stock > 0) {
+                  dispatch(addToCart(_id, 1));
+                }
               }}
-              className="px-6 py-1.5 rounded-lg border border-green-600 text-green-600 font-bold text-sm hover:bg-green-50 uppercase transition-colors"
+              disabled={stock === 0}
+              className={`px-6 py-1.5 rounded-lg border font-bold text-sm uppercase transition-colors ${
+                stock === 0
+                  ? 'border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50'
+                  : 'border-green-600 text-green-600 hover:bg-green-50'
+              }`}
             >
-              ADD
+              {stock === 0 ? 'SOLD OUT' : 'ADD'}
             </button>
           ) : (
             <div
@@ -135,9 +149,18 @@ export default function ProductCard({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  dispatch(updateCartQty(cartItem!._id, quantity + 1));
+                  if (stock !== undefined && cartItem && quantity < stock) {
+                    dispatch(updateCartQty(cartItem._id, quantity + 1));
+                  } else if (stock !== undefined && quantity >= stock) {
+                    toast.error('Maximum available stock reached');
+                  }
                 }}
-                className="w-6 h-6 flex items-center justify-center bg-green-700 rounded text-white shadow-sm hover:bg-green-800"
+                disabled={stock !== undefined && quantity >= stock}
+                className={`w-6 h-6 flex items-center justify-center rounded text-white shadow-sm transition-colors ${
+                  stock !== undefined && quantity >= stock
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-green-700 hover:bg-green-800'
+                }`}
               >
                 <Plus size={14} strokeWidth={3} />
               </button>
@@ -145,6 +168,6 @@ export default function ProductCard({
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
