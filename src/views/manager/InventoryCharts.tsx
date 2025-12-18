@@ -13,8 +13,8 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import type { Product } from '../../redux/types/productTypes';
-import type { Category } from '../../redux/types/categoryTypes';
+import type { Product } from '../../types/Product';
+import type { Category } from '../../types/Category';
 
 interface InventoryChartsProps {
   products: Product[];
