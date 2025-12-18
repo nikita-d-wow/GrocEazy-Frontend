@@ -56,17 +56,20 @@ export default function Header() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
           {/* Search */}
-          <div className="relative group">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
-              placeholder="Search available products..."
-              className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
-            />
-            <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
-          </div>
+          {/* Search */}
+          {!['admin', 'manager'].includes(role) && (
+            <div className="relative group">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                placeholder="Search available products..."
+                className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
+              />
+              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
+            </div>
+          )}
 
           {/* Wishlist & Cart (CUSTOMER ONLY) */}
           {isCustomer && (
@@ -131,14 +134,16 @@ export default function Header() {
       {/* Mobile Dropdown */}
       {open && (
         <div className="md:hidden px-4 pt-2 pb-6 bg-white border-t border-gray-100 shadow-xl space-y-4 animate-slideDown">
-          <div className="relative mt-2">
-            <input
-              type="text"
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-100"
-            />
-            <Search className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
-          </div>
+          {!['admin', 'manager'].includes(role) && (
+            <div className="relative mt-2">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-100"
+              />
+              <Search className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
+            </div>
+          )}
 
           <div className="flex flex-col gap-2">
             {navItems.map((item) => (

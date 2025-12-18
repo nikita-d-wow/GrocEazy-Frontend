@@ -62,8 +62,12 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
             >
               <span className="text-gray-600">
                 Product ·{' '}
-                <span className="text-gray-400">{item.productId}</span> ×{' '}
-                {item.quantity}
+                <span className="text-gray-400">
+                  {typeof item.productId === 'object'
+                    ? item.productId.name
+                    : item.productId}
+                </span>{' '}
+                × {item.quantity}
               </span>
               <span className="text-base font-semibold text-gray-800">
                 ₹{item.lineTotal}
