@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,11 +24,25 @@ const ResetPassword: React.FC = () => {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const { token: paramToken } = useParams();
+
+  // Support both query param (?token=...) and path param (/token)
+  const token = searchParams.get('token') || paramToken;
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Debugging
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('ResetPassword Debug:', {
+      url: window.location.href,
+      queryToken: searchParams.get('token'),
+      paramToken,
+      resolvedToken: token,
+    });
+  }, [searchParams, paramToken, token]);
 
   const {
     register,
@@ -40,6 +54,7 @@ const ResetPassword: React.FC = () => {
 
   useEffect(() => {
     if (!token) {
+      // Small delay to allow debugging before redirect (optional, currently instant)
       toast.error('Invalid or missing reset token');
       navigate('/login');
     }
