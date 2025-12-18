@@ -24,7 +24,7 @@ const initialState: SupportState = {
   loading: false,
   myTickets: [],
   tickets: [],
-  managers: [], // ✅ NEW
+  managers: [],
   error: null,
 };
 
