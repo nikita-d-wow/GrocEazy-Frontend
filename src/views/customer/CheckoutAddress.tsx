@@ -7,6 +7,7 @@ import type { RootState } from '../../redux/rootReducer';
 import type { IAddress } from '../../redux/types/authTypes';
 import { createOrder } from '../../redux/actions/orderActions';
 import type { AppDispatch } from '../../redux/store';
+import toast from 'react-hot-toast';
 
 const EMPTY_ADDRESSES: IAddress[] = [];
 
@@ -36,21 +37,41 @@ const CheckoutAddress = () => {
   }
 
   const handlePlaceOrder = () => {
-    if (!selectedAddress) {
+    if (!selectedAddress || !user) {
       return;
     }
 
-    const payload = {
-      items: cartItems.map((item) => ({
-        productId: item.product._id,
-        quantity: item.quantity,
-        unitPrice: item.product.price,
-      })),
-      address: selectedAddress,
-      paymentMethod: 'cod' as const,
+    // 🔥 REQUIRED: Order schema needs phone
+    if (!user.phone || user.phone.trim() === '') {
+      alert('Please add your phone number in profile to place an order.');
+      navigate('/profile');
+      return;
+    }
+
+    const address = {
+      fullName: user.name,
+      phone: user.phone, // ✅ now guaranteed
+      line1: selectedAddress.street,
+      city: selectedAddress.city,
+      state: selectedAddress.state,
+      postalCode: selectedAddress.zipCode,
     };
 
-    dispatch(createOrder(payload, navigate));
+    dispatch(
+      createOrder(
+        {
+          items: cartItems.map((item) => ({
+            productId: item.product._id,
+            quantity: item.quantity,
+            unitPrice: item.product.price,
+          })),
+          address,
+          paymentMethod: 'cod',
+        },
+        navigate
+      )
+    );
+    toast.success('Order placed successfully');
   };
 
   /* ---------------- RENDER ---------------- */

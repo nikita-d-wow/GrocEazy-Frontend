@@ -59,8 +59,16 @@ export const getOrderDetails = (id: string) => {
 export const createOrder = (payload: CreateOrderPayload, navigate: any) => {
   return async (dispatch: Dispatch<any>) => {
     dispatch({ type: CREATE_ORDER_REQUEST });
+
     try {
-      const { data } = await api.post<Order>('/api/orders', payload);
+      const token = localStorage.getItem('accessToken');
+
+      const { data } = await api.post<Order>('/api/orders', payload, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+      });
+
       dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
       dispatch(clearCart());
       navigate('/orders');
