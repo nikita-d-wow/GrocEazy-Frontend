@@ -4,7 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { login } from '../../redux/actions/authActions';
+import { login, logout } from '../../redux/actions/authActions';
+import toast from 'react-hot-toast';
 import type { RootState } from '../../redux/rootReducer';
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
@@ -19,7 +20,9 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 const Login: React.FC = () => {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
-  const { loading, error, accessToken, user } = useSelector((state: RootState) => state.auth);
+  const { loading, error, accessToken, user } = useSelector(
+    (state: RootState) => state.auth
+  );
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -36,7 +39,18 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     if (accessToken && user) {
-      if (user.role === 'admin') {
+      // Check for deactivated account
+      if (user.isActive === false) {
+        toast.error(
+          'Account deactivated. Contact support if you believe this is an error.'
+        );
+        dispatch(logout()); // Immediately clear state
+        return;
+      }
+
+      if (user.hasPassword === false) {
+        navigate('/set-password');
+      } else if (user.role === 'admin') {
         navigate('/admin');
       } else if (user.role === 'manager') {
         navigate('/manager');
@@ -62,22 +76,30 @@ const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
             <input
               {...register('email')}
               type="email"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
               placeholder="you@example.com"
             />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.email.message}
+              </p>
+            )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
             <div className="relative">
               <input
                 {...register('password')}
-                type={showPassword ? "text" : "password"}
+                type={showPassword ? 'text' : 'password'}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all"
                 placeholder="Enter your password"
               />
@@ -89,7 +111,19 @@ const Login: React.FC = () => {
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.password.message}
+              </p>
+            )}
+            <div className="flex justify-end mt-1">
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-green-600 hover:text-green-500"
+              >
+                Forgot Password?
+              </Link>
+            </div>
           </div>
 
           <button
@@ -111,7 +145,10 @@ const Login: React.FC = () => {
 
         <p className="text-center mt-8 text-sm text-gray-600">
           Don't have an account?{' '}
-          <Link to="/register" className="font-semibold text-green-600 hover:text-green-700">
+          <Link
+            to="/register"
+            className="font-semibold text-green-600 hover:text-green-700"
+          >
             Create account
           </Link>
         </p>

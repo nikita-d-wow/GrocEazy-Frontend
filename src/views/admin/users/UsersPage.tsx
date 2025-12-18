@@ -203,11 +203,27 @@ export default function UsersPage() {
                     </td>
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                       <button
+                        disabled={user.role === 'admin'}
                         onClick={() =>
                           handleStatusToggle(user._id, user.isActive)
                         }
-                        className={`p-2 rounded-full transition-colors ${user.isActive ? 'hover:bg-red-50 text-red-600' : 'hover:bg-green-50 text-green-600'}`}
-                        title={user.isActive ? 'Deactivate' : 'Activate'}
+                        className={`
+                          p-2 rounded-full transition-colors 
+                          ${
+                            user.role === 'admin'
+                              ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'
+                              : user.isActive
+                                ? 'hover:bg-red-50 text-red-600'
+                                : 'hover:bg-green-50 text-green-600'
+                          }
+                        `}
+                        title={
+                          user.role === 'admin'
+                            ? 'Cannot deactivate admin'
+                            : user.isActive
+                              ? 'Deactivate'
+                              : 'Activate'
+                        }
                       >
                         {user.isActive ? (
                           <UserX size={18} />

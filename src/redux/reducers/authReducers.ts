@@ -25,7 +25,7 @@ const initialState: AuthState = {
 
 export function authReducer(
   state = initialState,
-  action: AuthActionTypes,
+  action: AuthActionTypes
 ): AuthState {
   switch (action.type) {
     case AUTH_LOGIN_REQUEST:
@@ -35,7 +35,7 @@ export function authReducer(
         ...state,
         loading: false,
         accessToken: action.payload.accessToken,
-        user: action.payload.user,
+        user: { ...state.user, ...action.payload.user }, // Merge to keep existing fields if any, though usually login replaces all
         error: null,
       };
     case AUTH_LOGIN_FAILURE:
@@ -59,7 +59,9 @@ export function authReducer(
       const currentAddresses = state.user?.addresses || [];
       const newAddress = action.payload;
       // Prevent duplicates if address with same ID already exists
-      const exists = currentAddresses.some((addr) => addr._id === newAddress._id);
+      const exists = currentAddresses.some(
+        (addr) => addr._id === newAddress._id
+      );
 
       if (exists) {
         // Or update it? Usually ADD implies new. If exists, ignore or update.
@@ -68,10 +70,12 @@ export function authReducer(
           ...state,
           user: state.user
             ? {
-              ...state.user,
-              addresses: currentAddresses.map(addr => addr._id === newAddress._id ? newAddress : addr)
-            }
-            : null
+                ...state.user,
+                addresses: currentAddresses.map((addr) =>
+                  addr._id === newAddress._id ? newAddress : addr
+                ),
+              }
+            : null,
         };
       }
 
@@ -79,9 +83,9 @@ export function authReducer(
         ...state,
         user: state.user
           ? {
-            ...state.user,
-            addresses: [...currentAddresses, newAddress],
-          }
+              ...state.user,
+              addresses: [...currentAddresses, newAddress],
+            }
           : null,
       };
     }
@@ -90,18 +94,18 @@ export function authReducer(
         ...state,
         user: state.user
           ? {
-            ...state.user,
-            addresses: (state.user.addresses || []).map((addr) => {
-              if (addr._id === action.payload._id) {
-                return action.payload;
-              }
-              // If the updated address is set to default, ensure others are not
-              if (action.payload.isDefault) {
-                return { ...addr, isDefault: false };
-              }
-              return addr;
-            }),
-          }
+              ...state.user,
+              addresses: (state.user.addresses || []).map((addr) => {
+                if (addr._id === action.payload._id) {
+                  return action.payload;
+                }
+                // If the updated address is set to default, ensure others are not
+                if (action.payload.isDefault) {
+                  return { ...addr, isDefault: false };
+                }
+                return addr;
+              }),
+            }
           : null,
       };
     case 'DELETE_ADDRESS_SUCCESS':
@@ -109,11 +113,11 @@ export function authReducer(
         ...state,
         user: state.user
           ? {
-            ...state.user,
-            addresses: (state.user.addresses || []).filter(
-              (addr) => addr._id !== action.payload.addressId
-            ),
-          }
+              ...state.user,
+              addresses: (state.user.addresses || []).filter(
+                (addr) => addr._id !== action.payload.addressId
+              ),
+            }
           : null,
       };
     default:
