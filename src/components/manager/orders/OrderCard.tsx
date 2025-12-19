@@ -6,6 +6,9 @@ interface Props {
 }
 
 const OrderCard = ({ order, onStatusChange }: Props) => {
+  const customerName = order.userId?.name ?? 'Guest User';
+  const customerEmail = order.userId?.email ?? '—';
+
   return (
     <div className="rounded-[32px] bg-white/60 backdrop-blur-xl shadow-[0_25px_60px_rgba(0,0,0,0.08)] hover:shadow-[0_35px_80px_rgba(0,0,0,0.12)] transition-all">
       <div className="px-12 py-10 space-y-10">
@@ -13,9 +16,9 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-10">
           <div>
             <p className="text-lg font-semibold text-gray-900">
-              {order.userId.name}
+              {customerName}
             </p>
-            <p className="text-sm text-gray-500">{order.userId.email}</p>
+            <p className="text-sm text-gray-500">{customerEmail}</p>
             <p className="text-sm text-gray-400">
               {order.address.city}, {order.address.state} ·{' '}
               {order.address.phone}
@@ -63,9 +66,7 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
               <span className="text-gray-600">
                 Product ·{' '}
                 <span className="text-gray-400">
-                  {typeof item.productId === 'object'
-                    ? item.productId.name
-                    : item.productId}
+                  {item.productId?.name ?? 'Unknown Product'}
                 </span>{' '}
                 × {item.quantity}
               </span>

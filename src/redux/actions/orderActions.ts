@@ -16,6 +16,7 @@ import {
   type Order,
   type Address,
 } from '../types/orderTypes';
+
 import api from '../../services/api';
 import { clearCart } from './cartActions';
 
@@ -25,12 +26,21 @@ interface CreateOrderPayload {
   paymentMethod: 'cod' | 'online';
 }
 
+/* ================= USER ORDERS ================= */
+
 export const getMyOrders = () => {
   return async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
     try {
-      const { data } = await api.get<Order[]>('/api/orders');
-      dispatch({ type: FETCH_ORDERS_SUCCESS, payload: data });
+      const { data } = await api.get('/api/orders');
+
+      dispatch({
+        type: FETCH_ORDERS_SUCCESS,
+        payload: {
+          orders: data.orders ?? data,
+          pagination: data.pagination ?? null,
+        },
+      });
     } catch (error: any) {
       dispatch({
         type: FETCH_ORDERS_FAILURE,
@@ -96,7 +106,7 @@ export const cancelOrder = (id: string) => {
   };
 };
 
-/* ================= MANAGER ACTIONS ================= */
+/* ================= MANAGER ORDERS ================= */
 
 export const getAllOrders = (page = 1, limit = 5) => {
   return async (dispatch: Dispatch<OrderActionTypes>) => {
@@ -105,9 +115,13 @@ export const getAllOrders = (page = 1, limit = 5) => {
       const { data } = await api.get(
         `/api/orders/all?page=${page}&limit=${limit}`
       );
+
       dispatch({
         type: FETCH_ORDERS_SUCCESS,
-        payload: data.orders,
+        payload: {
+          orders: data.orders,
+          pagination: data.pagination,
+        },
       });
     } catch (error: any) {
       dispatch({

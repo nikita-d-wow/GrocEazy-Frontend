@@ -1,6 +1,4 @@
 import {
-  type OrderState,
-  type OrderActionTypes,
   FETCH_ORDERS_REQUEST,
   FETCH_ORDERS_SUCCESS,
   FETCH_ORDERS_FAILURE,
@@ -13,11 +11,14 @@ import {
   CANCEL_ORDER_REQUEST,
   CANCEL_ORDER_SUCCESS,
   CANCEL_ORDER_FAILURE,
+  type OrderState,
+  type OrderActionTypes,
 } from '../types/orderTypes';
 
 const initialState: OrderState = {
   orders: [],
   currentOrder: null,
+  pagination: null,
   loading: false,
   error: null,
 };
@@ -27,15 +28,22 @@ export const orderReducer = (
   action: OrderActionTypes
 ): OrderState => {
   switch (action.type) {
+    // ================= FETCH ORDERS =================
     case FETCH_ORDERS_REQUEST:
       return { ...state, loading: true, error: null };
 
     case FETCH_ORDERS_SUCCESS:
-      return { ...state, loading: false, orders: action.payload };
+      return {
+        ...state,
+        loading: false,
+        orders: action.payload.orders,
+        pagination: action.payload.pagination,
+      };
 
     case FETCH_ORDERS_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
+    // ================= FETCH ORDER DETAILS =================
     case FETCH_ORDER_DETAILS_REQUEST:
       return { ...state, loading: true, error: null };
 
@@ -52,6 +60,7 @@ export const orderReducer = (
     case FETCH_ORDER_DETAILS_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
+    // ================= CREATE ORDER =================
     case CREATE_ORDER_REQUEST:
       return { ...state, loading: true, error: null };
 
@@ -66,6 +75,7 @@ export const orderReducer = (
     case CREATE_ORDER_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
+    // ================= CANCEL ORDER =================
     case CANCEL_ORDER_REQUEST:
       return { ...state, loading: true, error: null };
 
