@@ -5,7 +5,6 @@ import {
   ChevronLeft,
   MapPin,
   Package,
-  CreditCard,
   Calendar,
   AlertTriangle,
   CheckCircle2,
@@ -234,22 +233,6 @@ export default function OrderDetails() {
                 Phone: {currentOrder.address?.phone || 'N/A'}
               </p>
             </address>
-
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-600 flex items-center gap-2">
-                <CreditCard size={16} />
-                Payment:
-                {currentOrder.paymentMethod ? (
-                  <span className="font-medium capitalize">
-                    {currentOrder.paymentMethod}
-                  </span>
-                ) : (
-                  <span className="font-medium capitalize">
-                    {currentOrder.paymentStatus || 'N/A'}
-                  </span>
-                )}
-              </p>
-            </div>
           </div>
 
           {/* ACTION ACTIONS */}
