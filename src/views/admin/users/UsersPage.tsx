@@ -36,7 +36,7 @@ export default function UsersPage() {
 
   const handleStatusToggle = (userId: string, currentStatus: boolean) => {
     if (
-      confirm(
+      window.confirm(
         `Are you sure you want to ${currentStatus ? 'deactivate' : 'activate'} this user?`
       )
     ) {
@@ -109,19 +109,19 @@ export default function UsersPage() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 md:px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   User
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="hidden md:table-cell px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Role
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="px-4 md:px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <th className="hidden md:table-cell px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Joined
                 </th>
-                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                <th className="px-4 md:px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
                   Actions
                 </th>
               </tr>
@@ -167,53 +167,67 @@ export default function UsersPage() {
                     key={user._id}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+                        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold flex-shrink-0">
                           {user.name?.charAt(0) ||
                             user.email.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">
                             {user.name || 'Unknown'}
                           </p>
-                          <p className="text-xs text-gray-500">{user.email}</p>
+                          <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-none">{user.email}</p>
+                          {/* Mobile Only Role Badge */}
+                          <div className="md:hidden mt-1">
+                            <span className={`
+                                text-[10px] px-2 py-0.5 rounded-full font-medium border
+                                ${user.role === 'admin'
+                                ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                : user.role === 'manager'
+                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                  : 'bg-green-50 text-green-700 border-green-200'
+                              }
+                            `}>
+                              {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden md:table-cell px-6 py-4">
                       <span
                         className={`
                                       px-2.5 py-1 rounded-full text-xs font-semibold border
-                                      ${
-                                        user.role === 'admin'
-                                          ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                          : user.role === 'manager'
-                                            ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                            : 'bg-green-50 text-green-700 border-green-200'
-                                      }
+                                      ${user.role === 'admin'
+                            ? 'bg-purple-50 text-purple-700 border-purple-200'
+                            : user.role === 'manager'
+                              ? 'bg-blue-50 text-blue-700 border-blue-200'
+                              : 'bg-green-50 text-green-700 border-green-200'
+                          }
                                   `}
                       >
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-4 md:px-6 py-4">
                       {user.isActive ? (
                         <span className="flex items-center gap-1.5 text-green-600 text-sm font-medium">
                           <span className="w-2 h-2 rounded-full bg-green-500"></span>{' '}
-                          Active
+                          <span className="hidden sm:inline">Active</span>
                         </span>
                       ) : (
                         <span className="flex items-center gap-1.5 text-red-600 text-sm font-medium">
                           <span className="w-2 h-2 rounded-full bg-red-500"></span>{' '}
-                          Inactive
+                          <span className="hidden sm:inline">Inactive</span>
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="hidden md:table-cell px-6 py-4 text-sm text-gray-500">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
+                    <td className="px-4 md:px-6 py-4 text-right flex items-center justify-end gap-2">
+                      {/* Actions Buttons */}
                       <button
                         disabled={user.role === 'admin'}
                         onClick={() =>
@@ -221,12 +235,11 @@ export default function UsersPage() {
                         }
                         className={`
                           p-2 rounded-full transition-colors 
-                          ${
-                            user.role === 'admin'
-                              ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'
-                              : user.isActive
-                                ? 'hover:bg-red-50 text-red-600'
-                                : 'hover:bg-green-50 text-green-600'
+                          ${user.role === 'admin'
+                            ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'
+                            : user.isActive
+                              ? 'hover:bg-red-50 text-red-600'
+                              : 'hover:bg-green-50 text-green-600'
                           }
                         `}
                         title={

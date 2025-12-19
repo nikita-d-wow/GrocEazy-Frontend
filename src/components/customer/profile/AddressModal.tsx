@@ -24,6 +24,8 @@ export default function AddressModal({
         isDefault: false,
     });
 
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
     useEffect(() => {
         if (initialData) {
             setFormData({
@@ -46,6 +48,8 @@ export default function AddressModal({
                 isDefault: false,
             });
         }
+        setErrors({});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData, isOpen]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,12 +58,44 @@ export default function AddressModal({
             ...prev,
             [name]: type === 'checkbox' ? checked : value,
         }));
+        // Clear error when user types
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+    };
+
+    const validateForm = () => {
+        const newErrors: { [key: string]: string } = {};
+
+        if (!formData.street || formData.street.length < 5) {
+            newErrors.street = 'Street address must be at least 5 characters';
+        }
+        if (!formData.city || formData.city.length < 2) {
+            newErrors.city = 'City must be at least 2 characters';
+        }
+        if (!formData.state || formData.state.length < 2) {
+            newErrors.state = 'State must be at least 2 characters';
+        }
+        if (!formData.country || formData.country.length < 2) {
+            newErrors.country = 'Country must be at least 2 characters';
+        }
+        // Basic Zip Code validation (5 digits minimum)
+        const zipRegex = /^\d{5}(-\d{4})?$/;
+
+        if (!formData.zipCode || !zipRegex.test(formData.zipCode)) {
+            newErrors.zipCode = 'Invalid Zip Code (e.g. 10001)';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
-        onClose();
+        if (validateForm()) {
+            onSave(formData);
+            onClose();
+        }
     };
 
     if (!isOpen) return null;
@@ -91,8 +127,9 @@ export default function AddressModal({
                             onChange={handleChange}
                             required
                             placeholder="123 Main St"
-                            className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                            className={`w-full px-4 py-2 rounded-lg border ${errors.street ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'} focus:outline-none focus:ring-2 transition-all`}
                         />
+                        {errors.street && <p className="text-xs text-red-500 mt-1">{errors.street}</p>}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
@@ -107,8 +144,9 @@ export default function AddressModal({
                                 onChange={handleChange}
                                 required
                                 placeholder="New York"
-                                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                                className={`w-full px-4 py-2 rounded-lg border ${errors.city ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'} focus:outline-none focus:ring-2 transition-all`}
                             />
+                            {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -121,8 +159,9 @@ export default function AddressModal({
                                 onChange={handleChange}
                                 required
                                 placeholder="NY"
-                                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                                className={`w-full px-4 py-2 rounded-lg border ${errors.state ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'} focus:outline-none focus:ring-2 transition-all`}
                             />
+                            {errors.state && <p className="text-xs text-red-500 mt-1">{errors.state}</p>}
                         </div>
                     </div>
 
@@ -138,8 +177,9 @@ export default function AddressModal({
                                 onChange={handleChange}
                                 required
                                 placeholder="10001"
-                                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                                className={`w-full px-4 py-2 rounded-lg border ${errors.zipCode ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'} focus:outline-none focus:ring-2 transition-all`}
                             />
+                            {errors.zipCode && <p className="text-xs text-red-500 mt-1">{errors.zipCode}</p>}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -152,8 +192,9 @@ export default function AddressModal({
                                 onChange={handleChange}
                                 required
                                 placeholder="USA"
-                                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all"
+                                className={`w-full px-4 py-2 rounded-lg border ${errors.country ? 'border-red-500 focus:ring-red-200' : 'border-gray-200 focus:ring-green-500/20 focus:border-green-500'} focus:outline-none focus:ring-2 transition-all`}
                             />
+                            {errors.country && <p className="text-xs text-red-500 mt-1">{errors.country}</p>}
                         </div>
                     </div>
 

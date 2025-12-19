@@ -27,8 +27,26 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const validatePhone = (phone: string) => {
+        // Remove spaces, dashes, parentheses to count digits
+        const digits = phone.replace(/\D/g, '');
+        // Basic check: at least 10 digits
+        if (digits.length < 10) {
+            return false;
+        }
+        // Check for invalid characters (allow digits, space, +, -, (, ))
+        const validChars = /^[0-9+\-\s()]*$/;
+        return validChars.test(phone);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validatePhone(formData.phone)) {
+            setMessage({ type: 'error', text: 'Please enter a valid phone number (at least 10 digits).' });
+            return;
+        }
+
         setIsSaving(true);
         setMessage(null);
 
@@ -86,8 +104,8 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                 {message && (
                     <div
                         className={`p-3 rounded-lg text-sm ${message.type === 'success'
-                                ? 'bg-green-50 text-green-700'
-                                : 'bg-red-50 text-red-700'
+                            ? 'bg-green-50 text-green-700'
+                            : 'bg-red-50 text-red-700'
                             }`}
                     >
                         {message.text}
