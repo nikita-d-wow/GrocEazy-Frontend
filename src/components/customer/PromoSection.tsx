@@ -32,7 +32,7 @@ export default function PromoSection() {
       {/* GRID WRAPPER */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div
-          onClick={() => handleNavigate('vegetable')}
+          onClick={() => handleNavigate('veggies')}
           className="relative h-48 sm:h-56 rounded-3xl overflow-hidden shadow-md group cursor-pointer hover:shadow-xl transition-all"
         >
           <img
@@ -44,9 +44,7 @@ export default function PromoSection() {
             <h3 className="text-white text-2xl font-bold mb-2 w-2/3">
               Everyday Fresh & Clean
             </h3>
-            <span className="text-green-300 font-medium">
-              Shop Vegetables →
-            </span>
+            <span className="text-green-300 font-medium">Shop Veggies →</span>
           </div>
         </div>
 

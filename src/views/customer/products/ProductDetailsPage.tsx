@@ -60,6 +60,10 @@ const ProductDetailsPage: FC = () => {
     if (!product) {
       return;
     }
+    if (product.stock <= 0) {
+      toast.error('Product is out of stock');
+      return;
+    }
     try {
       await dispatch(addToCart(product._id, 1));
       toast.success(`Item added to cart`);
@@ -69,10 +73,18 @@ const ProductDetailsPage: FC = () => {
   };
 
   const incrementCart = () => {
-    if (cartItem) {
-      dispatch(updateCartQty(cartItem._id, cartQuantity + 1));
+    if (cartItem && product) {
+      if (cartQuantity < product.stock) {
+        dispatch(updateCartQty(cartItem._id, cartQuantity + 1));
+      } else {
+        toast.error('Maximum available stock reached');
+      }
     } else if (product) {
-      dispatch(addToCart(product._id, 1));
+      if (product.stock > 0) {
+        dispatch(addToCart(product._id, 1));
+      } else {
+        toast.error('Product is out of stock');
+      }
     }
   };
 
@@ -100,23 +112,33 @@ const ProductDetailsPage: FC = () => {
       ? (product.categoryId as any).name
       : 'Groceries';
 
+  const categoryId =
+    typeof product.categoryId === 'object'
+      ? (product.categoryId as any)._id
+      : product.categoryId;
+
   // Recommendations Logic is now handled by Redux / API fetch
   // const similarProducts and const topProducts are selected from store above
 
   return (
     <div className="bg-gray-50 min-h-screen pb-24 font-sans text-gray-900">
       {/* Breadcrumb Header */}
-      <div className="bg-white border-b sticky top-[72px] z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-2 text-xs md:text-sm text-gray-500 overflow-x-auto whitespace-nowrap">
-          <Link to="/" className="hover:text-green-600">
+      <div className="bg-white border-b sticky top-[64px] sm:top-[72px] z-30 shadow-sm overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm text-gray-500 overflow-x-auto whitespace-nowrap no-scrollbar">
+          <Link to="/" className="hover:text-green-600 shrink-0">
             Home
           </Link>
-          <ChevronRight className="w-4 h-4" />
-          <Link to="/products" className="hover:text-green-600">
+          <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+          <Link
+            to={`/products?category=${categoryId}`}
+            className="hover:text-green-600 shrink-0"
+          >
             {categoryName}
           </Link>
-          <ChevronRight className="w-4 h-4" />
-          <span className="text-gray-900 font-medium">{product.name}</span>
+          <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+          <span className="text-gray-900 font-medium truncate">
+            {product.name}
+          </span>
         </div>
       </div>
 
@@ -160,7 +182,7 @@ const ProductDetailsPage: FC = () => {
             {/* Title Block */}
             <div className="mb-6">
               <Link
-                to={`/products?category=${product.categoryId}`}
+                to={`/products?category=${categoryId}`}
                 className="text-sm font-bold text-gray-500 hover:text-green-600 mb-1 block"
               >
                 View all by {categoryName}
@@ -223,7 +245,7 @@ const ProductDetailsPage: FC = () => {
 
               {/* Description */}
               {product.description && (
-                <div className="mb-8">
+                <div className="mb-8 border-b pb-8 border-gray-100">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
                     Product Details
                   </h3>
@@ -233,51 +255,57 @@ const ProductDetailsPage: FC = () => {
                 </div>
               )}
 
-              {/* Why Shop From Us - Custom Styling */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">
+              {/* Why Shop From Us - Optimized Content */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
+                <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">
                   Why shop from GrocEazy?
                 </h3>
-                <div className="space-y-5">
+                <div className="space-y-6">
+                  {/* Delivery */}
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-xl shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-emerald-100/50">
                       ⚡
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 text-sm">
+                      <h4 className="font-bold text-gray-900 text-sm md:text-base">
                         Superfast Delivery
                       </h4>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
                         Get your order delivered to your doorstep at the
                         earliest from dark stores near you.
                       </p>
                     </div>
                   </div>
+
+                  {/* Prices */}
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-xl shrink-0">
-                      💲
+                    <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-amber-100/50">
+                      🏷️
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 text-sm">
+                      <h4 className="font-bold text-gray-900 text-sm md:text-base">
                         Best Prices & Offers
                       </h4>
-                      <p className="text-xs text-gray-500 mt-0.5">
+                      <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
                         Best price destination with offers directly from the
                         manufacturers.
                       </p>
                     </div>
                   </div>
+
+                  {/* Curated */}
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-xl shrink-0">
-                      🥬
+                    <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-purple-100/50">
+                      ✨
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 text-sm">
-                        Wide Assortment
+                      <h4 className="font-bold text-gray-900 text-sm md:text-base">
+                        Curated for Every Occasion
                       </h4>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        Choose from 5000+ products across food, personal care,
-                        household & other categories.
+                      <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
+                        Whether it’s your morning coffee, a midday snack, or
+                        your nightly skincare routine, find an exhaustive range
+                        of products tailored to your lifestyle.
                       </p>
                     </div>
                   </div>
@@ -290,20 +318,28 @@ const ProductDetailsPage: FC = () => {
         {/* Similar Products */}
         {similarProducts.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Similar Products
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                Similar Products
+              </h2>
+              {similarProducts.length > 6 && (
+                <span className="text-xs text-green-600 font-semibold md:hidden">
+                  Scroll right →
+                </span>
+              )}
+            </div>
+            <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto pb-4 no-scrollbar">
               {similarProducts.map((p, idx) => (
-                <ProductCard
-                  key={p._id}
-                  _id={p._id}
-                  name={p.name}
-                  image={p.images[0]}
-                  price={p.price}
-                  stock={p.stock}
-                  index={idx}
-                />
+                <div key={p._id} className="min-w-[160px] sm:min-w-0">
+                  <ProductCard
+                    _id={p._id}
+                    name={p.name}
+                    image={p.images[0]}
+                    price={p.price}
+                    stock={p.stock}
+                    index={idx}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -312,20 +348,28 @@ const ProductDetailsPage: FC = () => {
         {/* Top 10 Products (People Also Bought) */}
         {topProducts.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Top 10 Products
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {topProducts.map((p, idx) => (
-                <ProductCard
-                  key={p._id}
-                  _id={p._id}
-                  name={p.name}
-                  image={p.images[0]}
-                  price={p.price}
-                  stock={p.stock}
-                  index={idx}
-                />
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                Top 10 Products
+              </h2>
+              {topProducts.length > 5 && (
+                <span className="text-xs text-green-600 font-semibold md:hidden">
+                  Scroll right →
+                </span>
+              )}
+            </div>
+            <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto pb-4 no-scrollbar">
+              {topProducts.slice(0, 10).map((p, idx) => (
+                <div key={p._id} className="min-w-[160px] sm:min-w-0">
+                  <ProductCard
+                    _id={p._id}
+                    name={p.name}
+                    image={p.images[0]}
+                    price={p.price}
+                    stock={p.stock}
+                    index={idx}
+                  />
+                </div>
               ))}
             </div>
           </div>

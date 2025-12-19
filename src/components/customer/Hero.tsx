@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import banner1 from '../../assets/banner_veggies.jpg';
 import banner2 from '../../assets/banner_grocery_2.png';
 import Button from '../common/Button';
@@ -73,25 +74,54 @@ export default function Hero() {
             {/* Content */}
             <div className="relative h-full flex flex-col justify-center px-6 sm:px-16 lg:px-24 max-w-2xl">
               <div
-                className={`w-fit px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border backdrop-blur-md ${slide.tagColor}`}
+                className={`w-fit px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-2 sm:mb-4 border backdrop-blur-md ${slide.tagColor}`}
               >
                 {slide.tag}
               </div>
 
-              <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg mb-2 sm:mb-3">
+              <h1 className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight drop-shadow-lg mb-1 sm:mb-3">
                 {slide.title}
               </h1>
 
-              <p className="text-gray-200 text-xs xs:text-sm sm:text-lg mb-4 sm:mb-6 max-w-md font-medium line-clamp-2 sm:line-clamp-none">
+              <p className="text-gray-200 text-[10px] xs:text-[11px] sm:text-base md:text-lg mb-3 sm:mb-6 max-w-sm sm:max-w-md font-medium line-clamp-2 sm:line-clamp-none">
                 {slide.subtitle}
               </p>
 
               <Button
                 onClick={() => navigate('/products')}
-                className="w-fit !rounded-full !px-8 shadow-sm hover:shadow-md hover:scale-105 transition-all text-sm sm:text-base bg-green-700 hover:bg-green-800 border-none text-white font-semibold"
+                className="
+                  w-fit
+                  !rounded-full
+                  !px-6 sm:!px-10
+                  !py-2 sm:!py-3.5
+                  text-xs sm:text-lg
+                  font-bold
+                  text-white
+                  bg-emerald-600
+                  hover:bg-emerald-500
+                  shadow-lg shadow-emerald-600/30
+                  hover:shadow-emerald-500/50
+                  hover:scale-105
+                  transition-all duration-300
+                  border-none
+                  relative
+                  overflow-hidden
+                "
                 size="lg"
-                rightIcon={<ChevronRight className="w-4 h-4" />}
+                rightIcon={
+                  <ChevronRight className="w-3 h-3 sm:w-5 sm:h-5 ml-1" />
+                }
               >
+                <motion.span
+                  initial={{ x: -100 }}
+                  animate={{ x: 100 }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: 1.5,
+                    ease: 'linear',
+                  }}
+                  className="absolute inset-0 w-1/3 h-full bg-white/20 skew-x-[-20deg]"
+                />
                 Shop Now
               </Button>
             </div>

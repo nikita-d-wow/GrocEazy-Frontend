@@ -16,7 +16,7 @@ import {
 
 import type { Product } from '../../types/Product';
 
-import ProductForm from '../../components/manager/ProductForm';
+import ProductForm from '../../components/products/ProductForm';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
@@ -49,7 +49,7 @@ const ProductManagement: FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Products</h1>

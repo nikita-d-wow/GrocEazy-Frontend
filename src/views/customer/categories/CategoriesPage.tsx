@@ -18,7 +18,11 @@ export default function CategoriesPage() {
       <h1 className="text-3xl font-bold text-gray-900 mb-8">
         Shop by Categories
       </h1>
-      <CategoryGrid categories={categories.filter((cat) => !cat.isDeleted)} />
+      <CategoryGrid
+        categories={categories.filter(
+          (cat) => !cat.isDeleted && cat.isActive !== false
+        )}
+      />
     </div>
   );
 }

@@ -17,7 +17,7 @@ import {
 
 import type { Category } from '../../types/Category';
 
-import CategoryForm from '../../components/manager/CategoryForm';
+import CategoryForm from '../../components/categories/CategoryForm';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';

@@ -36,5 +36,6 @@ export interface CustomerProductCardProps {
   name: string;
   image: string;
   price: number;
-  stock?: number;
+  stock: number;
+  isActive?: boolean;
 }

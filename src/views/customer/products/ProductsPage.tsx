@@ -9,49 +9,51 @@ import { fetchWishlist } from '../../../redux/actions/wishlistActions';
 import type { Product } from '../../../types/Product';
 import MobileCategorySidebar from '../../../components/products/MobileCategorySidebar';
 import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
+import { useLocation, useNavigate } from 'react-router-dom';
+import type { RootState } from '../../../redux/store';
+
+interface CategoryData {
+  _id: string;
+  name: string;
+}
 
 const ProductsPage: FC = () => {
   const dispatch = useAppDispatch();
-  const { products, loading, error } = useSelector(
-    (state: any) => state.product
-  );
-  const { user } = useSelector((state: any) => state.auth);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  const [filters, setFilters] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const categoryParam = params.get('category');
-    const searchParam = params.get('search');
-    return {
-      selectedCategory: categoryParam || null,
-      searchQuery: searchParam || '',
-      priceRange: [0, 1000] as [number, number],
-      sortBy: 'featured',
-    };
+  const { products, loading, error } = useSelector(
+    (state: RootState) => state.product
+  );
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  // 1. DERIVE category and search directly from URL (Prevents infinite loops)
+  const queryParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  );
+  const selectedCategory = queryParams.get('category') || null;
+  const searchQuery = queryParams.get('search') || '';
+
+  // 2. Local state for filters NOT in the URL
+  const [localFilters, setLocalFilters] = useState({
+    priceRange: [0, 1000] as [number, number],
+    sortBy: 'featured',
   });
 
-  // Infinite scroll state
+  // Combine for children components
+  const allFilters = useMemo(
+    () => ({
+      selectedCategory,
+      searchQuery,
+      ...localFilters,
+    }),
+    [selectedCategory, searchQuery, localFilters]
+  );
+
   const [displayCount, setDisplayCount] = useState(20);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-
-  // Update URL when category filter changes
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (filters.selectedCategory) {
-      params.set('category', filters.selectedCategory);
-    } else {
-      params.delete('category');
-    }
-
-    if (filters.searchQuery) {
-      params.set('search', filters.searchQuery);
-    } else {
-      params.delete('search');
-    }
-
-    const newUrl = `${window.location.pathname}?${params.toString()}`;
-    window.history.replaceState(null, '', newUrl);
-  }, [filters.selectedCategory, filters.searchQuery]);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -60,92 +62,107 @@ const ProductsPage: FC = () => {
     }
   }, [dispatch, user]);
 
-  // Intersection Observer for infinite scroll
+  // Infinite Scroll Observer
   useEffect(() => {
+    const observerTarget = loadMoreRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isLoadingMore && !loading) {
           setIsLoadingMore(true);
-          // Simulate loading delay for smooth UX
           setTimeout(() => {
             setDisplayCount((prev) => prev + 20);
             setIsLoadingMore(false);
           }, 300);
         }
       },
-      { threshold: 0.1, rootMargin: '100px' }
+      { threshold: 0.1 }
     );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+    if (observerTarget) {
+      observer.observe(observerTarget);
     }
-
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
+      if (observerTarget) {
+        observer.unobserve(observerTarget);
       }
     };
   }, [isLoadingMore, loading]);
 
   const filteredProducts = useMemo(() => {
-    let result = [...products];
+    let result = products.filter((p: Product) => p.isActive !== false);
 
-    // Filter by Category
-    if (filters.selectedCategory) {
-      result = result.filter((p: Product) => {
-        const productCategoryId =
-          typeof p.categoryId === 'object' && p.categoryId !== null
-            ? (p.categoryId as any)._id
-            : p.categoryId;
-        // Ensure string comparison
-        return String(productCategoryId) === String(filters.selectedCategory);
-      });
-    }
-
-    // Filter by Search Query
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase();
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
       result = result.filter(
         (p: Product) =>
           p.name.toLowerCase().includes(query) ||
           p.description?.toLowerCase().includes(query)
       );
+    } else if (selectedCategory) {
+      result = result.filter((p: Product) => {
+        const catId =
+          typeof p.categoryId === 'object' && p.categoryId !== null
+            ? (p.categoryId as unknown as CategoryData)._id
+            : p.categoryId;
+        return String(catId) === String(selectedCategory);
+      });
     }
 
-    // Filter by Price
     result = result.filter(
-      (p: Product) =>
-        p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
+      (p) =>
+        p.price >= localFilters.priceRange[0] &&
+        p.price <= localFilters.priceRange[1]
     );
 
-    // Sort
-    if (filters.sortBy === 'price_asc') {
+    if (localFilters.sortBy === 'price_asc') {
       result.sort((a, b) => a.price - b.price);
-    } else if (filters.sortBy === 'price_desc') {
+    } else if (localFilters.sortBy === 'price_desc') {
       result.sort((a, b) => b.price - a.price);
-    } else if (filters.sortBy === 'newest') {
+    } else if (localFilters.sortBy === 'newest') {
       result.reverse();
-    } else if (filters.sortBy === 'deals') {
-      // Sort by featured for now (can be enhanced with discount field later)
-      result.sort((a, b) => (a.price < b.price ? -1 : 1));
-    } else if (filters.sortBy === 'rating') {
-      // Sort by rating when available (placeholder for now)
-      result.sort((a, b) => (b.price > a.price ? -1 : 1));
     }
-    // 'featured' is default/original order
 
     return result;
-  }, [products, filters]);
+  }, [products, searchQuery, selectedCategory, localFilters]);
 
-  // Slice for infinite scroll
-  const displayedProducts = filteredProducts.slice(0, displayCount);
-  const hasMore = displayCount < filteredProducts.length;
+  // 3. Centralized update handler
+  const handleUpdateFilters = (updates: any) => {
+    const newParams = new URLSearchParams(location.search);
 
-  // Wrapper to reset display count when filters change
-  const handleSetFilters = (newFilters: any) => {
-    setFilters(newFilters);
+    // If searching, remove category. If picking category, remove search.
+    if (updates.searchQuery !== undefined) {
+      if (updates.searchQuery.trim() !== '') {
+        newParams.set('search', updates.searchQuery);
+        newParams.delete('category');
+      } else {
+        newParams.delete('search');
+      }
+    }
+
+    if (updates.selectedCategory !== undefined) {
+      if (updates.selectedCategory) {
+        newParams.set('category', updates.selectedCategory);
+        newParams.delete('search');
+      } else {
+        newParams.delete('category');
+      }
+    }
+
+    // Sync to URL
+    navigate(`${location.pathname}?${newParams.toString()}`, { replace: true });
+
+    // Sync Local State
+    if (updates.priceRange || updates.sortBy) {
+      setLocalFilters((prev) => ({
+        ...prev,
+        priceRange: updates.priceRange || prev.priceRange,
+        sortBy: updates.sortBy || prev.sortBy,
+      }));
+    }
+
     setDisplayCount(20);
   };
+
+  const displayedProducts = filteredProducts.slice(0, displayCount);
 
   if (error) {
     return <div className="text-center text-red-500 py-10">Error: {error}</div>;
@@ -162,36 +179,34 @@ const ProductsPage: FC = () => {
         </div>
         <div className="mt-4 md:mt-0">
           <span className="text-gray-600 font-medium">
-            {filteredProducts.length === 0 && filters.searchQuery
-              ? 'No products available'
-              : `${filteredProducts.length} results found`}
+            {filteredProducts.length} results found
           </span>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8 relative items-start">
-        {/* Mobile Category Sidebar (Horizontal Scroll) */}
-        <div className="lg:hidden w-full overflow-x-auto pb-4 -mt-4 bg-white sticky top-16 z-30 border-b border-gray-100 no-scrollbar">
+        {/* Mobile View Sidebar Re-Added */}
+        <div className="lg:hidden w-full overflow-x-auto pb-4 bg-white sticky top-[72px] z-30 border-b border-gray-100 no-scrollbar">
           <MobileCategorySidebar
-            selectedCategory={filters.selectedCategory}
+            selectedCategory={selectedCategory}
             onSelectCategory={(id) =>
-              handleSetFilters({ ...filters, selectedCategory: id })
+              handleUpdateFilters({ selectedCategory: id, searchQuery: '' })
             }
           />
         </div>
 
-        {/* Sidebar Filters (Desktop) */}
+        {/* Desktop View Sidebar */}
         <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
-          <ProductFilters filters={filters} setFilters={handleSetFilters} />
+          <ProductFilters
+            filters={allFilters}
+            setFilters={(updates: any) => handleUpdateFilters(updates)}
+          />
         </aside>
 
-        {/* Product Grid */}
         <main className="flex-1 w-full">
-          {' '}
-          {/* pl-32 for extra sidebar offset */}
           {loading && products.length === 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
                   className="bg-white rounded-2xl h-80 animate-pulse border border-gray-100"
@@ -200,53 +215,18 @@ const ProductsPage: FC = () => {
             </div>
           ) : (
             <>
-              {/* Reset Filters / Results header for mobile */}
-              <div className="lg:hidden mb-4 flex justify-between items-center pr-4">
-                <h2 className="text-lg font-bold">
-                  {filters.selectedCategory
-                    ? (
-                        products.find(
-                          (p: Product) =>
-                            (p.categoryId as any)._id ===
-                            filters.selectedCategory
-                        )?.categoryId as any
-                      )?.name
-                    : 'All Products'}
-                </h2>
-                <span className="text-xs text-gray-500">
-                  {filteredProducts.length} items
-                </span>
-              </div>
-
               <ProductGrid products={displayedProducts} />
-
-              {/* Infinite Scroll Trigger & Loading Indicator */}
-              {hasMore && (
-                <div ref={loadMoreRef} className="py-8 text-center">
+              {displayCount < filteredProducts.length && (
+                <div ref={loadMoreRef} className="py-12 text-center">
                   {isLoadingMore && (
-                    <div className="flex justify-center items-center gap-3">
-                      <div className="w-6 h-6 border-3 border-green-600 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-gray-600 font-medium">
-                        Loading more products...
-                      </span>
-                    </div>
+                    <div className="animate-spin border-4 border-green-600 border-t-transparent rounded-full w-8 h-8 mx-auto" />
                   )}
-                </div>
-              )}
-
-              {/* End of List Message */}
-              {!hasMore && filteredProducts.length > 20 && (
-                <div className="py-8 text-center">
-                  <p className="text-gray-500 font-medium">
-                    ✓ You've reached the end
-                  </p>
                 </div>
               )}
             </>
           )}
         </main>
       </div>
-
       <FloatingCartBar />
     </div>
   );

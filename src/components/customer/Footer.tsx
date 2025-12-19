@@ -89,9 +89,13 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3 text-gray-600">
                 <Mail className="w-5 h-5 text-green-600 shrink-0" />
-                <Link to="/contact" className="hover:text-green-600">
-                  support@groceazy.com
-                </Link>
+                {role === 'customer' ? (
+                  <Link to="/contact" className="hover:text-green-600">
+                    support@groceazy.com
+                  </Link>
+                ) : (
+                  <span className="text-gray-600">support@groceazy.com</span>
+                )}
               </li>
             </ul>
           </div>
