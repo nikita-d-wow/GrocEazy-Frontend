@@ -15,8 +15,8 @@ import {
 } from '../types/userTypes';
 import api from '../../services/api';
 
-// Fetch Users (with pagination & role filter)
-export const getUsers = (page = 1, role = '') => {
+// Fetch Users (with pagination & role filter & search)
+export const getUsers = (page = 1, role = '', search = '') => {
   return async (dispatch: Dispatch<UserActionTypes>) => {
     dispatch({ type: FETCH_USERS_REQUEST });
     try {
@@ -24,6 +24,9 @@ export const getUsers = (page = 1, role = '') => {
       let queryString = `/api/users?page=${page}&limit=10`;
       if (role) {
         queryString += `&role=${role}`;
+      }
+      if (search) {
+        queryString += `&search=${encodeURIComponent(search)}`;
       }
 
       const { data } = await api.get<{ users: User[]; pagination: Pagination }>(

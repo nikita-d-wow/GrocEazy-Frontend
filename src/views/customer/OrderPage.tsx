@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Loader2, PackageX } from 'lucide-react';
 import OrderCard from '../../components/customer/orders/OrderCard';
 import { getMyOrders } from '../../redux/actions/orderActions';
+import { fetchProducts } from '../../redux/actions/productActions';
 import type { RootState } from '../../redux/rootReducer';
 import type { OrderActionTypes } from '../../redux/types/orderTypes';
 import type { ThunkDispatch } from 'redux-thunk';
@@ -16,6 +17,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     dispatch(getMyOrders());
+    dispatch(fetchProducts());
   }, [dispatch]);
 
   if (loading) {

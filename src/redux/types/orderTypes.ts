@@ -10,7 +10,7 @@ export interface Address {
 }
 
 export interface OrderItem {
-  product: Product; // Populated product
+  productId: Product; // Populated product
   quantity: number;
   unitPrice: number;
 }
@@ -19,8 +19,9 @@ export interface Order {
   _id: string;
   user: string; // User ID
   items: OrderItem[];
-  shippingAddress: Address;
-  paymentMethod: 'cod' | 'online';
+  address: Address;
+  paymentMethod?: 'cod' | 'online';
+  paymentStatus?: string;
   totalAmount: number;
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   createdAt: string;

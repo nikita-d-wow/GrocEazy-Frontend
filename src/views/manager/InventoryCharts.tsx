@@ -62,7 +62,23 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
   // 2. Category Distribution (Bar Chart)
   const categoryData = useMemo(() => {
     const data = categories.map((cat) => {
-      const catProducts = products.filter((p) => p.categoryId === cat._id);
+      const catProducts = products.filter((p) => {
+        let pCatId;
+        // Check categoryId object/string
+        if (typeof p.categoryId === 'object' && p.categoryId) {
+          pCatId = (p.categoryId as any)._id;
+        } else if (p.categoryId) {
+          pCatId = p.categoryId;
+        }
+        // fallback to category field
+        else if (typeof p.category === 'object' && p.category) {
+          pCatId = (p.category as any)._id;
+        } else {
+          pCatId = p.category;
+        }
+
+        return pCatId === cat._id;
+      });
       const totalStock = catProducts.reduce((acc, p) => acc + p.stock, 0);
       return {
         name: cat.name,
