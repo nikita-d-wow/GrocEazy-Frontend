@@ -6,24 +6,30 @@ import { fetchAllSupportTickets } from '../../redux/actions/supportActions';
 import {
   selectSupportTickets,
   selectSupportLoading,
+  selectSupportPagination,
 } from '../../redux/selectors/supportSelectors';
 
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import Pagination from '../../components/common/Pagination';
 
 import type { AppDispatch } from '../../redux/store';
 import type { SupportTicket } from '../../redux/types/support.types';
 
 import { STATUS_MAP } from '../../utils/ticketStatus';
 
+const PAGE_LIMIT = 10;
+
 export default function AdminSupportTickets() {
   const dispatch = useDispatch<AppDispatch>();
+
   const tickets = useSelector(selectSupportTickets);
   const loading = useSelector(selectSupportLoading);
+  const { page, totalPages } = useSelector(selectSupportPagination);
 
   useEffect(() => {
-    dispatch(fetchAllSupportTickets());
-  }, [dispatch]);
+    dispatch(fetchAllSupportTickets(page, PAGE_LIMIT));
+  }, [dispatch, page]);
 
   if (loading) {
     return <Loader />;
@@ -66,7 +72,6 @@ export default function AdminSupportTickets() {
                   hover:shadow-2xl hover:-translate-y-1
                 "
               >
-                {/* SOFT EDGE GLOW */}
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/5 via-transparent to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                 <div className="relative p-6 sm:p-8">
@@ -121,6 +126,19 @@ export default function AdminSupportTickets() {
             );
           })}
         </div>
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(p) =>
+                dispatch(fetchAllSupportTickets(p, PAGE_LIMIT))
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
   );

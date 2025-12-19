@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Eye, Search, SlidersHorizontal, UserX, UserCheck } from 'lucide-react';
 import { getUsers, updateUserStatus } from '../../../redux/actions/userActions';
@@ -20,10 +20,19 @@ export default function UsersPage() {
   const [page, setPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [submittedSearch, setSubmittedSearch] = useState('');
 
   useEffect(() => {
-    dispatch(getUsers(page, roleFilter));
-  }, [dispatch, page, roleFilter]);
+    dispatch(getUsers(page, roleFilter, submittedSearch));
+  }, [dispatch, page, roleFilter, submittedSearch]);
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setPage(1);
+      setSubmittedSearch(searchQuery);
+    }
+  };
 
   const handleStatusToggle = (userId: string, currentStatus: boolean) => {
     if (
@@ -67,6 +76,9 @@ export default function UsersPage() {
             <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
               placeholder="Search users..."
               className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
             />

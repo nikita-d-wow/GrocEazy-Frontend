@@ -1,5 +1,7 @@
 import type { Product } from '../../types/Product';
 
+/* ================= ADDRESS ================= */
+
 export interface Address {
   fullName: string;
   line1: string;
@@ -9,32 +11,57 @@ export interface Address {
   phone: string;
 }
 
+/* ================= ORDER ITEM ================= */
+
 export interface OrderItem {
-  product: Product; // Populated product
+  productId: Product | null; // can be null
   quantity: number;
   unitPrice: number;
 }
 
+/* ================= USER (POPULATED) ================= */
+
+export interface OrderUser {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+/* ================= ORDER ================= */
+
 export interface Order {
   _id: string;
-  user: string; // User ID
+  userId: OrderUser | null;
   items: OrderItem[];
-  shippingAddress: Address;
-  paymentMethod: 'cod' | 'online';
+  address: Address;
+  paymentMethod?: 'cod' | 'online';
+  paymentStatus?: string;
   totalAmount: number;
   status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
   createdAt: string;
   updatedAt: string;
 }
 
+/* ================= PAGINATION ================= */
+
+export interface OrderPagination {
+  total: number;
+  page: number;
+  pages: number;
+}
+
+/* ================= STATE ================= */
+
 export interface OrderState {
   orders: Order[];
   currentOrder: Order | null;
+  pagination: OrderPagination | null;
   loading: boolean;
   error: string | null;
 }
 
-// Action Types
+/* ================= ACTION TYPES ================= */
+
 export const FETCH_ORDERS_REQUEST = 'FETCH_ORDERS_REQUEST';
 export const FETCH_ORDERS_SUCCESS = 'FETCH_ORDERS_SUCCESS';
 export const FETCH_ORDERS_FAILURE = 'FETCH_ORDERS_FAILURE';
@@ -51,13 +78,20 @@ export const CANCEL_ORDER_REQUEST = 'CANCEL_ORDER_REQUEST';
 export const CANCEL_ORDER_SUCCESS = 'CANCEL_ORDER_SUCCESS';
 export const CANCEL_ORDER_FAILURE = 'CANCEL_ORDER_FAILURE';
 
+/* ================= ACTION INTERFACES ================= */
+
 interface FetchOrdersRequestAction {
   type: typeof FETCH_ORDERS_REQUEST;
 }
+
 interface FetchOrdersSuccessAction {
   type: typeof FETCH_ORDERS_SUCCESS;
-  payload: Order[];
+  payload: {
+    orders: Order[];
+    pagination: OrderPagination | null;
+  };
 }
+
 interface FetchOrdersFailureAction {
   type: typeof FETCH_ORDERS_FAILURE;
   payload: string;
@@ -66,10 +100,12 @@ interface FetchOrdersFailureAction {
 interface FetchOrderDetailsRequestAction {
   type: typeof FETCH_ORDER_DETAILS_REQUEST;
 }
+
 interface FetchOrderDetailsSuccessAction {
   type: typeof FETCH_ORDER_DETAILS_SUCCESS;
   payload: Order;
 }
+
 interface FetchOrderDetailsFailureAction {
   type: typeof FETCH_ORDER_DETAILS_FAILURE;
   payload: string;
@@ -78,10 +114,12 @@ interface FetchOrderDetailsFailureAction {
 interface CreateOrderRequestAction {
   type: typeof CREATE_ORDER_REQUEST;
 }
+
 interface CreateOrderSuccessAction {
   type: typeof CREATE_ORDER_SUCCESS;
-  payload: Order; // Return the created order
+  payload: Order;
 }
+
 interface CreateOrderFailureAction {
   type: typeof CREATE_ORDER_FAILURE;
   payload: string;
@@ -90,14 +128,18 @@ interface CreateOrderFailureAction {
 interface CancelOrderRequestAction {
   type: typeof CANCEL_ORDER_REQUEST;
 }
+
 interface CancelOrderSuccessAction {
   type: typeof CANCEL_ORDER_SUCCESS;
-  payload: string; // Order ID
+  payload: string; // order id
 }
+
 interface CancelOrderFailureAction {
   type: typeof CANCEL_ORDER_FAILURE;
   payload: string;
 }
+
+/* ================= UNION ================= */
 
 export type OrderActionTypes =
   | FetchOrdersRequestAction

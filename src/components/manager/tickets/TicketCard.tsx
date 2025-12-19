@@ -5,6 +5,8 @@ import type {
 import TicketHeader from './TicketHeader';
 import TicketFooter from './TicketFooter';
 
+import { useNavigate } from 'react-router-dom';
+
 interface Props {
   ticket: SupportTicket;
   updating: boolean;
@@ -16,15 +18,27 @@ export default function TicketCard({
   updating,
   onStatusChange,
 }: Props) {
+  const navigate = useNavigate();
+
   return (
     <div
+      onClick={(e) => {
+        // Prevent navigation if clicking on status select or buttons
+        if (
+          (e.target as HTMLElement).closest('button') ||
+          (e.target as HTMLElement).closest('select')
+        ) {
+          return;
+        }
+        navigate(`/manager/support/${ticket._id}`);
+      }}
       className="
         group relative overflow-hidden
         rounded-2xl border border-white/50
         bg-white/70 backdrop-blur-xl
         p-6 shadow-sm hover:shadow-xl
         transition-all duration-300
-        hover:-translate-y-1
+        hover:-translate-y-1 cursor-pointer
       "
     >
       <div

@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import EmptyState from '../../components/common/EmptyState';
 import Loader from '../../components/common/Loader';
+import Pagination from '../../components/common/Pagination';
 
 import CartItem from '../../components/customer/cart/CartItem';
 import CartSummary from '../../components/customer/cart/CartSummary';
@@ -16,13 +17,13 @@ import {
   removeCartItem,
 } from '../../redux/actions/cartActions';
 
-// 👉 import wishlist action (example)
 import { addToWishlist } from '../../redux/actions/wishlistActions';
 
 import {
   selectCartItems,
   selectCartLoading,
   selectCartTotal,
+  selectCartPagination,
 } from '../../redux/selectors/cartSelectors';
 
 import type { AppDispatch } from '../../redux/store';
@@ -39,24 +40,27 @@ interface CartItemUI {
   quantity: number;
 }
 
+const PAGE_LIMIT = 8;
+
 export default function CartPage() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  // Add auth selector
   const { user } = useSelector((state: RootState) => state.auth);
 
   const loading = useSelector(selectCartLoading);
   const cartItems = useSelector(selectCartItems);
   const total = useSelector(selectCartTotal);
+  const { page, totalPages } = useSelector(selectCartPagination);
 
+  /* ================= FETCH CART ================= */
   useEffect(() => {
-    // Only fetch if user exists
     if (user) {
-      dispatch(fetchCart());
+      dispatch(fetchCart(page, PAGE_LIMIT));
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, page]);
 
+  /* ================= ACTIONS ================= */
   const updateQty = (cartId: string, type: QtyAction) => {
     const item = cartItems.find((i) => i._id === cartId);
     if (!item) {
@@ -73,13 +77,12 @@ export default function CartPage() {
     dispatch(removeCartItem(cartId));
   };
 
-  // ✅ Move single item to wishlist
   const moveToWishlist = (cartId: string, productId: string) => {
     dispatch(addToWishlist(productId));
     dispatch(removeCartItem(cartId));
   };
 
-  // Show login query if not logged in
+  /* ================= AUTH GUARD ================= */
   if (!user) {
     return (
       <div className="min-h-screen px-4 py-8">
@@ -100,6 +103,7 @@ export default function CartPage() {
     return <Loader />;
   }
 
+  /* ================= UI MAPPING ================= */
   const uiCartItems: CartItemUI[] = cartItems
     .filter((item) => item.product && item.product._id)
     .map((item) => ({
@@ -113,6 +117,7 @@ export default function CartPage() {
 
   const formattedTotal = Number(total).toFixed(2);
 
+  /* ================= RENDER ================= */
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-20 py-8">
       <CartHeader />
@@ -124,25 +129,40 @@ export default function CartPage() {
           icon={<ShoppingCart size={48} className="text-primary" />}
         />
       ) : (
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* LEFT */}
-          <div className="lg:col-span-2 space-y-4 min-w-0">
-            {uiCartItems.map((item) => (
-              <CartItem
-                key={item._id}
-                item={item}
-                updateQty={updateQty}
-                removeItem={removeItem}
-                moveToWishlist={moveToWishlist}
-              />
-            ))}
+        <>
+          <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* LEFT */}
+            <div className="lg:col-span-2 space-y-4 min-w-0">
+              {uiCartItems.map((item) => (
+                <CartItem
+                  key={item._id}
+                  item={item}
+                  updateQty={updateQty}
+                  removeItem={removeItem}
+                  moveToWishlist={moveToWishlist}
+                />
+              ))}
+            </div>
+
+            {/* RIGHT */}
+            <div className="w-full max-w-full">
+              <CartSummary total={Number(formattedTotal)} />
+            </div>
           </div>
 
-          {/* RIGHT */}
-          <div className="w-full max-w-full">
-            <CartSummary total={Number(formattedTotal)} />
-          </div>
-        </div>
+          {/* PAGINATION */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={(newPage) =>
+                  dispatch(fetchCart(newPage, PAGE_LIMIT))
+                }
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

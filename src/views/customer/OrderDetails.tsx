@@ -5,7 +5,6 @@ import {
   ChevronLeft,
   MapPin,
   Package,
-  CreditCard,
   Calendar,
   AlertTriangle,
   CheckCircle2,
@@ -28,7 +27,7 @@ const STEPS = [
 export default function OrderDetails() {
   const { id } = useParams<{ id: string }>();
   const dispatch =
-    useDispatch<ThunkDispatch<RootState, any, OrderActionTypes>>();
+    useDispatch<ThunkDispatch<RootState, undefined, OrderActionTypes>>();
   const { currentOrder, loading, error } = useSelector(
     (state: RootState) => state.order
   );
@@ -163,7 +162,7 @@ export default function OrderDetails() {
             <div className="space-y-4">
               {currentOrder.items.map((item, index) => {
                 // Safe check for missing product data
-                if (!item.product || typeof item.product !== 'object') {
+                if (!item.productId || typeof item.productId !== 'object') {
                   return (
                     <div key={`missing-${index}`} className="text-red-500 py-2">
                       Product information missing for this item.
@@ -173,22 +172,27 @@ export default function OrderDetails() {
 
                 return (
                   <div
-                    key={item.product._id}
+                    key={item.productId._id}
                     className="flex gap-4 border-b border-gray-50 last:border-0 pb-4 last:pb-0"
                   >
                     <img
                       src={
-                        item.product.images?.[0] ||
+                        item.productId.images?.[0] ||
                         'https://via.placeholder.com/150'
                       }
-                      alt={item.product.name || 'Product'}
+                      alt={item.productId.name || 'Product'}
                       className="w-16 h-16 rounded-xl object-cover border border-gray-100"
                     />
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900">
-                        {item.product.name || 'Unknown Product'}
+                        {item.productId.name || 'Unknown Product'}
                       </h4>
-                      <p className="text-sm text-gray-500">
+                      {item.productId.description && (
+                        <p className="text-sm text-gray-500 line-clamp-1 mt-0.5">
+                          {item.productId.description}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500 mt-1">
                         Qty: {item.quantity}
                       </p>
                     </div>
@@ -217,28 +221,18 @@ export default function OrderDetails() {
             </h3>
             <address className="not-italic text-sm text-gray-600 space-y-1">
               <p className="font-medium text-gray-900">
-                {currentOrder.shippingAddress?.fullName || 'N/A'}
+                {currentOrder.address?.fullName || 'N/A'}
               </p>
-              <p>{currentOrder.shippingAddress?.line1 || ''}</p>
+              <p>{currentOrder.address?.line1 || ''}</p>
               <p>
-                {currentOrder.shippingAddress?.city || ''},{' '}
-                {currentOrder.shippingAddress?.state || ''}
+                {currentOrder.address?.city || ''},{' '}
+                {currentOrder.address?.state || ''}
               </p>
-              <p>{currentOrder.shippingAddress?.postalCode || ''}</p>
+              <p>{currentOrder.address?.postalCode || ''}</p>
               <p className="mt-2 text-gray-500">
-                Phone: {currentOrder.shippingAddress?.phone || 'N/A'}
+                Phone: {currentOrder.address?.phone || 'N/A'}
               </p>
             </address>
-
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-600 flex items-center gap-2">
-                <CreditCard size={16} />
-                Payment:{' '}
-                <span className="font-medium capitalize">
-                  {currentOrder.paymentMethod}
-                </span>
-              </p>
-            </div>
           </div>
 
           {/* ACTION ACTIONS */}

@@ -18,17 +18,19 @@ import {
 
 import type { SupportState, SupportActionTypes } from '../types/support.types';
 
-/* ================= INITIAL STATE ================= */
-
 const initialState: SupportState = {
   loading: false,
   myTickets: [],
   tickets: [],
   managers: [],
   error: null,
+  pagination: {
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  },
 };
-
-/* ================= REDUCER ================= */
 
 export function supportReducer(
   state = initialState,
@@ -45,14 +47,14 @@ export function supportReducer(
         ...state,
         loading: false,
         myTickets: [action.payload, ...state.myTickets],
-        tickets: [action.payload, ...state.tickets],
       };
 
     case SUPPORT_FETCH_MY_SUCCESS:
       return {
         ...state,
         loading: false,
-        myTickets: action.payload,
+        myTickets: action.payload.tickets,
+        pagination: action.payload.pagination,
       };
 
     case SUPPORT_FETCH_ALL_SUCCESS:
@@ -61,6 +63,7 @@ export function supportReducer(
         loading: false,
         tickets: action.payload.tickets,
         managers: action.payload.managers,
+        pagination: action.payload.pagination,
       };
 
     case SUPPORT_CREATE_FAILURE:

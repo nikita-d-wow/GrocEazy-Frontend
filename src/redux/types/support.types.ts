@@ -32,7 +32,7 @@ export interface IUser {
   name?: string;
 }
 
-// ✅ MATCHES BACKEND RESPONSE
+// ================= TICKET =================
 export interface SupportTicket {
   _id: string;
   subject: string;
@@ -44,18 +44,34 @@ export interface SupportTicket {
   assignedManager?: IUser;
 }
 
-// ✅ FETCH ALL RESPONSE SHAPE
+// ================= PAGINATION =================
+export interface SupportPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+// ================= PAYLOADS =================
+export interface SupportFetchMyPayload {
+  tickets: SupportTicket[];
+  pagination: SupportPagination;
+}
+
 export interface SupportFetchAllPayload {
   tickets: SupportTicket[];
   managers: IUser[];
+  pagination: SupportPagination;
 }
 
+// ================= STATE =================
 export interface SupportState {
   loading: boolean;
   myTickets: SupportTicket[];
   tickets: SupportTicket[];
   managers: IUser[];
   error: string | null;
+  pagination: SupportPagination;
 }
 
 // ================= ACTION UNION =================
@@ -64,7 +80,10 @@ export type SupportActionTypes =
   | { type: typeof SUPPORT_CREATE_SUCCESS; payload: SupportTicket }
   | { type: typeof SUPPORT_CREATE_FAILURE; payload: string }
   | { type: typeof SUPPORT_FETCH_MY_REQUEST }
-  | { type: typeof SUPPORT_FETCH_MY_SUCCESS; payload: SupportTicket[] }
+  | {
+      type: typeof SUPPORT_FETCH_MY_SUCCESS;
+      payload: SupportFetchMyPayload;
+    }
   | { type: typeof SUPPORT_FETCH_MY_FAILURE; payload: string }
   | { type: typeof SUPPORT_FETCH_ALL_REQUEST }
   | {

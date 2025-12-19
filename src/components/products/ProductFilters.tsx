@@ -1,7 +1,6 @@
 import type { FC } from 'react';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-
 import { fetchCategories } from '../../redux/actions/categoryActions';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import type { Category } from '../../types/Category';
@@ -30,12 +29,12 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
   const handleCategoryChange = (categoryId: string) => {
     setFilters({
       ...filters,
+      searchQuery: '', // Reset search bar text immediately
       selectedCategory:
         filters.selectedCategory === categoryId ? null : categoryId,
     });
   };
 
-  // Filter out deleted categories
   const visibleCategories = (categories || []).filter(
     (cat: Category) => !cat.isDeleted
   );
@@ -46,12 +45,10 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
         Filters
       </h3>
 
-      {/* Categories */}
       <div className="mb-8">
         <h4 className="font-semibold text-gray-700 mb-4 text-sm uppercase tracking-wide">
           Categories
         </h4>
-
         {loading ? (
           <div className="space-y-2">
             {[1, 2, 3, 4].map((i) => (
@@ -60,19 +57,23 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
           </div>
         ) : (
           <ul className="space-y-1">
-            {/* All Categories Option */}
             <li
               className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${
                 !filters.selectedCategory
                   ? 'bg-green-50 text-green-700 font-semibold shadow-sm'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
-              onClick={() => setFilters({ ...filters, selectedCategory: null })}
+              onClick={() =>
+                setFilters({
+                  ...filters,
+                  selectedCategory: null,
+                  searchQuery: '',
+                })
+              }
             >
               All Categories
             </li>
 
-            {/* Category List */}
             {visibleCategories.map((category: Category) => (
               <li
                 key={category._id}
@@ -90,12 +91,10 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
         )}
       </div>
 
-      {/* Price Range */}
       <div className="mb-8">
         <h4 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">
           Price Range
         </h4>
-
         <PriceRangeSlider
           min={0}
           max={1000}
@@ -106,7 +105,6 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
         />
       </div>
 
-      {/* Sort */}
       <div>
         <h4 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">
           Sort By

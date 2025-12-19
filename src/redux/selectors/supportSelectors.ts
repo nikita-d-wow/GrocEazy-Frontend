@@ -11,3 +11,6 @@ export const selectSupportManagers = (state: RootState) =>
 export const selectSupportLoading = (state: RootState) => state.support.loading;
 
 export const selectSupportError = (state: RootState) => state.support.error;
+
+export const selectSupportPagination = (state: RootState) =>
+  state.support.pagination;

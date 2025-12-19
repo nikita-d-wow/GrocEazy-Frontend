@@ -13,13 +13,13 @@ import {
   SUPPORT_FETCH_ALL_FAILURE,
   SUPPORT_UPDATE_STATUS_REQUEST,
   SUPPORT_UPDATE_STATUS_FAILURE,
-  SUPPORT_ASSIGN_MANAGER_REQUEST,
-  SUPPORT_ASSIGN_MANAGER_FAILURE,
   SUPPORT_DELETE_REQUEST,
   SUPPORT_DELETE_FAILURE,
 } from '../types/support.types';
 
 import type { SupportTicket, TicketStatus } from '../types/support.types';
+
+const DEFAULT_LIMIT = 10;
 
 /* ================= CUSTOMER ================= */
 
@@ -45,46 +45,59 @@ export const createSupportTicket =
     }
   };
 
-export const fetchMySupportTickets = () => async (dispatch: AppDispatch) => {
-  dispatch({ type: SUPPORT_FETCH_MY_REQUEST });
+export const fetchMySupportTickets =
+  (page = 1, limit = DEFAULT_LIMIT) =>
+  async (dispatch: AppDispatch) => {
+    dispatch({ type: SUPPORT_FETCH_MY_REQUEST });
 
-  try {
-    const { data } = await api.get('/api/support/my');
+    try {
+      const { data } = await api.get(
+        `/api/support/my?page=${page}&limit=${limit}`
+      );
 
-    dispatch({
-      type: SUPPORT_FETCH_MY_SUCCESS,
-      payload: data.tickets as SupportTicket[],
-    });
-  } catch {
-    dispatch({
-      type: SUPPORT_FETCH_MY_FAILURE,
-      payload: 'Failed to fetch support tickets',
-    });
-  }
-};
+      dispatch({
+        type: SUPPORT_FETCH_MY_SUCCESS,
+        payload: {
+          tickets: data.tickets,
+          pagination: data.pagination,
+        },
+      });
+    } catch (err: any) {
+      dispatch({
+        type: SUPPORT_FETCH_MY_FAILURE,
+        payload:
+          err.response?.data?.message || 'Failed to fetch support tickets',
+      });
+    }
+  };
 
 /* ================= ADMIN / MANAGER ================= */
 
-export const fetchAllSupportTickets = () => async (dispatch: AppDispatch) => {
-  dispatch({ type: SUPPORT_FETCH_ALL_REQUEST });
+export const fetchAllSupportTickets =
+  (page = 1, limit = DEFAULT_LIMIT) =>
+  async (dispatch: AppDispatch) => {
+    dispatch({ type: SUPPORT_FETCH_ALL_REQUEST });
 
-  try {
-    const { data } = await api.get('/api/support');
+    try {
+      const { data } = await api.get(
+        `/api/support?page=${page}&limit=${limit}`
+      );
 
-    dispatch({
-      type: SUPPORT_FETCH_ALL_SUCCESS,
-      payload: {
-        tickets: data.tickets,
-        managers: data.managers ?? [],
-      },
-    });
-  } catch {
-    dispatch({
-      type: SUPPORT_FETCH_ALL_FAILURE,
-      payload: 'Failed to fetch all tickets',
-    });
-  }
-};
+      dispatch({
+        type: SUPPORT_FETCH_ALL_SUCCESS,
+        payload: {
+          tickets: data.tickets,
+          pagination: data.pagination,
+          managers: data.managers ?? [],
+        },
+      });
+    } catch {
+      dispatch({
+        type: SUPPORT_FETCH_ALL_FAILURE,
+        payload: 'Failed to fetch all tickets',
+      });
+    }
+  };
 
 export const updateSupportTicketStatus =
   (ticketId: string, status: TicketStatus) => async (dispatch: AppDispatch) => {
@@ -97,42 +110,6 @@ export const updateSupportTicketStatus =
       dispatch({
         type: SUPPORT_UPDATE_STATUS_FAILURE,
         payload: 'Failed to update ticket status',
-      });
-    }
-  };
-
-/* ===== ASSIGN MANAGER (ADMIN) ===== */
-
-export const assignSupportTicketManager =
-  (ticketId: string, managerId: string) => async (dispatch: AppDispatch) => {
-    dispatch({ type: SUPPORT_ASSIGN_MANAGER_REQUEST });
-
-    try {
-      await api.patch(`/api/support/${ticketId}/assign`, { managerId });
-      dispatch(fetchAllSupportTickets());
-    } catch {
-      dispatch({
-        type: SUPPORT_ASSIGN_MANAGER_FAILURE,
-        payload: 'Failed to assign manager',
-      });
-    }
-  };
-
-/* ===== UNASSIGN ===== */
-
-export const unassignTicket =
-  (ticketId: string) => async (dispatch: AppDispatch) => {
-    dispatch({ type: SUPPORT_ASSIGN_MANAGER_REQUEST });
-
-    try {
-      await api.patch(`/api/support/${ticketId}/assign`, {
-        managerId: null,
-      });
-      dispatch(fetchAllSupportTickets());
-    } catch {
-      dispatch({
-        type: SUPPORT_ASSIGN_MANAGER_FAILURE,
-        payload: 'Failed to unassign ticket',
       });
     }
   };

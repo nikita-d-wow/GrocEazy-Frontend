@@ -5,22 +5,32 @@ import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
 
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import Pagination from '../../components/common/Pagination';
 
 import { fetchMySupportTickets } from '../../redux/actions/supportActions';
+import {
+  selectSupportMyTickets,
+  selectSupportLoading,
+  selectSupportPagination,
+} from '../../redux/selectors/supportSelectors';
+
 import type { AppDispatch } from '../../redux/store';
-import type { RootState } from '../../redux/rootReducer';
 import type { SupportTicket } from '../../redux/types/support.types';
+
+const PAGE_LIMIT = 4;
 
 export default function MyTickets() {
   const dispatch = useDispatch<AppDispatch>();
 
-  const { myTickets, loading } = useSelector(
-    (state: RootState) => state.support
-  );
+  const myTickets = useSelector(selectSupportMyTickets);
+  const loading = useSelector(selectSupportLoading);
+  const pagination = useSelector(selectSupportPagination);
+
+  const currentPage = pagination?.page || 1;
 
   useEffect(() => {
-    dispatch(fetchMySupportTickets());
-  }, [dispatch]);
+    dispatch(fetchMySupportTickets(currentPage, PAGE_LIMIT));
+  }, [dispatch, currentPage]);
 
   if (loading) {
     return <Loader />;
@@ -46,6 +56,16 @@ export default function MyTickets() {
           <TicketCard key={ticket._id} ticket={ticket} />
         ))}
       </div>
+
+      {pagination.totalPages > 1 && (
+        <div className="mt-10 flex justify-center">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={pagination.totalPages}
+            onPageChange={(p) => dispatch(fetchMySupportTickets(p, PAGE_LIMIT))}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -54,25 +74,13 @@ export default function MyTickets() {
 
 function TicketCard({ ticket }: { ticket: SupportTicket }) {
   return (
-    <div
-      className="
-        bg-white border border-gray-200 rounded-2xl
-        p-6 shadow-sm hover:shadow-lg
-        transition-all duration-300
-        flex flex-col sm:flex-row
-        sm:items-center sm:justify-between gap-6
-      "
-    >
-      {/* LEFT */}
+    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
       <div>
         <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold">
           Ticket ID
         </p>
-
         <p className="text-sm font-medium text-gray-600">{ticket._id}</p>
-
         <p className="mt-2 text-lg font-bold text-gray-900">{ticket.subject}</p>
-
         <p className="text-sm text-gray-500 mt-1">
           Created on{' '}
           <span className="font-medium">
@@ -81,7 +89,6 @@ function TicketCard({ ticket }: { ticket: SupportTicket }) {
         </p>
       </div>
 
-      {/* RIGHT */}
       <div className="flex items-center">
         <StatusChip status={ticket.status} />
       </div>
@@ -121,8 +128,6 @@ function StatusChip({ status }: { status: SupportTicket['status'] }) {
   );
 }
 
-/* ===================== CHIP ===================== */
-
 function Chip({
   icon,
   label,
@@ -134,14 +139,7 @@ function Chip({
 }) {
   return (
     <span
-      className={`
-        inline-flex items-center gap-2
-        px-4 py-2
-        rounded-full
-        text-sm font-bold
-        shadow-sm
-        ${className}
-      `}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold shadow-sm ${className}`}
     >
       {icon}
       {label}

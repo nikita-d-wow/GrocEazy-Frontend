@@ -6,7 +6,8 @@ interface Props {
 }
 
 const OrderCard = ({ order, onStatusChange }: Props) => {
-  const user = order.userId;
+  const customerName = order.userId?.name ?? 'Guest User';
+  const customerEmail = order.userId?.email ?? '—';
 
   return (
     <div className="rounded-[32px] bg-white/60 backdrop-blur-xl shadow-[0_25px_60px_rgba(0,0,0,0.08)] hover:shadow-[0_35px_80px_rgba(0,0,0,0.12)] transition-all">
@@ -15,9 +16,9 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
         <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-10">
           <div>
             <p className="text-lg font-semibold text-gray-900">
-              {user?.name || 'Customer'}
+              {customerName}
             </p>
-            <p className="text-sm text-gray-500">{user?.email || '—'}</p>
+            <p className="text-sm text-gray-500">{customerEmail}</p>
             <p className="text-sm text-gray-400">
               {order.address?.city}, {order.address?.state} ·{' '}
               {order.address?.phone}
@@ -62,33 +63,23 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
 
         {/* ITEMS */}
         <div className="space-y-5">
-          {order.items.map((item: any, idx: number) => {
-            const product = item.productId;
-
-            return (
-              <div
-                key={idx}
-                className="flex justify-between items-center rounded-2xl bg-white/70 backdrop-blur px-10 py-5 text-sm shadow-sm"
-              >
-                <span className="text-gray-600">
-                  {product ? (
-                    <>
-                      {product.name}{' '}
-                      <span className="text-gray-400">× {item.quantity}</span>
-                    </>
-                  ) : (
-                    <span className="italic text-gray-400">
-                      Product removed × {item.quantity}
-                    </span>
-                  )}
-                </span>
-
-                <span className="text-base font-semibold text-gray-800">
-                  ₹{item.lineTotal}
-                </span>
-              </div>
-            );
-          })}
+          {order.items.map((item: any, idx: number) => (
+            <div
+              key={idx}
+              className="flex justify-between items-center rounded-2xl bg-white/70 backdrop-blur px-10 py-5 text-sm shadow-sm"
+            >
+              <span className="text-gray-600">
+                Product ·{' '}
+                <span className="text-gray-400">
+                  {item.productId?.name ?? 'Unknown Product'}
+                </span>{' '}
+                × {item.quantity}
+              </span>
+              <span className="text-base font-semibold text-gray-800">
+                ₹{item.lineTotal}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

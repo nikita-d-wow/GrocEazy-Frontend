@@ -144,9 +144,30 @@ const Inventory: FC = () => {
                     product.lowStockThreshold
                   );
                   const StatusIcon = status.icon;
+
+                  // Handle both populated categoryId/category object and string IDs
+                  const getCategoryId = (p: typeof product) => {
+                    // Check categoryId field first
+                    if (
+                      typeof p.categoryId === 'object' &&
+                      p.categoryId !== null
+                    ) {
+                      return (p.categoryId as { _id: string })._id;
+                    }
+                    if (typeof p.categoryId === 'string' && p.categoryId) {
+                      return p.categoryId;
+                    }
+                    // Check category field
+                    if (typeof p.category === 'object' && p.category !== null) {
+                      return (p.category as { _id: string })._id;
+                    }
+                    return p.category;
+                  };
+
+                  const catId = getCategoryId(product);
+
                   const categoryName =
-                    categories.find((c) => c._id === product.categoryId)
-                      ?.name || 'N/A';
+                    categories.find((c) => c._id === catId)?.name || 'N/A';
 
                   return (
                     <tr

@@ -9,9 +9,9 @@ import { buildAnalytics } from '../../utils/analyticsBuilder';
 
 import AnalyticsCards from '../../components/manager/analytics/AnalyticsCards';
 import ChartCard from '../../components/manager/analytics/ChartCard';
-import RevenueBarChart from '../../components/manager/analytics/RevenueBarChart';
+import RevenueBarChart from '../../utils/wrappers/RevenueBarChartWrapper';
 import InventoryPieChart from '../../components/manager/analytics/IneventoryPieChart';
-import ProductStatusPieChart from '../../components/manager/analytics/ProductsStatusPieChart';
+import ProductStatusPieChart from '../../utils/wrappers/ProductStatusPieChartWrapper';
 
 import {
   Chart as ChartJS,

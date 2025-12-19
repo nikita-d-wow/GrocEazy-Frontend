@@ -25,45 +25,44 @@ export default function Header() {
     if (searchParam !== searchQuery) {
       setSearchQuery(searchParam);
     }
-  }, [location.search, searchQuery]);
+  }, [location.search]); // Remove searchQuery from deps to avoid re-triggering needlessly
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    if (e.key === 'Enter') {
+      const trimmed = searchQuery.trim();
+      const params = new URLSearchParams(location.search);
+      if (trimmed) {
+        params.set('search', trimmed);
+      } else {
+        params.delete('search');
+      }
+      navigate(`/products?${params.toString()}`);
+      setOpen(false); // Close mobile menu if open
     }
   };
 
-  // Debouncing logic
+  // Debouncing logic for "search as you type"
   React.useEffect(() => {
-    if (!searchQuery.trim()) {
-      // If query is cleared, and we are on products page, update URL to remove search
-      const currentParams = new URLSearchParams(location.search);
-      if (currentParams.has('search') && location.pathname === '/products') {
-        const timeoutId = setTimeout(() => {
-          const params = new URLSearchParams(location.search);
-          params.delete('search');
-          navigate(`${location.pathname}?${params.toString()}`, {
-            replace: true,
-          });
-        }, 500);
-        return () => clearTimeout(timeoutId);
-      }
-      return;
-    }
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams(location.search);
+      const currentSearch = params.get('search') || '';
+      const trimmedQuery = searchQuery.trim();
 
-    const timeoutId = setTimeout(() => {
-      const currentParams = new URLSearchParams(location.search);
-      if (currentParams.get('search') !== searchQuery.trim()) {
-        const params = new URLSearchParams(location.search);
-        params.set('search', searchQuery.trim());
-        const path =
-          location.pathname === '/products' ? '/products' : '/products';
-        navigate(`${path}?${params.toString()}`, { replace: true });
+      // Only navigate if the trimmed query is different from what's in the URL
+      if (trimmedQuery !== currentSearch) {
+        if (trimmedQuery) {
+          params.set('search', trimmedQuery);
+        } else {
+          params.delete('search');
+        }
+
+        // Always go to /products for search results
+        navigate(`/products?${params.toString()}`, { replace: true });
       }
     }, 500);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, navigate, location.pathname, location.search]);
+    return () => clearTimeout(timer);
+  }, [searchQuery, navigate, location.pathname]); // Removed location.search to prevent loops
 
   const dispatch = useAppDispatch();
 
@@ -125,17 +124,20 @@ export default function Header() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
           {/* Search */}
-          <div className="relative group">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
-              placeholder="Search available products..."
-              className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
-            />
-            <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
-          </div>
+          {/* Search */}
+          {!['admin', 'manager'].includes(role) && (
+            <div className="relative group">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                placeholder="Search available products..."
+                className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
+              />
+              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
+            </div>
+          )}
 
           {/* Wishlist & Cart (CUSTOMER ONLY) */}
           {isCustomer && (

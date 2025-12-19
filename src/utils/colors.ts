@@ -17,3 +17,15 @@ export const pastel = {
   emerald: '#bbf7d0',
   gray: '#e5e7eb',
 };
+
+export const bright = {
+  indigo: '#6366f1', // Indigo 500
+  sky: '#0ea5e9', // Sky 500
+  amber: '#f59e0b', // Amber 500
+  rose: '#f43f5e', // Rose 500
+  emerald: '#10b981', // Emerald 500
+  purple: '#a855f7', // Purple 500
+  pink: '#ec4899', // Pink 500
+  cyan: '#06b6d4', // Cyan 500
+  gray: '#9ca3af', // Gray 400
+};

@@ -9,7 +9,8 @@ export interface Product {
   price: number;
   images: string[];
   isActive: boolean;
-  categoryId: string;
+  categoryId: string | { _id: string; name: string };
+  category?: { _id: string; name: string } | string;
   createdBy?: string;
   isDeleted: boolean;
   createdAt: string;
