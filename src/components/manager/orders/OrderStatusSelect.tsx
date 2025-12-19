@@ -12,12 +12,14 @@ const OrderStatusSelect = ({ status, disabled, onChange }: Props) => {
   return (
     <div
       className={`
+        relative
         inline-flex items-center
-        rounded-full
-        px-4 py-2
-        text-sm font-medium
-        ring-1
-        ${meta.bg} ${meta.text} ${meta.ring}
+        rounded-xl
+        px-3 py-1.5
+        text-xs font-bold uppercase tracking-wider
+        shadow-sm transition-all duration-300
+        ${meta.bg} ${meta.text} ring-1 ${meta.ring}
+        hover:shadow-md hover:scale-[1.02]
       `}
     >
       <select
@@ -30,20 +32,27 @@ const OrderStatusSelect = ({ status, disabled, onChange }: Props) => {
           cursor-pointer
           disabled:cursor-not-allowed
           appearance-none
-          pr-5
-          text-sm
-          min-w-[90px]
+          pr-6
+          text-[11px]
+          min-w-[100px]
+          font-black
         "
       >
         {ORDER_STATUSES.map((s) => (
-          <option key={s} value={s}>
+          <option
+            key={s}
+            value={s}
+            className="bg-white text-gray-900 font-medium normal-case"
+          >
             {s}
           </option>
         ))}
       </select>
 
       {/* dropdown arrow */}
-      <span className="ml-2 pointer-events-none text-xs opacity-70">▾</span>
+      <span className="absolute right-3 pointer-events-none text-[10px] opacity-60">
+        ▼
+      </span>
     </div>
   );
 };

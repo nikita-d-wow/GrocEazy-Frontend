@@ -25,8 +25,8 @@ const OrdersManagement = () => {
   }, [dispatch, page]);
 
   return (
-    <div className="min-h-screen px-4 sm:px-6 lg:px-12 py-8">
-      <div className="max-w-[1400px] mx-auto space-y-10">
+    <div className="min-h-screen bg-transparent px-4 sm:px-8 lg:px-12 py-10 animate-fadeIn">
+      <div className="max-w-[1400px] mx-auto space-y-12">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
