@@ -13,4 +13,4 @@ export const selectSupportLoading = (state: RootState) => state.support.loading;
 export const selectSupportError = (state: RootState) => state.support.error;
 
 export const selectSupportPagination = (state: RootState) =>
-  state.support.pagination;
+  state.support.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 };
