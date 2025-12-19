@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { CreditCard, Wallet, ArrowRight } from 'lucide-react';
+import { Wallet, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
@@ -27,10 +27,10 @@ const Checkout = () => {
   const total = subtotal + delivery;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
       <div className="grid lg:grid-cols-3 gap-8">
         {/* LEFT */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="lg:col-span-2 glass-card p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">
             Order Summary
           </h2>
@@ -38,12 +38,12 @@ const Checkout = () => {
           {items.map((item) => (
             <div
               key={item.product._id}
-              className="flex items-center gap-4 py-4 border-b border-gray-100"
+              className="flex items-center gap-4 py-4 border-b border-gray-100 last:border-0"
             >
               <img
                 src={item.product.images?.[0]}
                 alt={item.product.name}
-                className="w-16 h-16 rounded-lg object-cover border"
+                className="w-16 h-16 rounded-lg object-cover shadow-sm"
               />
 
               <div className="flex-1">
@@ -59,7 +59,7 @@ const Checkout = () => {
         </div>
 
         {/* RIGHT */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit">
+        <div className="glass-card p-6 h-fit">
           <h3 className="text-lg font-bold text-gray-900 mb-4">
             Payment Method
           </h3>
@@ -67,24 +67,13 @@ const Checkout = () => {
           <div className="space-y-3">
             <button
               onClick={() => setPaymentMethod('cod')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-left ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all duration-300 ${
                 paymentMethod === 'cod'
-                  ? 'border-primary bg-primary-light text-primary-dark'
-                  : 'border-gray-200 hover:bg-gray-50'
+                  ? 'border-primary bg-primary/10 text-primary-dark shadow-sm'
+                  : 'border-transparent bg-gray-50 hover:bg-gray-100'
               }`}
             >
               <Wallet size={18} /> Cash on Delivery
-            </button>
-
-            <button
-              onClick={() => setPaymentMethod('online')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-left ${
-                paymentMethod === 'online'
-                  ? 'border-primary bg-primary-light text-primary-dark'
-                  : 'border-gray-200 hover:bg-gray-50'
-              }`}
-            >
-              <CreditCard size={18} /> Online Payment
             </button>
           </div>
 
@@ -97,7 +86,7 @@ const Checkout = () => {
               <span>Delivery</span>
               <span>{delivery === 0 ? 'Free' : `₹${delivery}`}</span>
             </div>
-            <div className="flex justify-between font-semibold text-base">
+            <div className="flex justify-between font-semibold text-base mt-4 pt-4 border-t border-gray-100">
               <span>Total</span>
               <span>₹{total}</span>
             </div>
@@ -109,7 +98,7 @@ const Checkout = () => {
                 state: { paymentMethod, total },
               })
             }
-            className="mt-6 w-full bg-primary text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-primary-dark transition"
+            className="mt-6 w-full bg-primary text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
           >
             Continue <ArrowRight size={18} />
           </button>

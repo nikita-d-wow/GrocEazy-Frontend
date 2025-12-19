@@ -13,6 +13,12 @@ const initialState: WishlistState = {
   loading: false,
   items: [],
   error: null,
+  pagination: {
+    page: 1,
+    limit: 12,
+    total: 0,
+    totalPages: 1,
+  },
 };
 
 export function wishlistReducer(
@@ -24,7 +30,12 @@ export function wishlistReducer(
       return { ...state, loading: true, error: null };
 
     case WISHLIST_FETCH_SUCCESS:
-      return { ...state, loading: false, items: action.payload };
+      return {
+        ...state,
+        loading: false,
+        items: action.payload.items,
+        pagination: action.payload.pagination,
+      };
 
     case WISHLIST_FETCH_FAILURE:
       return { ...state, loading: false, error: action.payload };

@@ -8,28 +8,33 @@ import { fetchWishlist } from '../../redux/actions/wishlistActions';
 import {
   selectWishlistItems,
   selectWishlistLoading,
+  selectWishlistPagination,
 } from '../../redux/selectors/wishlistSelectors';
 
 import type { AppDispatch } from '../../redux/store';
+import type { RootState } from '../../redux/rootReducer';
 
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import Pagination from '../../components/common/Pagination';
 import WishlistGrid from '../../components/customer/wishlist/WishlistGrid';
 
-import type { RootState } from '../../redux/rootReducer';
+const PAGE_LIMIT = 6;
 
 export default function WishlistPage() {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
   const items = useSelector(selectWishlistItems);
   const loading = useSelector(selectWishlistLoading);
+  const { page, totalPages } = useSelector(selectWishlistPagination);
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     if (user) {
-      dispatch(fetchWishlist());
+      dispatch(fetchWishlist(page, PAGE_LIMIT));
     }
-  }, [dispatch, user]);
+  }, [dispatch, user, page]);
 
   if (!user) {
     return (
@@ -68,6 +73,16 @@ export default function WishlistPage() {
       <h1 className="text-3xl font-bold mb-8 text-gray-900">Your Wishlist</h1>
 
       <WishlistGrid items={items} />
+
+      {totalPages > 1 && (
+        <div className="mt-10 flex justify-center">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(p) => dispatch(fetchWishlist(p, PAGE_LIMIT))}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -82,7 +82,7 @@ const CheckoutAddress = () => {
 
   /* ---------------- RENDER ---------------- */
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
       {/* PAGE HEADER */}
       <header className="mb-10">
         <h1 className="text-3xl font-bold text-gray-900">Delivery Address</h1>
@@ -99,7 +99,7 @@ const CheckoutAddress = () => {
               onClick={() => navigate('/profile?tab=address')}
               className="inline-flex items-center gap-2 px-4 py-2
                          bg-primary text-white text-sm font-medium
-                         rounded-lg hover:bg-primary-dark transition"
+                         rounded-xl hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
             >
               <Plus size={16} />
               Add New Address
@@ -107,7 +107,7 @@ const CheckoutAddress = () => {
           </div>
 
           {addresses.length === 0 && (
-            <div className="border border-dashed border-gray-300 rounded-xl p-10 text-center bg-white">
+            <div className="border border-dashed border-gray-300 rounded-xl p-10 text-center glass-card">
               <MapPin size={36} className="mx-auto text-gray-400 mb-4" />
               <p className="text-gray-600 mb-4">
                 You don’t have any saved addresses yet.
@@ -124,20 +124,26 @@ const CheckoutAddress = () => {
                   <div
                     key={address._id}
                     onClick={() => setSelectedAddressId(address._id ?? null)}
-                    className={`cursor-pointer rounded-xl border p-5 transition
+                    className={`cursor-pointer rounded-xl border p-5 transition-all duration-300
                       ${
                         isSelected
-                          ? 'border-primary bg-primary-light'
-                          : 'border-gray-200 bg-white hover:bg-gray-50'
+                          ? 'border-primary bg-primary/10 shadow-2xl'
+                          : 'border-transparent bg-white/60 hover:bg-white/80 shadow-lg hover:shadow-2xl'
                       }`}
                   >
                     <div className="flex justify-between items-start gap-4">
                       <div className="space-y-1">
-                        <p className="text-sm text-gray-800">
+                        <p className="text-sm text-gray-800 font-medium">
                           {address.street}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {address.city}, {address.state}
+                          {address.city}, {address.state} - {address.zipCode}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {address.country}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Phone: {user?.phone || 'N/A'}
                         </p>
                       </div>
 
@@ -153,7 +159,7 @@ const CheckoutAddress = () => {
         </section>
 
         {/* ================= RIGHT ================= */}
-        <aside className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit">
+        <aside className="glass-card p-6 h-fit">
           <h2 className="text-lg font-bold text-gray-900 mb-4">
             Order Summary
           </h2>
@@ -173,9 +179,10 @@ const CheckoutAddress = () => {
             disabled={!selectedAddressId || cartItems.length === 0}
             onClick={handlePlaceOrder}
             className="mt-6 w-full bg-primary text-white
-                       py-3 rounded-lg font-medium
+                       py-3 rounded-xl font-medium
                        hover:bg-primary-dark transition
-                       disabled:opacity-50 disabled:cursor-not-allowed"
+                       disabled:opacity-50 disabled:cursor-not-allowed
+                       shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
           >
             Place Order
           </button>

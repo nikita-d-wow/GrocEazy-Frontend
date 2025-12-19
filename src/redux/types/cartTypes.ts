@@ -24,10 +24,26 @@ export interface CartItem {
   product: CartProduct;
 }
 
+/* ======================
+   PAGINATION TYPE
+====================== */
+
+export interface CartPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/* ======================
+   CART STATE
+====================== */
+
 export interface CartState {
   loading: boolean;
   items: CartItem[];
   error: string | null;
+  pagination: CartPagination;
 }
 
 /* ======================
@@ -36,6 +52,12 @@ export interface CartState {
 
 export type CartActionTypes =
   | { type: typeof CART_FETCH_REQUEST }
-  | { type: typeof CART_FETCH_SUCCESS; payload: CartItem[] }
+  | {
+      type: typeof CART_FETCH_SUCCESS;
+      payload: {
+        items: CartItem[];
+        pagination: CartPagination;
+      };
+    }
   | { type: typeof CART_FETCH_FAILURE; payload: string }
   | { type: typeof CART_CLEAR };

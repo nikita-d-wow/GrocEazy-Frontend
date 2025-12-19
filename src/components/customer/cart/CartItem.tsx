@@ -14,14 +14,7 @@ export default function CartItem({
 }: CartItemProps & ExtraProps) {
   const handleMoveToWishlist = () => {
     moveToWishlist(item._id, item.productId);
-
-    toast.success('Moved to wishlist ❤️', {
-      style: {
-        borderRadius: '12px',
-        background: '#fff',
-        color: '#111',
-      },
-    });
+    toast.success('Moved to wishlist ❤️');
   };
 
   return (
@@ -30,124 +23,113 @@ export default function CartItem({
         bg-white p-4 sm:p-6
         rounded-2xl sm:rounded-3xl
         border border-gray-200
-        shadow-[0_4px_14px_rgba(0,0,0,0.07)]
-        hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)]
-        transition-all duration-300 hover:-translate-y-1
+        shadow-sm
+        transition
         flex flex-col sm:flex-row gap-4 sm:gap-6
-        items-start sm:items-center
-        animate-fadeSlide
       "
     >
-      {/* IMAGE */}
-      <img
-        src={item.image}
-        alt={item.name}
-        className="
-          w-20 h-20
-          sm:w-24 sm:h-24
-          lg:w-28 lg:h-28
-          rounded-xl sm:rounded-2xl
-          object-cover
-          shadow-md
-          border border-gray-100
-          shrink-0
-        "
-      />
-
-      {/* PRODUCT INFO */}
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold text-gray-900 text-base sm:text-lg lg:text-xl break-words">
-          {item.name}
-        </p>
-
-        <p className="text-gray-500 mt-1 text-sm sm:text-base">
-          Price:{' '}
-          <span className="text-primary font-semibold">₹{item.unitPrice}</span>
-        </p>
-
-        {/* ✅ Wishlist — PRIMARY COLOR */}
-        <button
-          type="button"
-          onClick={handleMoveToWishlist}
+      {/* ================= LEFT ================= */}
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 flex-1">
+        {/* IMAGE */}
+        <img
+          src={item.image}
+          alt={item.name}
           className="
-            mt-2 inline-flex items-center gap-2
-            px-3 py-1.5
-            rounded-full
-            bg-primary/10 text-primary
-            text-xs sm:text-sm font-semibold
-            hover:bg-primary/20
-            active:scale-95
-            transition
+            w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28
+            rounded-xl object-cover
+            border border-gray-100
+            shrink-0
           "
-        >
-          <Heart size={14} />
-          Move to wishlist
-        </button>
+        />
 
-        {/* QUANTITY */}
-        <div className="mt-4 flex items-center gap-3 sm:gap-4">
-          {item.quantity > 1 && (
-            <button
-              type="button"
-              onClick={() => updateQty(item._id, 'dec')}
-              className="
-                p-2 rounded-lg sm:rounded-xl
-                bg-red-50 border border-red-200
-                hover:bg-red-100
-                active:scale-90
-                transition shadow-sm
-              "
-            >
-              <Minus size={16} className="text-red-600" />
-            </button>
-          )}
+        {/* INFO */}
+        <div className="flex-1 min-w-0">
+          <p className="font-semibold text-gray-900 text-base sm:text-lg line-clamp-2">
+            {item.name}
+          </p>
 
-          <span className="font-semibold text-gray-900 text-sm sm:text-lg px-2">
-            {item.quantity}
-          </span>
+          <p className="text-sm text-gray-500 mt-1">
+            Price:{' '}
+            <span className="text-primary font-semibold">
+              ₹{item.unitPrice}
+            </span>
+          </p>
 
-          <button
-            type="button"
-            onClick={() => updateQty(item._id, 'inc')}
+          {/* QUANTITY */}
+          <div
             className="
-              p-2 rounded-lg sm:rounded-xl
-              bg-green-50 border border-green-200
-              hover:bg-green-100
-              active:scale-90
-              transition shadow-sm
+              mt-3
+              flex items-center gap-4
+              justify-start
             "
           >
-            <Plus size={16} className="text-green-700" />
-          </button>
+            {item.quantity > 1 && (
+              <button
+                onClick={() => updateQty(item._id, 'dec')}
+                className="
+                  p-2 rounded-lg
+                  bg-red-50 border border-red-200
+                  hover:bg-red-100
+                "
+              >
+                <Minus size={16} className="text-red-600" />
+              </button>
+            )}
+
+            <span className="font-semibold text-gray-900">{item.quantity}</span>
+
+            <button
+              onClick={() => updateQty(item._id, 'inc')}
+              className="
+                p-2 rounded-lg
+                bg-green-50 border border-green-200
+                hover:bg-green-100
+              "
+            >
+              <Plus size={16} className="text-green-700" />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* RIGHT */}
+      {/* ================= RIGHT ================= */}
       <div
         className="
           w-full sm:w-auto
-          flex sm:flex-col
-          justify-between sm:justify-center
+          flex flex-row sm:flex-col
+          justify-between sm:justify-start
           items-center sm:items-end
-          gap-2 sm:gap-4
-          text-right
+          gap-3 sm:gap-4
+          pt-2 sm:pt-0
+          border-t sm:border-t-0 border-gray-100
         "
       >
-        <p className="text-lg sm:text-xl font-bold text-gray-900">
-          ₹{item.unitPrice * item.quantity}
-        </p>
-
+        {/* WISHLIST */}
         <button
-          type="button"
-          onClick={() => removeItem(item._id)}
+          onClick={handleMoveToWishlist}
           className="
-            text-red-500 hover:text-red-700
-            active:scale-95
-            transition
+            inline-flex items-center gap-2
+            text-primary text-sm font-medium
+            hover:underline
           "
         >
-          <Trash2 size={20} />
+          <Heart size={14} />
+          Wishlist
         </button>
+
+        {/* TOTAL + DELETE */}
+        <div className="flex items-center gap-3">
+          <p className="font-bold text-gray-900">
+            ₹{item.unitPrice * item.quantity}
+          </p>
+
+          <button
+            onClick={() => removeItem(item._id)}
+            className="text-red-500 hover:text-red-700"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
       </div>
     </div>
   );

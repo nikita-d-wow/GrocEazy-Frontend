@@ -8,16 +8,23 @@ import {
 } from '../types/cartTypes';
 import type { AppDispatch } from '../store';
 
-export const fetchCart = () => {
-  return async (dispatch: AppDispatch) => {
+const DEFAULT_LIMIT = 5;
+
+/* ================= FETCH CART (PAGINATED) ================= */
+export const fetchCart =
+  (page = 1, limit = DEFAULT_LIMIT) =>
+  async (dispatch: AppDispatch) => {
     dispatch({ type: CART_FETCH_REQUEST });
 
     try {
-      const { data } = await api.get('/api/cart');
+      const { data } = await api.get(`/api/cart?page=${page}&limit=${limit}`);
 
       dispatch({
         type: CART_FETCH_SUCCESS,
-        payload: data.cart,
+        payload: {
+          items: data.items,
+          pagination: data.pagination,
+        },
       });
     } catch (err: unknown) {
       const message =
@@ -29,27 +36,34 @@ export const fetchCart = () => {
       });
     }
   };
-};
 
+/* ================= UPDATE QUANTITY ================= */
 export const updateCartQty = (cartId: string, quantity: number) => {
-  return async (dispatch: AppDispatch) => {
+  return async (dispatch: AppDispatch, getState: any) => {
     try {
-      if (quantity < 0) {
+      if (quantity < 1) {
         return;
-      } // Prevent negative quantity
+      }
+
       await api.put(`/api/cart/${cartId}`, { quantity });
-      dispatch(fetchCart());
+
+      const { page, limit } = getState().cart.pagination;
+      dispatch(fetchCart(page, limit));
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to update quantity');
     }
   };
 };
 
+/* ================= REMOVE ITEM ================= */
 export const removeCartItem = (cartId: string) => {
-  return async (dispatch: AppDispatch) => {
+  return async (dispatch: AppDispatch, getState: any) => {
     try {
       await api.delete(`/api/cart/${cartId}`);
-      dispatch(fetchCart());
+
+      const { page, limit } = getState().cart.pagination;
+      dispatch(fetchCart(page, limit));
+
       toast.success('Item removed from cart');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to remove item');
@@ -57,6 +71,7 @@ export const removeCartItem = (cartId: string) => {
   };
 };
 
+/* ================= CLEAR CART ================= */
 export const clearCart = () => {
   return async (dispatch: AppDispatch) => {
     try {
@@ -69,21 +84,20 @@ export const clearCart = () => {
   };
 };
 
+/* ================= ADD TO CART ================= */
 export const addToCart = (productId: string, quantity = 1) => {
   return async (dispatch: AppDispatch, getState: any) => {
-    const { auth } = getState();
+    const { auth, cart } = getState();
+
     if (!auth.user) {
       toast.error('Please log in to add items to cart');
       return;
     }
 
     try {
-      await api.post('/api/cart', {
-        productId,
-        quantity,
-      });
+      await api.post('/api/cart', { productId, quantity });
 
-      dispatch(fetchCart());
+      dispatch(fetchCart(cart.pagination.page, cart.pagination.limit));
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to add item to cart');
       throw err;

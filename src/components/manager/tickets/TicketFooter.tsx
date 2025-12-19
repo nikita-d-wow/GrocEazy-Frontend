@@ -10,7 +10,9 @@ export default function TicketFooter({ ticket }: { ticket: SupportTicket }) {
         </div>
         <span className="truncate">
           <span className="font-medium text-gray-700 mr-1">Customer:</span>
-          {ticket.user?.email}
+          {ticket.user?.name
+            ? `${ticket.user.name} (${ticket.user.email})`
+            : ticket.user?.email}
         </span>
       </p>
 
