@@ -91,12 +91,46 @@ const ProductsPage: FC = () => {
     let result = products.filter((p: Product) => p.isActive !== false);
 
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (p: Product) =>
-          p.name.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query)
-      );
+      const query = searchQuery.toLowerCase().trim();
+      const queryWords = query.split(/\s+/).filter((w) => w.length > 0);
+
+      // 1. Try matching only in names first (High precision)
+      const nameMatches = result.filter((p: Product) => {
+        const name = p.name.toLowerCase();
+        return queryWords.every((word) => name.includes(word));
+      });
+
+      if (nameMatches.length > 0) {
+        result = nameMatches;
+      } else {
+        // 2. If no name matches, fallback to name + description (Broad search)
+        // But only for queries that are long enough to be meaningful
+        result = result.filter((p: Product) => {
+          const name = p.name.toLowerCase();
+          const desc = p.description?.toLowerCase() || '';
+          return queryWords.every(
+            (word) => name.includes(word) || desc.includes(word)
+          );
+        });
+      }
+
+      // Sort: Exact name matches and starts-with first
+      result.sort((a, b) => {
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+
+        const aExact = aName === query ? 2 : aName.startsWith(query) ? 1 : 0;
+        const bExact = bName === query ? 2 : bName.startsWith(query) ? 1 : 0;
+
+        if (aExact !== bExact) {
+          return bExact - aExact;
+        }
+
+        // Secondary sort: contains in name
+        const aInName = aName.includes(query) ? 1 : 0;
+        const bInName = bName.includes(query) ? 1 : 0;
+        return bInName - aInName;
+      });
     } else if (selectedCategory) {
       result = result.filter((p: Product) => {
         const catId =

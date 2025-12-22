@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   LogOut,
   User,
-  Settings,
   ShoppingBag,
   ChevronDown,
   ShieldCheck,
@@ -125,18 +124,6 @@ const UserProfileDropdown: React.FC = () => {
                 >
                   <ShoppingBag size={16} />
                   My Orders
-                </button>
-                {/* User did not explicitly ask for Settings in the list, but strictly followed the list for other roles. 
-                    Customer list: Home, Shop, Wishlist, Cart, Contact. 
-                    Settings was in the dropdown previously. I'll keep it for customers only for now as it's common. */}
-                <button
-                  onClick={() => {
-                    setIsOpen(false); /* Navigate to settings */
-                  }}
-                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  <Settings size={16} />
-                  Settings
                 </button>
               </>
             )}

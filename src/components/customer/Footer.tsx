@@ -26,9 +26,20 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* BRAND */}
           <div className="col-span-1 md:col-span-2 space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
-              Groc<span className="text-green-600">Eazy</span>
-            </h2>
+            <Link
+              to={
+                role === 'admin'
+                  ? '/admin'
+                  : role === 'manager'
+                    ? '/manager'
+                    : '/'
+              }
+              className="inline-block"
+            >
+              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
+                Groc<span className="text-green-600">Eazy</span>
+              </h2>
+            </Link>
 
             <p className="text-gray-600 leading-relaxed max-w-sm">
               Fresh groceries delivered to your doorstep in minutes. We partner
