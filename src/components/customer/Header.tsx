@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, Menu, Heart } from 'lucide-react';
+import { Search, ShoppingCart, Menu, Heart, ShoppingBag } from 'lucide-react';
 import React, { useState } from 'react';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -290,6 +290,22 @@ export default function Header() {
                   </div>
                 </div>
               </div>
+
+              {/* My Orders Mobile Link */}
+              {isCustomer && (
+                <div
+                  onClick={() => {
+                    navigate('/orders');
+                    setOpen(false);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                    <ShoppingBag size={20} />
+                  </div>
+                  <div className="font-medium text-gray-700">My Orders</div>
+                </div>
+              )}
 
               <div className="pt-2 px-1 text-center">
                 <button
