@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Loader2, PackageX } from 'lucide-react';
+import { Loader2, PackageX, ChevronLeft, ChevronRight } from 'lucide-react';
 import OrderCard from '../../components/customer/orders/OrderCard';
 import { getMyOrders } from '../../redux/actions/orderActions';
 import { fetchProducts } from '../../redux/actions/productActions';
@@ -11,14 +11,24 @@ import type { ThunkDispatch } from 'redux-thunk';
 export default function OrdersPage() {
   const dispatch =
     useDispatch<ThunkDispatch<RootState, any, OrderActionTypes>>();
-  const { orders, loading, error } = useSelector(
+  const { orders, pagination, loading, error } = useSelector(
     (state: RootState) => state.order
   );
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
   useEffect(() => {
-    dispatch(getMyOrders());
+    dispatch(getMyOrders(currentPage, itemsPerPage));
     dispatch(fetchProducts());
-  }, [dispatch]);
+  }, [dispatch, currentPage]);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && pagination && page <= pagination.pages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   if (loading) {
     return (
@@ -35,7 +45,7 @@ export default function OrdersPage() {
         <h3 className="text-xl font-semibold text-gray-900">Oops!</h3>
         <p className="text-gray-500 mt-2">{error}</p>
         <button
-          onClick={() => dispatch(getMyOrders())}
+          onClick={() => dispatch(getMyOrders(currentPage, itemsPerPage))}
           className="mt-4 text-primary font-medium hover:underline"
         >
           Try Again
@@ -62,6 +72,45 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <OrderCard key={order._id} order={order} />
           ))}
+
+          {/* Pagination Controls */}
+          {pagination && pagination.pages > 1 && (
+            <div className="flex justify-center items-center mt-8 space-x-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-600" />
+              </button>
+
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: pagination.pages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                        currentPage === page
+                          ? 'bg-primary text-white shadow-md'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+              </div>
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === pagination.pages}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
