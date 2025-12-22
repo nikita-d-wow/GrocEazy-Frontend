@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import type { Dispatch } from 'redux';
 import {
   FETCH_ORDERS_REQUEST,
@@ -28,9 +29,10 @@ interface CreateOrderPayload {
 
 /* ================= USER ORDERS ================= */
 
-export const getMyOrders = () => {
-  return async (dispatch: Dispatch<OrderActionTypes>) => {
+export const getMyOrders =
+  () => async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
+
     try {
       const { data } = await api.get('/api/orders');
 
@@ -48,11 +50,11 @@ export const getMyOrders = () => {
       });
     }
   };
-};
 
-export const getOrderDetails = (id: string) => {
-  return async (dispatch: Dispatch<OrderActionTypes>) => {
+export const getOrderDetails =
+  (id: string) => async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDER_DETAILS_REQUEST });
+
     try {
       const { data } = await api.get<Order>(`/api/orders/${id}`);
       dispatch({ type: FETCH_ORDER_DETAILS_SUCCESS, payload: data });
@@ -64,39 +66,44 @@ export const getOrderDetails = (id: string) => {
       });
     }
   };
-};
 
-export const createOrder = (payload: CreateOrderPayload, navigate: any) => {
-  return async (dispatch: Dispatch<any>) => {
+/* ================= CREATE ORDER ================= */
+
+export const createOrder =
+  (payload: CreateOrderPayload, navigate: any) =>
+  async (dispatch: Dispatch<any>) => {
     dispatch({ type: CREATE_ORDER_REQUEST });
 
     try {
-      const token = localStorage.getItem('accessToken');
-
-      const { data } = await api.post<Order>('/api/orders', payload, {
-        headers: {
-          Authorization: token ? `Bearer ${token}` : '',
-        },
-      });
+      const { data } = await api.post<Order>('/api/orders', payload);
 
       dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
+
+      // ✅ clear frontend cart ONLY after successful order
       dispatch(clearCart());
-      navigate('/orders');
+
+      toast.success('Order placed successfully!');
+      navigate('/');
     } catch (error: any) {
       dispatch({
         type: CREATE_ORDER_FAILURE,
         payload: error.response?.data?.message || 'Failed to create order',
       });
+
+      toast.error(error.response?.data?.message || 'Order failed, try again');
     }
   };
-};
 
-export const cancelOrder = (id: string) => {
-  return async (dispatch: Dispatch<OrderActionTypes>) => {
+/* ================= CANCEL ORDER ================= */
+
+export const cancelOrder =
+  (id: string) => async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: CANCEL_ORDER_REQUEST });
+
     try {
       await api.patch(`/api/orders/${id}/cancel`);
       dispatch({ type: CANCEL_ORDER_SUCCESS, payload: id });
+      toast.success('Order cancelled');
     } catch (error: any) {
       dispatch({
         type: CANCEL_ORDER_FAILURE,
@@ -104,13 +111,14 @@ export const cancelOrder = (id: string) => {
       });
     }
   };
-};
 
 /* ================= MANAGER ORDERS ================= */
 
-export const getAllOrders = (page = 1, limit = 5) => {
-  return async (dispatch: Dispatch<OrderActionTypes>) => {
+export const getAllOrders =
+  (page = 1, limit = 5) =>
+  async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
+
     try {
       const { data } = await api.get(
         `/api/orders/all?page=${page}&limit=${limit}`
@@ -130,11 +138,12 @@ export const getAllOrders = (page = 1, limit = 5) => {
       });
     }
   };
-};
 
-export const changeOrderStatus = (id: string, status: string) => {
-  return async (dispatch: Dispatch<OrderActionTypes>) => {
+export const changeOrderStatus =
+  (id: string, status: string) =>
+  async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDER_DETAILS_REQUEST });
+
     try {
       const { data } = await api.patch(`/api/orders/${id}/status`, { status });
       dispatch({
@@ -149,4 +158,3 @@ export const changeOrderStatus = (id: string, status: string) => {
       });
     }
   };
-};

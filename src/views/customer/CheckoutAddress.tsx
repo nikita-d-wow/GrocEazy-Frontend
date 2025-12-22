@@ -7,7 +7,6 @@ import type { RootState } from '../../redux/rootReducer';
 import type { IAddress } from '../../redux/types/authTypes';
 import { createOrder } from '../../redux/actions/orderActions';
 import type { AppDispatch } from '../../redux/store';
-import toast from 'react-hot-toast';
 import type { Address } from '../../redux/types/orderTypes';
 // import AddressManager from '../../components/customer/profile/AddressManager';
 
@@ -76,8 +75,6 @@ const CheckoutAddress = () => {
         navigate
       )
     );
-
-    toast.success('Order placed successfully');
   };
 
   /* ---------------- RENDER ---------------- */
