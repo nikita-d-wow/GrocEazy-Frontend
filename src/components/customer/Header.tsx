@@ -18,14 +18,50 @@ export default function Header() {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
 
-  // Sync search input with URL when navigating back/forward or externally
+  // 1. Sync state FROM URL (Handles browser back/forward and external navigations)
   React.useEffect(() => {
-    const searchParam =
-      new URLSearchParams(location.search).get('search') || '';
+    const urlParams = new URLSearchParams(location.search);
+    const searchParam = urlParams.get('search') || '';
     if (searchParam !== searchQuery) {
       setSearchQuery(searchParam);
     }
-  }, [location.search]); // Remove searchQuery from deps to avoid re-triggering needlessly
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]); // Only re-run when actual URL search changes
+
+  // 2. Sync URL FROM state (Handles typing with debounce)
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const currentSearch = urlParams.get('search') || '';
+    const trimmedQuery = searchQuery.trim();
+
+    // Avoid redundant navigation if state matches URL
+    if (trimmedQuery === currentSearch) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      const newParams = new URLSearchParams(location.search);
+      if (trimmedQuery) {
+        newParams.set('search', trimmedQuery);
+        newParams.delete('category'); // Searching usually clears category
+      } else {
+        newParams.delete('search');
+      }
+
+      // Only navigate if we're not just clearing an empty search on a non-products page
+      const isStillDifferent =
+        newParams.get('search') !==
+        (new URLSearchParams(location.search).get('search') || '');
+
+      if (isStillDifferent) {
+        navigate(`/products?${newParams.toString()}`, { replace: true });
+        setOpen(false); // Close mobile menu
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, navigate]); // Notice location.search is NOT a dependency to prevent feedback loops
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -33,36 +69,14 @@ export default function Header() {
       const params = new URLSearchParams(location.search);
       if (trimmed) {
         params.set('search', trimmed);
+        params.delete('category');
       } else {
         params.delete('search');
       }
-      navigate(`/products?${params.toString()}`);
-      setOpen(false); // Close mobile menu if open
+      navigate(`/products?${params.toString()}`, { replace: true });
+      setOpen(false);
     }
   };
-
-  // Debouncing logic for "search as you type"
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      const params = new URLSearchParams(location.search);
-      const currentSearch = params.get('search') || '';
-      const trimmedQuery = searchQuery.trim();
-
-      // Only navigate if the trimmed query is different from what's in the URL
-      if (trimmedQuery !== currentSearch) {
-        if (trimmedQuery) {
-          params.set('search', trimmedQuery);
-        } else {
-          params.delete('search');
-        }
-
-        // Always go to /products for search results
-        navigate(`/products?${params.toString()}`, { replace: true });
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery, navigate, location.pathname]); // Removed location.search to prevent loops
 
   const dispatch = useAppDispatch();
 
@@ -96,13 +110,18 @@ export default function Header() {
   return (
     <header className="w-full bg-white/90 backdrop-blur-md border-b border-green-50 sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-3 flex items-center justify-between">
-        {/* Logo - Link removed as requested, keeping cursor pointer */}
-        <div className="flex items-center gap-2 group mr-8 cursor-pointer select-none">
+        {/* Logo - Link added with role-based navigation */}
+        <Link
+          to={
+            role === 'admin' ? '/admin' : role === 'manager' ? '/manager' : '/'
+          }
+          className="flex items-center gap-2 group mr-8 cursor-pointer select-none"
+        >
           <h1 className="text-2xl font-bold text-gray-800 tracking-tight flex items-center">
             Groc
             <span className="text-green-600">Eazy</span>
           </h1>
-        </div>
+        </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8 text-gray-600 font-medium">

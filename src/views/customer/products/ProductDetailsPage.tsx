@@ -16,6 +16,7 @@ import {
   addToCart,
   updateCartQty,
   removeCartItem,
+  fetchCart,
 } from '../../../redux/actions/cartActions';
 
 import {
@@ -27,6 +28,7 @@ import { selectCartItems } from '../../../redux/selectors/cartSelectors';
 
 import ProductCard from '../../../components/customer/ProductCard';
 import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
+import type { RootState } from '../../../redux/store';
 
 const ProductDetailsPage: FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +38,7 @@ const ProductDetailsPage: FC = () => {
   const similarProducts = useSelector(selectSimilarProducts);
   const topProducts = useSelector(selectTopProducts);
   const cartItems = useSelector(selectCartItems);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -45,14 +48,17 @@ const ProductDetailsPage: FC = () => {
       dispatch(fetchSimilarProducts(id));
     }
     dispatch(fetchTopProducts());
+    if (user) {
+      dispatch(fetchCart());
+    }
     window.scrollTo(0, 0);
-  }, [dispatch, id]);
+  }, [dispatch, id, user]);
 
   const product = products.find((p) => p._id === id);
 
   // Cart Logic
-  const cartItem = cartItems.find(
-    (item: CartItem) => item.product._id === product?._id
+  const cartItem = (cartItems || []).find(
+    (item: CartItem) => (item.product?._id || item.product) === product?._id
   );
   const cartQuantity = cartItem?.quantity ?? 0;
 
