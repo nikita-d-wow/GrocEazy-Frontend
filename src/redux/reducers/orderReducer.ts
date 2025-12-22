@@ -11,6 +11,9 @@ import {
   CANCEL_ORDER_REQUEST,
   CANCEL_ORDER_SUCCESS,
   CANCEL_ORDER_FAILURE,
+  UPDATE_ORDER_STATUS_REQUEST,
+  UPDATE_ORDER_STATUS_SUCCESS,
+  UPDATE_ORDER_STATUS_FAILURE,
   type OrderState,
   type OrderActionTypes,
 } from '../types/orderTypes';
@@ -96,6 +99,41 @@ export const orderReducer = (
 
     case CANCEL_ORDER_FAILURE:
       return { ...state, loading: false, error: action.payload };
+
+    // ================= BACKGROUND STATUS UPDATE =================
+    case UPDATE_ORDER_STATUS_REQUEST:
+      return { ...state, error: null }; // Don't set global loading
+
+    case UPDATE_ORDER_STATUS_SUCCESS:
+      return {
+        ...state,
+        orders: state.orders.map((order) => {
+          if (order._id === action.payload._id) {
+            // ✅ Safety check: If payload has userId as string (unpopulated), keep our existing populated object
+            const preservedUser =
+              typeof action.payload.userId === 'string'
+                ? order.userId
+                : action.payload.userId || order.userId;
+
+            return { ...order, ...action.payload, userId: preservedUser };
+          }
+          return order;
+        }),
+        currentOrder:
+          state.currentOrder?._id === action.payload._id
+            ? {
+                ...state.currentOrder,
+                ...action.payload,
+                userId:
+                  typeof action.payload.userId === 'string'
+                    ? state.currentOrder.userId
+                    : action.payload.userId || state.currentOrder.userId,
+              }
+            : state.currentOrder,
+      };
+
+    case UPDATE_ORDER_STATUS_FAILURE:
+      return { ...state, error: action.payload.error };
 
     default:
       return state;

@@ -17,6 +17,22 @@ export default function CartItem({
     toast.success('Moved to wishlist ❤️');
   };
 
+  const isIncrementDisabled = item.quantity >= item.stock;
+
+  const handleIncrement = () => {
+    // 🔒 HARD STOP — API WILL NOT BE CALLED
+    if (isIncrementDisabled) {
+      toast.error(
+        item.stock === 0
+          ? 'Out of stock'
+          : `Only ${item.stock} item(s) available`
+      );
+      return;
+    }
+
+    updateQty(item._id, 'inc');
+  };
+
   return (
     <div
       className="
@@ -28,9 +44,8 @@ export default function CartItem({
         flex flex-col sm:flex-row gap-4 sm:gap-6
       "
     >
-      {/* ================= LEFT ================= */}
+      {/* LEFT */}
       <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 flex-1">
-        {/* IMAGE */}
         <img
           src={item.image}
           alt={item.name}
@@ -42,7 +57,6 @@ export default function CartItem({
           "
         />
 
-        {/* INFO */}
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-gray-900 text-base sm:text-lg line-clamp-2">
             {item.name}
@@ -56,18 +70,12 @@ export default function CartItem({
           </p>
 
           {/* QUANTITY */}
-          <div
-            className="
-              mt-3
-              flex items-center gap-4
-              justify-start
-            "
-          >
+          <div className="mt-3 flex items-center gap-4 justify-start">
             {item.quantity > 1 && (
               <button
                 onClick={() => updateQty(item._id, 'dec')}
                 className="
-                  p-2 rounded-lg
+                  p-2 rounded-lg cursor-pointer
                   bg-red-50 border border-red-200
                   hover:bg-red-100
                 "
@@ -78,21 +86,26 @@ export default function CartItem({
 
             <span className="font-semibold text-gray-900">{item.quantity}</span>
 
+            {/* INCREMENT */}
             <button
-              onClick={() => updateQty(item._id, 'inc')}
-              className="
-                p-2 rounded-lg
-                bg-green-50 border border-green-200
-                hover:bg-green-100
-              "
+              onClick={handleIncrement}
+              disabled={isIncrementDisabled}
+              className={`
+                p-2 rounded-lg border transition-colors
+                ${
+                  isIncrementDisabled
+                    ? 'bg-gray-100 border-gray-200 cursor-not-allowed text-gray-400'
+                    : 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700 cursor-pointer'
+                }
+              `}
             >
-              <Plus size={16} className="text-green-700" />
+              <Plus size={16} />
             </button>
           </div>
         </div>
       </div>
 
-      {/* ================= RIGHT ================= */}
+      {/* RIGHT */}
       <div
         className="
           w-full sm:w-auto
@@ -104,20 +117,18 @@ export default function CartItem({
           border-t sm:border-t-0 border-gray-100
         "
       >
-        {/* WISHLIST */}
         <button
           onClick={handleMoveToWishlist}
           className="
             inline-flex items-center gap-2
             text-primary text-sm font-medium
-            hover:underline
+            hover:underline cursor-pointer
           "
         >
           <Heart size={14} />
           Wishlist
         </button>
 
-        {/* TOTAL + DELETE */}
         <div className="flex items-center gap-3">
           <p className="font-bold text-gray-900">
             ₹{item.unitPrice * item.quantity}
@@ -125,7 +136,7 @@ export default function CartItem({
 
           <button
             onClick={() => removeItem(item._id)}
-            className="text-red-500 hover:text-red-700"
+            className="text-red-500 hover:text-red-700 cursor-pointer"
           >
             <Trash2 size={18} />
           </button>

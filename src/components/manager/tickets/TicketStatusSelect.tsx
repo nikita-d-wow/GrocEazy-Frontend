@@ -74,8 +74,8 @@ export default function TicketStatusSelect({
           ${currentConfig.bg} ${currentConfig.color}
           ${
             isOpen
-              ? 'ring-2 ring-violet-500/20 border-violet-200'
-              : 'border-transparent hover:border-gray-200'
+              ? 'ring-2 ring-violet-500/20 border-violet-200 cursor-pointer'
+              : 'border-transparent hover:border-gray-200 cursor-pointer'
           }
           disabled:opacity-50 disabled:cursor-not-allowed
         `}
@@ -122,8 +122,8 @@ export default function TicketStatusSelect({
                     px-3 py-2 rounded-xl text-sm transition-colors
                     ${
                       isSelected
-                        ? 'bg-violet-50 text-violet-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? 'bg-violet-50 text-violet-700 font-medium cursor-pointer'
+                        : 'text-gray-600 hover:bg-gray-50 cursor-pointer'
                     }
                   `}
                 >

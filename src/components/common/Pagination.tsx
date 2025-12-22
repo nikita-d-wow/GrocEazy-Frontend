@@ -56,7 +56,7 @@ const Pagination: FC<PaginationProps> = ({
           p-2 rounded-lg border border-gray-200
           text-primary hover:bg-primary/10
           disabled:opacity-40 disabled:cursor-not-allowed
-          transition-colors
+          transition-colors cursor-pointer
         "
         aria-label="Previous page"
       >
@@ -80,6 +80,7 @@ const Pagination: FC<PaginationProps> = ({
                   ? 'bg-primary text-white shadow-md'
                   : 'border border-gray-200 text-gray-700 hover:bg-primary/10 hover:text-primary'
               }
+              cursor-pointer
             `}
           >
             {page}
@@ -95,7 +96,7 @@ const Pagination: FC<PaginationProps> = ({
           p-2 rounded-lg border border-gray-200
           text-primary hover:bg-primary/10
           disabled:opacity-40 disabled:cursor-not-allowed
-          transition-colors
+          transition-colors cursor-pointer
         "
         aria-label="Next page"
       >

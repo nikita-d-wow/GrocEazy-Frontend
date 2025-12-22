@@ -13,6 +13,9 @@ import {
   CANCEL_ORDER_REQUEST,
   CANCEL_ORDER_SUCCESS,
   CANCEL_ORDER_FAILURE,
+  UPDATE_ORDER_STATUS_REQUEST,
+  UPDATE_ORDER_STATUS_SUCCESS,
+  UPDATE_ORDER_STATUS_FAILURE,
   type OrderActionTypes,
   type Order,
   type Address,
@@ -142,19 +145,22 @@ export const getAllOrders =
 export const changeOrderStatus =
   (id: string, status: string) =>
   async (dispatch: Dispatch<OrderActionTypes>) => {
-    dispatch({ type: FETCH_ORDER_DETAILS_REQUEST });
+    dispatch({ type: UPDATE_ORDER_STATUS_REQUEST, payload: id });
 
     try {
       const { data } = await api.patch(`/api/orders/${id}/status`, { status });
       dispatch({
-        type: FETCH_ORDER_DETAILS_SUCCESS,
+        type: UPDATE_ORDER_STATUS_SUCCESS,
         payload: data.order,
       });
     } catch (error: any) {
       dispatch({
-        type: FETCH_ORDER_DETAILS_FAILURE,
-        payload:
-          error.response?.data?.message || 'Failed to update order status',
+        type: UPDATE_ORDER_STATUS_FAILURE,
+        payload: {
+          id,
+          error:
+            error.response?.data?.message || 'Failed to update order status',
+        },
       });
     }
   };

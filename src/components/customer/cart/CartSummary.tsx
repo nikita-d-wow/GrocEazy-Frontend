@@ -43,7 +43,7 @@ export default function CartSummary({ total }: CartSummaryProps) {
           shadow-md
           hover:bg-primary/90
           active:scale-95
-          transition
+          transition cursor-pointer
         "
       >
         Proceed to Checkout

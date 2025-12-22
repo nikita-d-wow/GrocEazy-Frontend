@@ -78,6 +78,10 @@ export const CANCEL_ORDER_REQUEST = 'CANCEL_ORDER_REQUEST';
 export const CANCEL_ORDER_SUCCESS = 'CANCEL_ORDER_SUCCESS';
 export const CANCEL_ORDER_FAILURE = 'CANCEL_ORDER_FAILURE';
 
+export const UPDATE_ORDER_STATUS_REQUEST = 'UPDATE_ORDER_STATUS_REQUEST';
+export const UPDATE_ORDER_STATUS_SUCCESS = 'UPDATE_ORDER_STATUS_SUCCESS';
+export const UPDATE_ORDER_STATUS_FAILURE = 'UPDATE_ORDER_STATUS_FAILURE';
+
 /* ================= ACTION INTERFACES ================= */
 
 interface FetchOrdersRequestAction {
@@ -139,6 +143,21 @@ interface CancelOrderFailureAction {
   payload: string;
 }
 
+interface UpdateOrderStatusRequestAction {
+  type: typeof UPDATE_ORDER_STATUS_REQUEST;
+  payload: string; // id
+}
+
+interface UpdateOrderStatusSuccessAction {
+  type: typeof UPDATE_ORDER_STATUS_SUCCESS;
+  payload: Order;
+}
+
+interface UpdateOrderStatusFailureAction {
+  type: typeof UPDATE_ORDER_STATUS_FAILURE;
+  payload: { id: string; error: string };
+}
+
 /* ================= UNION ================= */
 
 export type OrderActionTypes =
@@ -153,4 +172,7 @@ export type OrderActionTypes =
   | CreateOrderFailureAction
   | CancelOrderRequestAction
   | CancelOrderSuccessAction
-  | CancelOrderFailureAction;
+  | CancelOrderFailureAction
+  | UpdateOrderStatusRequestAction
+  | UpdateOrderStatusSuccessAction
+  | UpdateOrderStatusFailureAction;

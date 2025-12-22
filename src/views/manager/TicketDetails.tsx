@@ -62,7 +62,7 @@ export default function TicketDetails() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-8 sm:px-16 lg:px-24">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* BACK BUTTON */}
         <button

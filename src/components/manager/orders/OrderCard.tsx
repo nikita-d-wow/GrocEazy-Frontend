@@ -1,4 +1,6 @@
 import OrderStatusSelect from './OrderStatusSelect';
+import { useNavigate } from 'react-router-dom';
+import { Package, Calendar, IndianRupee, Hash } from 'lucide-react';
 
 interface Props {
   order: any;
@@ -6,119 +8,85 @@ interface Props {
 }
 
 const OrderCard = ({ order, onStatusChange }: Props) => {
+  const navigate = useNavigate();
   const customerName = order.userId?.name ?? 'Guest User';
-  const customerEmail = order.userId?.email ?? '—';
 
   return (
-    <div className="glass-card overflow-hidden hover:translate-y-[-4px] transition-all duration-300">
-      <div className="p-6 md:p-10 space-y-8">
-        {/* USER + STATUS */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl font-bold text-primary">
-                {customerName.charAt(0)}
+    <div
+      onClick={(e) => {
+        if (
+          (e.target as HTMLElement).closest('button') ||
+          (e.target as HTMLElement).closest('select')
+        ) {
+          return;
+        }
+        navigate(`/manager/orders/${order._id}`);
+      }}
+      className="
+        bg-white/70 backdrop-blur-xl border border-white/60
+        rounded-2xl p-4 sm:p-6
+        hover:shadow-xl hover:-translate-y-1
+        transition-all duration-300 cursor-pointer
+        group relative overflow-hidden
+      "
+    >
+      {/* Decorative Gradient Background on Hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        {/* LEFT SECTION: User & ID */}
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary group-hover:bg-primary group-hover:text-white transition-all">
+            <Package size={24} />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors flex items-center gap-2">
+              {customerName}
+            </h3>
+            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 font-medium">
+              <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded text-[10px] font-mono border border-gray-200 uppercase">
+                <Hash size={10} /> {order._id.slice(-8)}
+              </span>
+              <span className="w-1 h-1 rounded-full bg-gray-300" />
+              <span className="flex items-center gap-1">
+                <Calendar size={12} className="text-primary/60" />
+                {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                  day: '2-digit',
+                  month: 'short',
+                })}
               </span>
             </div>
-            <div>
-              <p className="text-xl font-bold text-gray-900 group-hover:text-primary transition-colors">
-                {customerName}
-              </p>
-              <p className="text-sm font-medium text-gray-500">
-                {customerEmail}
-              </p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-gray-400">
-                <span>
-                  {order.address.city}, {order.address.state}
-                </span>
-                <span className="w-1 h-1 rounded-full bg-gray-300" />
-                <span>{order.address.phone}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="self-start lg:self-center">
-            <OrderStatusSelect
-              status={order.status}
-              disabled={order.status === 'Delivered'}
-              onChange={(status) => onStatusChange(order._id, status)}
-            />
           </div>
         </div>
 
-        {/* META GRID */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 p-6 rounded-2xl bg-black/5 border border-white/20">
-          <div className="space-y-1">
-            <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
-              Order ID
-            </p>
-            <p className="text-sm font-bold text-gray-700 truncate">
-              {order._id.slice(-8).toUpperCase()}
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
+        {/* MIDDLE SECTION: Minimal Stats */}
+        <div className="flex items-center gap-8 lg:gap-12">
+          <div className="hidden sm:block">
+            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">
               Items
             </p>
             <p className="text-sm font-bold text-gray-700">
-              {order.items.length} units
+              {order.items?.length || 0} units
             </p>
           </div>
-          <div className="space-y-1">
-            <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
-              Date
-            </p>
-            <p className="text-sm font-bold text-gray-700">
-              {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </p>
-          </div>
-          <div className="space-y-1">
-            <p className="text-[10px] uppercase tracking-wider font-bold text-gray-400">
+          <div>
+            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">
               Total Amount
             </p>
-            <p className="text-2xl font-black text-primary">
-              ₹{order.totalAmount}
+            <p className="text-xl font-black text-primary flex items-center">
+              <IndianRupee size={16} className="mt-0.5" />
+              {order.totalAmount}
             </p>
           </div>
         </div>
 
-        {/* ITEMS LIST */}
-        <div className="space-y-3">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">
-            Order Details
-          </p>
-          <div className="grid gap-3">
-            {order.items.map((item: any, idx: number) => (
-              <div
-                key={idx}
-                className="flex justify-between items-center p-4 rounded-xl bg-white/40 border border-white/60 hover:bg-white/60 transition-colors group"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center text-xs font-bold text-gray-400 border border-gray-100 shadow-sm">
-                    {idx + 1}
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm group-hover:text-primary transition-colors line-clamp-1">
-                      {item.productId?.name ?? 'Unknown Product'}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Quantity:{' '}
-                      <span className="font-bold text-gray-700">
-                        {item.quantity}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-                <span className="text-sm font-bold text-gray-900 bg-white/80 px-3 py-1 rounded-lg border border-white/60 shadow-sm">
-                  ₹{item.lineTotal}
-                </span>
-              </div>
-            ))}
-          </div>
+        {/* RIGHT SECTION: Status Select */}
+        <div className="flex-shrink-0">
+          <OrderStatusSelect
+            status={order.status}
+            disabled={order.status === 'Delivered'}
+            onChange={(status) => onStatusChange(order._id, status)}
+          />
         </div>
       </div>
     </div>
