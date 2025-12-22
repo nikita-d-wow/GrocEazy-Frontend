@@ -15,6 +15,8 @@ type Props = {
 export default function WishlistCard({ item }: Props) {
   const dispatch = useDispatch<AppDispatch>();
 
+  const isOutOfStock = item.product.stock < 1;
+
   return (
     <div
       className="
@@ -40,21 +42,29 @@ export default function WishlistCard({ item }: Props) {
         </p>
 
         <p className="text-primary font-bold text-lg">₹{item.product.price}</p>
+
+        {/* OUT OF STOCK LABEL */}
+        {isOutOfStock && (
+          <p className="text-sm text-red-500 font-medium">Out of stock</p>
+        )}
       </div>
 
       <div className="mt-5 flex gap-3">
         <button
+          disabled={isOutOfStock}
           onClick={() => dispatch(moveWishlistToCart(item._id))}
-          className="
+          className={`
             flex-1 flex items-center justify-center gap-2
-            bg-primary text-white
-            py-2 rounded-xl
-            hover:bg-primary-dark
-            active:scale-95 transition
-          "
+            py-2 rounded-xl transition
+            ${
+              isOutOfStock
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-primary text-white hover:bg-primary-dark active:scale-95'
+            }
+          `}
         >
           <ShoppingCart size={18} />
-          Move to Cart
+          {isOutOfStock ? 'Out of Stock' : 'Move to Cart'}
         </button>
 
         <button
