@@ -59,7 +59,7 @@ export default function WishlistCard({ item }: Props) {
             ${
               isOutOfStock
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-primary text-white hover:bg-primary-dark active:scale-95'
+                : 'bg-primary text-white hover:bg-primary-dark active:scale-95 cursor-pointer'
             }
           `}
         >
@@ -70,7 +70,7 @@ export default function WishlistCard({ item }: Props) {
         <button
           onClick={() => dispatch(removeWishlistItem(item._id))}
           className="
-            p-3 rounded-xl
+            p-3 rounded-xl cursor-pointer
             bg-red-50 text-red-600
             hover:bg-red-100
             active:scale-95 transition

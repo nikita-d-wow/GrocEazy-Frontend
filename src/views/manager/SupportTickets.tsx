@@ -58,7 +58,7 @@ export default function ManagerSupportTickets() {
 
   return (
     <div className="min-h-screen">
-      <div className="w-[95%] lg:w-[90%] mx-auto py-12">
+      <div className="max-w-[1400px] mx-auto px-8 sm:px-16 lg:px-24 py-12">
         <div className="flex items-center gap-4 mb-12">
           <div className="p-3 bg-white rounded-2xl shadow-sm text-primary">
             <Ticket size={28} />

@@ -9,9 +9,11 @@ import {
 const DEFAULT_LIMIT = 12;
 
 export const fetchWishlist =
-  (page = 1, limit = DEFAULT_LIMIT) =>
+  (page = 1, limit = DEFAULT_LIMIT, isSilent = false) =>
   async (dispatch: AppDispatch) => {
-    dispatch({ type: WISHLIST_FETCH_REQUEST });
+    if (!isSilent) {
+      dispatch({ type: WISHLIST_FETCH_REQUEST });
+    }
     try {
       const { data } = await api.get(
         `/api/wishlist?page=${page}&limit=${limit}`
@@ -36,19 +38,19 @@ export const removeWishlistItem =
   (wishlistId: string) => async (dispatch: AppDispatch, getState: any) => {
     await api.delete(`/api/wishlist/${wishlistId}`);
     const { page, limit } = getState().wishlist.pagination;
-    dispatch(fetchWishlist(page, limit));
+    dispatch(fetchWishlist(page, limit, true));
   };
 
 export const moveWishlistToCart =
   (wishlistId: string) => async (dispatch: AppDispatch, getState: any) => {
     await api.post(`/api/wishlist/${wishlistId}/move-to-cart`);
     const { page, limit } = getState().wishlist.pagination;
-    dispatch(fetchWishlist(page, limit));
+    dispatch(fetchWishlist(page, limit, true));
   };
 
 export const addToWishlist =
   (productId: string) => async (dispatch: AppDispatch, getState: any) => {
     await api.post('/api/wishlist', { productId });
     const { page, limit } = getState().wishlist.pagination;
-    dispatch(fetchWishlist(page, limit));
+    dispatch(fetchWishlist(page, limit, true));
   };

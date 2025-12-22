@@ -9,6 +9,7 @@ import CategoryManagement from '../views/manager/CategoryManagement';
 import SupportTickets from '../views/manager/SupportTickets';
 import TicketDetails from '../views/manager/TicketDetails';
 import OrdersManagement from '../views/manager/OrdersManagement';
+import ManagerOrderDetails from '../views/manager/ManagerOrderDetails';
 import Inventory from '../views/manager/Inventory';
 
 export const ManagerRoutes = (
@@ -26,6 +27,7 @@ export const ManagerRoutes = (
       <Route path="analytics" element={<Analytics />} />
       <Route path="inventory" element={<Inventory />} />
       <Route path="orders" element={<OrdersManagement />} />
+      <Route path="orders/:id" element={<ManagerOrderDetails />} />
       <Route path="products" element={<ProductManagement />} />
       <Route path="categories" element={<CategoryManagement />} />
       <Route path="support" element={<SupportTickets />} />

@@ -5,6 +5,7 @@ export interface CartItemType {
   image: string;
   unitPrice: number;
   quantity: number;
+  stock: number; // ✅ REQUIRED for disabling logic
 }
 
 export interface CartItemProps {
