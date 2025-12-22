@@ -1,6 +1,6 @@
 import { Minus, Plus, Trash2, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
-import type { CartItemProps } from '../../../types/Cart.jsx';
+import type { CartItemProps } from '../../../types/Cart';
 
 interface ExtraProps {
   moveToWishlist: (_cartId: string, _productId: string) => void;

@@ -38,6 +38,7 @@ interface CartItemUI {
   image: string;
   unitPrice: number;
   quantity: number;
+  stock: number;
 }
 
 const PAGE_LIMIT = 8;
@@ -113,6 +114,7 @@ export default function CartPage() {
       image: item.product.images?.[0] ?? '',
       unitPrice: item.product.price,
       quantity: item.quantity,
+      stock: item.product.stock,
     }));
 
   const formattedTotal = Number(total).toFixed(2);
