@@ -9,12 +9,13 @@ import { ManagerRoutes } from './routes/ManagerRoutes';
 import { AdminRoutes } from './routes/AdminRoutes';
 
 import Unauthorized from './views/auth/Unauthorized';
-//import { Toaster } from 'react-hot-toast';
+import ScrollToTop from './components/common/ScrollToTop';
+
 function App() {
   return (
     <div>
       <Toaster />
-
+      <ScrollToTop />
       <Routes>
         {PublicRoutes}
 
