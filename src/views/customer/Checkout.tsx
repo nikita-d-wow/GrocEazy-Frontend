@@ -98,7 +98,7 @@ const Checkout = () => {
                 state: { paymentMethod, total },
               })
             }
-            className="mt-6 w-full bg-primary text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
+            className="mt-6 w-full bg-primary text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] cursor-pointer"
           >
             Continue <ArrowRight size={18} />
           </button>

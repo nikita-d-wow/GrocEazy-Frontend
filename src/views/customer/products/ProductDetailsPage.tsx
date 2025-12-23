@@ -232,7 +232,7 @@ const ProductDetailsPage: FC = () => {
                     <div className="flex items-center justify-between w-full bg-green-700 text-white rounded-xl shadow-lg font-bold">
                       <button
                         onClick={decrementCart}
-                        className="p-3 hover:bg-green-800 rounded-l-xl transition"
+                        className="p-3 hover:bg-green-800 rounded-l-xl transition cursor-pointer"
                       >
                         <Minus className="w-5 h-5" />
                       </button>
@@ -240,7 +240,7 @@ const ProductDetailsPage: FC = () => {
                       <button
                         onClick={incrementCart}
                         disabled={cartQuantity >= product.stock}
-                        className="p-3 hover:bg-green-800 rounded-r-xl transition disabled:opacity-50"
+                        className="p-3 hover:bg-green-800 rounded-r-xl transition disabled:opacity-50 cursor-pointer"
                       >
                         <Plus className="w-5 h-5" />
                       </button>

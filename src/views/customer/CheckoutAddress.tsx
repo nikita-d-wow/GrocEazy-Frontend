@@ -178,7 +178,7 @@ const CheckoutAddress = () => {
             className="mt-6 w-full bg-primary text-white
                        py-3 rounded-xl font-medium
                        hover:bg-primary-dark transition
-                       disabled:opacity-50 disabled:cursor-not-allowed
+                       disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
                        shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
           >
             Place Order

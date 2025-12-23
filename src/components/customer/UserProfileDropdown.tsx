@@ -83,7 +83,7 @@ const UserProfileDropdown: React.FC = () => {
                 setIsOpen(false);
                 navigate('/admin');
               }}
-              className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+              className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
             >
               <ShieldCheck size={16} />
               Admin Dashboard
@@ -95,7 +95,7 @@ const UserProfileDropdown: React.FC = () => {
                 setIsOpen(false);
                 navigate('/manager');
               }}
-              className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+              className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
             >
               <Briefcase size={16} />
               Manager Dashboard
@@ -109,7 +109,7 @@ const UserProfileDropdown: React.FC = () => {
                     setIsOpen(false);
                     navigate('/profile');
                   }}
-                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
                 >
                   <User size={16} />
                   My Profile
@@ -120,7 +120,7 @@ const UserProfileDropdown: React.FC = () => {
                     setIsOpen(false);
                     navigate('/orders');
                   }}
-                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
                 >
                   <ShoppingBag size={16} />
                   My Orders
@@ -132,7 +132,7 @@ const UserProfileDropdown: React.FC = () => {
           <div className="border-t border-gray-100 mt-1 pt-1 px-1">
             <button
               onClick={handleLogout}
-              className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer"
             >
               <LogOut size={16} />
               Sign Out

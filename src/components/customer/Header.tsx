@@ -191,7 +191,7 @@ export default function Header() {
           ) : (
             <Link
               to="/login"
-              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm hover:shadow-md"
+              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm hover:shadow-md cursor-pointer"
             >
               Sign In
             </Link>
@@ -294,7 +294,7 @@ export default function Header() {
               <div className="pt-2 px-1 text-center">
                 <button
                   onClick={handleLogout}
-                  className="w-full bg-gray-50 text-red-600 px-4 py-3 rounded-xl font-semibold hover:bg-red-50 transition-colors mt-2"
+                  className="w-full bg-gray-50 text-red-600 px-4 py-3 rounded-xl font-semibold hover:bg-red-50 transition-colors mt-2 cursor-pointer"
                 >
                   Sign Out
                 </button>
