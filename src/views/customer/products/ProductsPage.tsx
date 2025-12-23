@@ -221,7 +221,7 @@ const ProductsPage: FC = () => {
 
       <div className="flex flex-col lg:flex-row gap-8 relative items-start">
         {/* Mobile View Sidebar Re-Added */}
-        <div className="lg:hidden w-full overflow-x-auto pb-4 bg-white sticky top-[72px] z-30 border-b border-gray-100 no-scrollbar">
+        <div className="lg:hidden w-full overflow-x-auto overflow-y-visible py-2 bg-white border-b border-gray-100 no-scrollbar">
           <MobileCategorySidebar
             selectedCategory={selectedCategory}
             onSelectCategory={(id) =>

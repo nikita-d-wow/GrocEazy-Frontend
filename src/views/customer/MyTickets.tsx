@@ -64,6 +64,7 @@ export default function MyTickets() {
             currentPage={currentPage}
             totalPages={pagination.totalPages}
             onPageChange={(p) => dispatch(fetchMySupportTickets(p, PAGE_LIMIT))}
+            isLoading={loading}
           />
         </div>
       )}
