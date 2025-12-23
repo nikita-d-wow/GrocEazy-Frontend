@@ -85,7 +85,6 @@ export default function WishlistPage() {
             currentPage={page}
             totalPages={totalPages}
             onPageChange={(p) => dispatch(fetchWishlist(p, PAGE_LIMIT))}
-            isLoading={loading}
           />
         </div>
       )}
