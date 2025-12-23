@@ -31,10 +31,10 @@ export default function MobileCategorySidebar({
   }, []);
 
   return (
-    <div className="flex gap-4 px-4 min-w-full">
+    <div className="flex gap-4 px-4 py-2 min-w-full">
       <button
         onClick={() => onSelectCategory(null)}
-        className={`flex-shrink-0 flex flex-col items-center justify-center p-2 rounded-xl transition-all w-20 border-2 ${
+        className={`flex-shrink-0 flex flex-col items-center justify-center p-2 rounded-xl transition-all w-20 border-2 cursor-pointer ${
           selectedCategory === null
             ? 'bg-green-100 text-green-700 border-green-600 scale-105'
             : 'bg-gray-50 text-gray-500 border-transparent'
@@ -50,7 +50,7 @@ export default function MobileCategorySidebar({
         <button
           key={category._id}
           onClick={() => onSelectCategory(category._id)}
-          className={`flex-shrink-0 flex flex-col items-center justify-center p-2 rounded-xl transition-all w-20 border-2 ${
+          className={`flex-shrink-0 flex flex-col items-center justify-center p-2 rounded-xl transition-all w-20 border-2 cursor-pointer ${
             selectedCategory === category._id
               ? 'bg-green-100 text-green-700 border-green-600 scale-105'
               : 'bg-gray-50 text-gray-500 border-transparent'

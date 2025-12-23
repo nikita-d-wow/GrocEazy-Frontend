@@ -206,6 +206,7 @@ export default function AdminSupportTickets() {
               onPageChange={(p) =>
                 dispatch(fetchAllSupportTickets(p, PAGE_LIMIT))
               }
+              isLoading={loading}
             />
           </div>
         )}

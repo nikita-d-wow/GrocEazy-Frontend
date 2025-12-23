@@ -129,7 +129,7 @@ const ProductDetailsPage: FC = () => {
   return (
     <div className="bg-gray-50 min-h-screen pb-24 font-sans text-gray-900">
       {/* Breadcrumb Header */}
-      <div className="bg-white border-b sticky top-[64px] sm:top-[72px] z-30 shadow-sm overflow-hidden">
+      <div className="bg-white border-b shadow-sm overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm text-gray-500 overflow-x-auto whitespace-nowrap no-scrollbar">
           <Link to="/" className="hover:text-green-600 shrink-0">
             Home

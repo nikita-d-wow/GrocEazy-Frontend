@@ -33,11 +33,16 @@ html {
 }
 
 @theme {
-  --color-primary: #16a34a; /* main brand green */
-  --color-primary-dark: #3e8e41; /* hover green */
-  --color-primary-light: #e7f5e9; /* soft background */
-  --color-accent-yellow: #f8e9a1; /* offers / sale */
-  --color-accent-orange: #f9a825; /* CTA button */
+  --color-primary: #16a34a;
+  /* main brand green */
+  --color-primary-dark: #3e8e41;
+  /* hover green */
+  --color-primary-light: #e7f5e9;
+  /* soft background */
+  --color-accent-yellow: #f8e9a1;
+  /* offers / sale */
+  --color-accent-orange: #f9a825;
+  /* CTA button */
   --color-text-dark: #1e1e1e;
   --color-surface: #ffffff;
 }
@@ -63,9 +68,11 @@ html {
     0% {
       transform: translateX(-100%) scaleX(0);
     }
+
     50% {
       transform: translateX(0) scaleX(0.5);
     }
+
     100% {
       transform: translateX(100%) scaleX(0);
     }
@@ -75,6 +82,7 @@ html {
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -85,10 +93,12 @@ html {
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -100,6 +110,7 @@ html {
       opacity: 0;
       transform: translateY(-10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -118,5 +129,18 @@ html {
   .ticket-card-hover:focus-within,
   .ticket-card-hover:hover {
     z-index: 50;
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
   }
 }
