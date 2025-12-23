@@ -4,16 +4,16 @@ import rootReducer from './rootReducer';
 
 const store = configureStore({
   reducer: rootReducer,
+  devTools: import.meta.env.MODE !== 'production',
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }),
-  devTools: import.meta.env.DEV,
 });
 
-export const persistor = persistStore(store as any);
+const persistor = persistStore(store as any);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 
-export { store };
+export { store, persistor };
