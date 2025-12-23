@@ -59,7 +59,16 @@ export default function ProductCard({
       await dispatch(removeWishlistItem(wishlistItem!._id));
       toast.success('Removed from wishlist');
     } else {
-      await dispatch(addToWishlist(_id));
+      await dispatch(
+        addToWishlist(_id, {
+          _id,
+          name,
+          price,
+          images: [image],
+          stock: stock || 0,
+          description: '', // Optional or empty for now
+        })
+      );
       toast.success('Added to wishlist');
     }
   };
@@ -113,7 +122,15 @@ export default function ProductCard({
               onClick={(e) => {
                 e.stopPropagation();
                 if (stock > 0) {
-                  dispatch(addToCart(_id, 1));
+                  dispatch(
+                    addToCart(_id, 1, {
+                      _id,
+                      name,
+                      price,
+                      images: [image],
+                      stock,
+                    })
+                  );
                 }
               }}
               disabled={stock === 0}

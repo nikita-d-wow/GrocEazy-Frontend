@@ -1,6 +1,8 @@
 export const WISHLIST_FETCH_REQUEST = 'WISHLIST_FETCH_REQUEST';
 export const WISHLIST_FETCH_SUCCESS = 'WISHLIST_FETCH_SUCCESS';
 export const WISHLIST_FETCH_FAILURE = 'WISHLIST_FETCH_FAILURE';
+export const WISHLIST_REMOVE_ITEM = 'WISHLIST_REMOVE_ITEM';
+export const WISHLIST_ADD_ITEM = 'WISHLIST_ADD_ITEM';
 
 export const WISHLIST_REMOVE_REQUEST = 'WISHLIST_REMOVE_REQUEST';
 export const WISHLIST_MOVE_TO_CART_REQUEST = 'WISHLIST_MOVE_TO_CART_REQUEST';
@@ -65,4 +67,6 @@ export type WishlistActionTypes =
         pagination: WishlistPagination;
       };
     }
-  | { type: typeof WISHLIST_FETCH_FAILURE; payload: string };
+  | { type: typeof WISHLIST_FETCH_FAILURE; payload: string }
+  | { type: typeof WISHLIST_REMOVE_ITEM; payload: string }
+  | { type: typeof WISHLIST_ADD_ITEM; payload: WishlistItem };

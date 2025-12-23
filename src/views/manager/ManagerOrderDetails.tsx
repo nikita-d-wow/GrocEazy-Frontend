@@ -69,7 +69,7 @@ export default function ManagerOrderDetails() {
   const customerEmail = order.userId?.email ?? '—';
 
   return (
-    <div className="min-h-screen py-12 px-8 sm:px-16 lg:px-24 bg-transparent animate-fadeIn">
+    <div className="min-h-screen py-10 px-6 sm:px-12 lg:px-20 bg-transparent animate-fadeIn">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* BACK BUTTON */}
         <button

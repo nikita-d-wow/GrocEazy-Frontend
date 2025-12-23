@@ -5,6 +5,9 @@ import {
   CART_FETCH_SUCCESS,
   CART_FETCH_FAILURE,
   CART_CLEAR,
+  CART_UPDATE_ITEM,
+  CART_REMOVE_ITEM,
+  CART_ADD_ITEM,
 } from '../types/cartTypes';
 import type { AppDispatch } from '../store';
 
@@ -40,6 +43,12 @@ export const fetchCart =
 /* ================= UPDATE QUANTITY ================= */
 export const updateCartQty = (cartId: string, quantity: number) => {
   return async (dispatch: AppDispatch, getState: any) => {
+    // Optimistic update
+    dispatch({
+      type: CART_UPDATE_ITEM,
+      payload: { cartId, quantity },
+    });
+
     try {
       if (quantity < 1) {
         return;
@@ -47,10 +56,14 @@ export const updateCartQty = (cartId: string, quantity: number) => {
 
       await api.put(`/api/cart/${cartId}`, { quantity });
 
+      // Background sync to ensure total price is correct etc
       const { page, limit } = getState().cart.pagination;
       dispatch(fetchCart(page, limit));
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to update quantity');
+      // Revert would be good here, for now just re-fetching
+      const { page, limit } = getState().cart.pagination;
+      dispatch(fetchCart(page, limit));
     }
   };
 };
@@ -58,6 +71,12 @@ export const updateCartQty = (cartId: string, quantity: number) => {
 /* ================= REMOVE ITEM ================= */
 export const removeCartItem = (cartId: string) => {
   return async (dispatch: AppDispatch, getState: any) => {
+    // Optimistic remove
+    dispatch({
+      type: CART_REMOVE_ITEM,
+      payload: cartId,
+    });
+
     try {
       await api.delete(`/api/cart/${cartId}`);
 
@@ -67,6 +86,9 @@ export const removeCartItem = (cartId: string) => {
       toast.success('Item removed from cart');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to remove item');
+      // Revert if needed
+      const { page, limit } = getState().cart.pagination;
+      dispatch(fetchCart(page, limit));
     }
   };
 };
@@ -85,7 +107,19 @@ export const clearCart = () => {
 };
 
 /* ================= ADD TO CART ================= */
-export const addToCart = (productId: string, quantity = 1) => {
+interface OptimisticProduct {
+  _id: string;
+  name: string;
+  price: number;
+  images: string[];
+  stock: number;
+}
+
+export const addToCart = (
+  productId: string,
+  quantity = 1,
+  product?: OptimisticProduct
+) => {
   return async (dispatch: AppDispatch, getState: any) => {
     const { auth, cart } = getState();
 
@@ -94,13 +128,37 @@ export const addToCart = (productId: string, quantity = 1) => {
       return;
     }
 
+    // Optimistic Update
+    if (product) {
+      dispatch({
+        type: CART_ADD_ITEM,
+        payload: {
+          _id: `temp-${Date.now()}`, // Temporary ID
+          productId: product._id,
+          quantity,
+          lineTotal: product.price * quantity,
+          product: {
+            _id: product._id,
+            name: product.name,
+            price: product.price,
+            images: product.images,
+            stock: product.stock,
+          },
+        },
+      });
+    }
+
     try {
       await api.post('/api/cart', { productId, quantity });
 
       dispatch(fetchCart(cart.pagination.page, cart.pagination.limit));
+      if (!product) {
+        toast.success('Added to cart');
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to add item to cart');
-      throw err;
+      // Revert if needed, but fetchCart usually fixes it
+      dispatch(fetchCart(cart.pagination.page, cart.pagination.limit));
     }
   };
 };

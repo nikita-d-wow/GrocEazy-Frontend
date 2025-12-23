@@ -30,9 +30,10 @@ export default function MyTickets() {
 
   useEffect(() => {
     dispatch(fetchMySupportTickets(currentPage, PAGE_LIMIT));
+    window.scrollTo(0, 0);
   }, [dispatch, currentPage]);
 
-  if (loading) {
+  if (loading && (!myTickets || myTickets.length === 0)) {
     return <Loader />;
   }
 
@@ -63,6 +64,7 @@ export default function MyTickets() {
             currentPage={currentPage}
             totalPages={pagination.totalPages}
             onPageChange={(p) => dispatch(fetchMySupportTickets(p, PAGE_LIMIT))}
+            isLoading={loading}
           />
         </div>
       )}

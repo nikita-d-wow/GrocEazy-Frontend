@@ -58,6 +58,7 @@ export default function CartPage() {
   useEffect(() => {
     if (user) {
       dispatch(fetchCart(page, PAGE_LIMIT));
+      window.scrollTo(0, 0);
     }
   }, [dispatch, user, page]);
 
@@ -79,7 +80,21 @@ export default function CartPage() {
   };
 
   const moveToWishlist = (cartId: string, productId: string) => {
-    dispatch(addToWishlist(productId));
+    const item = cartItems.find((i) => i._id === cartId);
+    if (item && item.product) {
+      dispatch(
+        addToWishlist(productId, {
+          _id: item.product._id,
+          name: item.product.name,
+          price: item.product.price,
+          images: item.product.images,
+          stock: item.product.stock,
+          description: '', // Optional or loaded if available
+        })
+      );
+    } else {
+      dispatch(addToWishlist(productId));
+    }
     dispatch(removeCartItem(cartId));
   };
 
@@ -161,6 +176,7 @@ export default function CartPage() {
                 onPageChange={(newPage) =>
                   dispatch(fetchCart(newPage, PAGE_LIMIT))
                 }
+                isLoading={loading}
               />
             </div>
           )}

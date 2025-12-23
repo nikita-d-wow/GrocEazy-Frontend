@@ -33,6 +33,7 @@ export default function WishlistPage() {
   useEffect(() => {
     if (user) {
       dispatch(fetchWishlist(page, PAGE_LIMIT));
+      window.scrollTo(0, 0);
     }
   }, [dispatch, user, page]);
 
@@ -52,8 +53,12 @@ export default function WishlistPage() {
     );
   }
 
-  if (loading) {
-    return <Loader />;
+  if (loading && items.length === 0) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
 
   if (items.length === 0) {
@@ -80,6 +85,7 @@ export default function WishlistPage() {
             currentPage={page}
             totalPages={totalPages}
             onPageChange={(p) => dispatch(fetchWishlist(p, PAGE_LIMIT))}
+            isLoading={loading}
           />
         </div>
       )}

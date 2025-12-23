@@ -54,7 +54,7 @@ export default function UsersPage() {
   // }
 
   return (
-    <div className="p-6 animate-fadeIn">
+    <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10 animate-fadeIn">
       <UserDetailsModal
         user={selectedUser}
         isOpen={isModalOpen}
@@ -177,19 +177,25 @@ export default function UsersPage() {
                           <p className="font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">
                             {user.name || 'Unknown'}
                           </p>
-                          <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-none">{user.email}</p>
+                          <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-none">
+                            {user.email}
+                          </p>
                           {/* Mobile Only Role Badge */}
                           <div className="md:hidden mt-1">
-                            <span className={`
+                            <span
+                              className={`
                                 text-[10px] px-2 py-0.5 rounded-full font-medium border
-                                ${user.role === 'admin'
-                                ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                : user.role === 'manager'
-                                  ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                  : 'bg-green-50 text-green-700 border-green-200'
-                              }
-                            `}>
-                              {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                                ${
+                                  user.role === 'admin'
+                                    ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                    : user.role === 'manager'
+                                      ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                      : 'bg-green-50 text-green-700 border-green-200'
+                                }
+                            `}
+                            >
+                              {user.role.charAt(0).toUpperCase() +
+                                user.role.slice(1)}
                             </span>
                           </div>
                         </div>
@@ -199,12 +205,13 @@ export default function UsersPage() {
                       <span
                         className={`
                                       px-2.5 py-1 rounded-full text-xs font-semibold border
-                                      ${user.role === 'admin'
-                            ? 'bg-purple-50 text-purple-700 border-purple-200'
-                            : user.role === 'manager'
-                              ? 'bg-blue-50 text-blue-700 border-blue-200'
-                              : 'bg-green-50 text-green-700 border-green-200'
-                          }
+                                      ${
+                                        user.role === 'admin'
+                                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                          : user.role === 'manager'
+                                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                            : 'bg-green-50 text-green-700 border-green-200'
+                                      }
                                   `}
                       >
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
@@ -235,11 +242,12 @@ export default function UsersPage() {
                         }
                         className={`
                           p-2 rounded-full transition-colors 
-                          ${user.role === 'admin'
-                            ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'
-                            : user.isActive
-                              ? 'hover:bg-red-50 text-red-600'
-                              : 'hover:bg-green-50 text-green-600'
+                          ${
+                            user.role === 'admin'
+                              ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'
+                              : user.isActive
+                                ? 'hover:bg-red-50 text-red-600'
+                                : 'hover:bg-green-50 text-green-600'
                           }
                         `}
                         title={

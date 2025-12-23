@@ -27,7 +27,7 @@ const OrdersManagement = () => {
   }, [dispatch, page]);
 
   return (
-    <div className="min-h-screen bg-transparent px-8 sm:px-16 lg:px-24 py-10 animate-fadeIn">
+    <div className="min-h-screen bg-transparent px-6 sm:px-12 lg:px-20 py-10 animate-fadeIn">
       <div className="max-w-[1400px] mx-auto space-y-10">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -48,7 +48,7 @@ const OrdersManagement = () => {
 
         {/* Content Area */}
         <div className="min-h-[500px] space-y-6">
-          {loading ? (
+          {loading && orders.length === 0 ? (
             <div className="h-[400px] flex items-center justify-center">
               <Loader />
             </div>
@@ -59,7 +59,7 @@ const OrdersManagement = () => {
                   <div
                     key={order._id}
                     className="animate-slideUp"
-                    style={{ animationDelay: `${index * 100}ms` }}
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <OrderCard
                       order={order}
@@ -78,6 +78,7 @@ const OrdersManagement = () => {
                     currentPage={page}
                     totalPages={pagination.pages}
                     onPageChange={(nextPage) => setPage(nextPage)}
+                    isLoading={loading}
                   />
                 </div>
               )}

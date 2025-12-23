@@ -49,10 +49,15 @@ export default function AdminSupportTickets() {
     }
 
     dispatch(fetchSupportStats());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, page, managers.length]);
 
-  if (loading) {
-    return <Loader />;
+  if (loading && tickets.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
 
   if (!tickets.length) {
@@ -73,7 +78,7 @@ export default function AdminSupportTickets() {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-4 py-14">
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
         {/* HEADER */}
         <div className="flex items-center gap-3 mb-12">
           <ShieldCheck className="text-indigo-600" size={28} />
@@ -97,8 +102,12 @@ export default function AdminSupportTickets() {
             return (
               <div
                 key={ticket._id}
-                style={{ zIndex: tickets.length - index }}
+                style={{
+                  zIndex: tickets.length - index,
+                  animationDelay: `${index * 50}ms`,
+                }}
                 className="
+                  animate-slideUp
                   relative
                   rounded-2xl
                   bg-white/60 backdrop-blur-xl
@@ -197,6 +206,7 @@ export default function AdminSupportTickets() {
               onPageChange={(p) =>
                 dispatch(fetchAllSupportTickets(p, PAGE_LIMIT))
               }
+              isLoading={loading}
             />
           </div>
         )}

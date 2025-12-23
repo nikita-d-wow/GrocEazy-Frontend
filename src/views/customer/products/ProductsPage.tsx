@@ -194,6 +194,7 @@ const ProductsPage: FC = () => {
     }
 
     setDisplayCount(20);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const displayedProducts = filteredProducts.slice(0, displayCount);

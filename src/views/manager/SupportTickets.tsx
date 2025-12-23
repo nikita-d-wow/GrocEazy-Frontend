@@ -16,6 +16,8 @@ import {
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 
+import Pagination from '../../components/common/Pagination';
+import { selectSupportPagination } from '../../redux/selectors/supportSelectors';
 import TicketCard from '../../components/manager/tickets/TicketCard';
 import type { AppDispatch } from '../../redux/store';
 import type { TicketStatus } from '../../redux/types/support.types';
@@ -24,12 +26,14 @@ export default function ManagerSupportTickets() {
   const dispatch = useDispatch<AppDispatch>();
   const tickets = useSelector(selectSupportTickets);
   const loading = useSelector(selectSupportLoading);
+  const { page, totalPages } = useSelector(selectSupportPagination);
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
-    dispatch(fetchAllSupportTickets());
-  }, [dispatch]);
+    dispatch(fetchAllSupportTickets(page));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [dispatch, page]);
 
   const updateStatus = async (id: string, status: TicketStatus) => {
     setUpdatingId(id);
@@ -43,8 +47,12 @@ export default function ManagerSupportTickets() {
     }
   };
 
-  if (loading) {
-    return <Loader />;
+  if (loading && tickets.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader />
+      </div>
+    );
   }
 
   if (!tickets.length) {
@@ -58,7 +66,7 @@ export default function ManagerSupportTickets() {
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-[1400px] mx-auto px-8 sm:px-16 lg:px-24 py-12">
+      <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
         <div className="flex items-center gap-4 mb-12">
           <div className="p-3 bg-white rounded-2xl shadow-sm text-primary">
             <Ticket size={28} />
@@ -88,6 +96,17 @@ export default function ManagerSupportTickets() {
             </div>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(p) => dispatch(fetchAllSupportTickets(p))}
+              isLoading={loading}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

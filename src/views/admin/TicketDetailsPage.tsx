@@ -80,7 +80,7 @@ export default function AdminTicketDetailsPage() {
   const statusUI = STATUS_MAP[ticket.status];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-8">
+    <div className="min-h-screen bg-gray-50/50 py-10 px-6 sm:px-12 lg:px-20">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* BACK BUTTON */}
         <div className="flex items-center justify-between">
