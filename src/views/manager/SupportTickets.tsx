@@ -43,7 +43,7 @@ export default function ManagerSupportTickets() {
     }
   };
 
-  if (loading) {
+  if (loading && tickets.length === 0) {
     return <Loader />;
   }
 

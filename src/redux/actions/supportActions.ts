@@ -12,8 +12,10 @@ import {
   SUPPORT_FETCH_ALL_SUCCESS,
   SUPPORT_FETCH_ALL_FAILURE,
   SUPPORT_UPDATE_STATUS_REQUEST,
+  SUPPORT_UPDATE_STATUS_SUCCESS,
   SUPPORT_UPDATE_STATUS_FAILURE,
   SUPPORT_DELETE_REQUEST,
+  SUPPORT_DELETE_SUCCESS,
   SUPPORT_DELETE_FAILURE,
 } from '../types/support.types';
 
@@ -100,13 +102,41 @@ export const fetchAllSupportTickets =
   };
 
 export const updateSupportTicketStatus =
-  (ticketId: string, status: TicketStatus) => async (dispatch: AppDispatch) => {
+  (ticketId: string, status: TicketStatus) =>
+  async (dispatch: AppDispatch, getState: any) => {
     dispatch({ type: SUPPORT_UPDATE_STATUS_REQUEST });
 
+    const { tickets, myTickets } = getState().support;
+    const ticketToUpdate =
+      tickets.find((t: SupportTicket) => t._id === ticketId) ||
+      myTickets.find((t: SupportTicket) => t._id === ticketId);
+
+    if (ticketToUpdate) {
+      // Optimistic Update
+      dispatch({
+        type: SUPPORT_UPDATE_STATUS_SUCCESS,
+        payload: { ...ticketToUpdate, status },
+      });
+    }
+
     try {
-      await api.patch(`/api/support/${ticketId}/status`, { status });
-      dispatch(fetchAllSupportTickets());
+      const { data } = await api.patch(`/api/support/${ticketId}/status`, {
+        status,
+      });
+      // Sync with server data (in case there are other changes like updatedBy, etc.)
+      dispatch({
+        type: SUPPORT_UPDATE_STATUS_SUCCESS,
+        payload: data.ticket as SupportTicket,
+      });
     } catch {
+      // Rollback if needed, but here we'll just show error
+      // Ideally we'd rollback to ticketToUpdate.status
+      if (ticketToUpdate) {
+        dispatch({
+          type: SUPPORT_UPDATE_STATUS_SUCCESS,
+          payload: ticketToUpdate,
+        });
+      }
       dispatch({
         type: SUPPORT_UPDATE_STATUS_FAILURE,
         payload: 'Failed to update ticket status',
@@ -120,7 +150,7 @@ export const deleteSupportTicket =
 
     try {
       await api.delete(`/api/support/${ticketId}`);
-      dispatch(fetchAllSupportTickets());
+      dispatch({ type: SUPPORT_DELETE_SUCCESS, payload: ticketId });
     } catch {
       dispatch({
         type: SUPPORT_DELETE_FAILURE,

@@ -48,7 +48,7 @@ const OrdersManagement = () => {
 
         {/* Content Area */}
         <div className="min-h-[500px] space-y-6">
-          {loading ? (
+          {loading && orders.length === 0 ? (
             <div className="h-[400px] flex items-center justify-center">
               <Loader />
             </div>

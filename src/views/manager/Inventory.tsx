@@ -26,19 +26,30 @@ const Inventory: FC = () => {
   const loading = useSelector(selectProductLoading);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   useEffect(() => {
     dispatch(fetchProducts());
     dispatch(fetchCategories());
   }, [dispatch]);
+
   const filteredProducts = useMemo(
     () =>
       products.filter(
         (p) =>
-          p && p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())
+          p &&
+          p.name &&
+          p.name.toLowerCase().includes(debouncedSearch.toLowerCase())
       ),
-    [products, searchTerm]
+    [products, debouncedSearch]
   );
 
   const getStockStatus = (stock: number, threshold: number = 5) => {

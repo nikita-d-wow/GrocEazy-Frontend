@@ -5,6 +5,7 @@ import {
   WISHLIST_FETCH_SUCCESS,
   WISHLIST_FETCH_FAILURE,
 } from '../types/wishlistTypes';
+import type { WishlistItem } from '../types/wishlistTypes';
 
 const DEFAULT_LIMIT = 12;
 
@@ -36,9 +37,35 @@ export const fetchWishlist =
 
 export const removeWishlistItem =
   (wishlistId: string) => async (dispatch: AppDispatch, getState: any) => {
-    await api.delete(`/api/wishlist/${wishlistId}`);
-    const { page, limit } = getState().wishlist.pagination;
-    dispatch(fetchWishlist(page, limit, true));
+    // Optimistic Update
+    const prevItems = getState().wishlist.items;
+    const prevPagination = getState().wishlist.pagination;
+
+    dispatch({
+      type: WISHLIST_FETCH_SUCCESS,
+      payload: {
+        items: prevItems.filter(
+          (item: WishlistItem) => item._id !== wishlistId
+        ),
+        pagination: prevPagination,
+      },
+    });
+
+    try {
+      await api.delete(`/api/wishlist/${wishlistId}`);
+      // Background sync
+      const { page, limit } = getState().wishlist.pagination;
+      dispatch(fetchWishlist(page, limit, true));
+    } catch {
+      // Rollback
+      dispatch({
+        type: WISHLIST_FETCH_SUCCESS,
+        payload: {
+          items: prevItems,
+          pagination: prevPagination,
+        },
+      });
+    }
   };
 
 export const moveWishlistToCart =

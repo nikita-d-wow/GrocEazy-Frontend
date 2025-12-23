@@ -9,10 +9,13 @@ import {
   SUPPORT_FETCH_ALL_SUCCESS,
   SUPPORT_FETCH_ALL_FAILURE,
   SUPPORT_UPDATE_STATUS_REQUEST,
+  SUPPORT_UPDATE_STATUS_SUCCESS,
   SUPPORT_UPDATE_STATUS_FAILURE,
   SUPPORT_ASSIGN_MANAGER_REQUEST,
+  SUPPORT_ASSIGN_MANAGER_SUCCESS,
   SUPPORT_ASSIGN_MANAGER_FAILURE,
   SUPPORT_DELETE_REQUEST,
+  SUPPORT_DELETE_SUCCESS,
   SUPPORT_DELETE_FAILURE,
 } from '../types/support.types';
 
@@ -69,7 +72,25 @@ export function supportReducer(
     case SUPPORT_CREATE_FAILURE:
     case SUPPORT_FETCH_MY_FAILURE:
     case SUPPORT_FETCH_ALL_FAILURE:
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload as string };
+
+    case SUPPORT_UPDATE_STATUS_SUCCESS:
+      return {
+        ...state,
+        tickets: state.tickets.map((t) =>
+          t._id === action.payload._id ? action.payload : t
+        ),
+        myTickets: state.myTickets.map((t) =>
+          t._id === action.payload._id ? action.payload : t
+        ),
+      };
+
+    case SUPPORT_DELETE_SUCCESS:
+      return {
+        ...state,
+        tickets: state.tickets.filter((t) => t._id !== action.payload),
+        myTickets: state.myTickets.filter((t) => t._id !== action.payload),
+      };
 
     case SUPPORT_UPDATE_STATUS_REQUEST:
     case SUPPORT_ASSIGN_MANAGER_REQUEST:

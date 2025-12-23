@@ -3,6 +3,9 @@ export const CART_FETCH_SUCCESS = 'CART_FETCH_SUCCESS';
 export const CART_FETCH_FAILURE = 'CART_FETCH_FAILURE';
 
 export const CART_CLEAR = 'CART_CLEAR';
+export const CART_ITEM_UPDATE_QTY = 'CART_ITEM_UPDATE_QTY';
+export const CART_ITEM_REMOVE = 'CART_ITEM_REMOVE';
+export const CART_ITEM_ADD = 'CART_ITEM_ADD';
 
 /* ======================
    CART DATA TYPES
@@ -60,4 +63,10 @@ export type CartActionTypes =
       };
     }
   | { type: typeof CART_FETCH_FAILURE; payload: string }
-  | { type: typeof CART_CLEAR };
+  | { type: typeof CART_CLEAR }
+  | {
+      type: typeof CART_ITEM_UPDATE_QTY;
+      payload: { cartId: string; quantity: number };
+    }
+  | { type: typeof CART_ITEM_REMOVE; payload: { cartId: string } }
+  | { type: typeof CART_ITEM_ADD; payload: { item: CartItem } };

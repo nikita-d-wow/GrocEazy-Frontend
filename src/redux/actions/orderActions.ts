@@ -144,8 +144,19 @@ export const getAllOrders =
 
 export const changeOrderStatus =
   (id: string, status: string) =>
-  async (dispatch: Dispatch<OrderActionTypes>) => {
+  async (dispatch: Dispatch<OrderActionTypes>, getState: any) => {
     dispatch({ type: UPDATE_ORDER_STATUS_REQUEST, payload: id });
+
+    const { orders } = getState().order;
+    const orderToUpdate = orders.find((o: Order) => o._id === id);
+
+    if (orderToUpdate) {
+      // Optimistic Update
+      dispatch({
+        type: UPDATE_ORDER_STATUS_SUCCESS,
+        payload: { ...orderToUpdate, status: status as any },
+      });
+    }
 
     try {
       const { data } = await api.patch(`/api/orders/${id}/status`, { status });
@@ -154,6 +165,13 @@ export const changeOrderStatus =
         payload: data.order,
       });
     } catch (error: any) {
+      // Rollback
+      if (orderToUpdate) {
+        dispatch({
+          type: UPDATE_ORDER_STATUS_SUCCESS,
+          payload: orderToUpdate,
+        });
+      }
       dispatch({
         type: UPDATE_ORDER_STATUS_FAILURE,
         payload: {

@@ -3,6 +3,9 @@ import {
   CART_FETCH_SUCCESS,
   CART_FETCH_FAILURE,
   CART_CLEAR,
+  CART_ITEM_UPDATE_QTY,
+  CART_ITEM_REMOVE,
+  CART_ITEM_ADD,
 } from '../types/cartTypes';
 
 import type { CartState, CartActionTypes } from '../types/cartTypes';
@@ -43,6 +46,31 @@ export function cartReducer(
         ...state,
         items: [],
         pagination: { ...initialState.pagination },
+      };
+    case CART_ITEM_UPDATE_QTY:
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item._id === action.payload.cartId
+            ? {
+                ...item,
+                quantity: action.payload.quantity,
+                lineTotal: item.product.price * action.payload.quantity,
+              }
+            : item
+        ),
+      };
+
+    case CART_ITEM_REMOVE:
+      return {
+        ...state,
+        items: state.items.filter((item) => item._id !== action.payload.cartId),
+      };
+
+    case CART_ITEM_ADD:
+      return {
+        ...state,
+        items: [...state.items, action.payload.item],
       };
 
     default:
