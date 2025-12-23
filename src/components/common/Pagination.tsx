@@ -14,6 +14,11 @@ const Pagination: FC<PaginationProps> = ({
   onPageChange,
   className = '',
 }) => {
+  const handlePageChange = (page: number) => {
+    onPageChange(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (totalPages <= 1) {
     return null;
   }
@@ -50,7 +55,7 @@ const Pagination: FC<PaginationProps> = ({
     <div className={`flex items-center justify-center gap-2 ${className}`}>
       {/* Previous */}
       <button
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1}
         className="
           p-2 rounded-lg border border-gray-200
@@ -72,7 +77,7 @@ const Pagination: FC<PaginationProps> = ({
         ) : (
           <button
             key={page}
-            onClick={() => onPageChange(page as number)}
+            onClick={() => handlePageChange(page as number)}
             className={`
               min-w-[40px] h-10 px-3 rounded-lg font-medium transition-all
               ${
@@ -90,7 +95,7 @@ const Pagination: FC<PaginationProps> = ({
 
       {/* Next */}
       <button
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => handlePageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
         className="
           p-2 rounded-lg border border-gray-200
