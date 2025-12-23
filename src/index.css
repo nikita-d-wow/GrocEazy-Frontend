@@ -32,6 +32,22 @@
     animation: slideDown 0.3s ease-out forwards;
   }
 
+  .animate-progress {
+    animation: progress 2s ease-in-out infinite;
+  }
+
+  @keyframes progress {
+    0% {
+      transform: translateX(-100%) scaleX(0);
+    }
+    50% {
+      transform: translateX(0) scaleX(0.5);
+    }
+    100% {
+      transform: translateX(100%) scaleX(0);
+    }
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
@@ -69,5 +85,15 @@
 
   .glass-card {
     @apply bg-white/70 backdrop-blur-lg border border-white/50 shadow-lg rounded-2xl transition duration-300;
+  }
+
+  .ticket-card-hover {
+    @apply relative transition-all duration-300;
+    z-index: 10;
+  }
+
+  .ticket-card-hover:focus-within,
+  .ticket-card-hover:hover {
+    z-index: 50;
   }
 }
