@@ -23,6 +23,14 @@ export const SUPPORT_DELETE_REQUEST = 'SUPPORT_DELETE_REQUEST';
 export const SUPPORT_DELETE_SUCCESS = 'SUPPORT_DELETE_SUCCESS';
 export const SUPPORT_DELETE_FAILURE = 'SUPPORT_DELETE_FAILURE';
 
+export const SUPPORT_FETCH_MANAGERS_REQUEST = 'SUPPORT_FETCH_MANAGERS_REQUEST';
+export const SUPPORT_FETCH_MANAGERS_SUCCESS = 'SUPPORT_FETCH_MANAGERS_SUCCESS';
+export const SUPPORT_FETCH_MANAGERS_FAILURE = 'SUPPORT_FETCH_MANAGERS_FAILURE';
+
+export const SUPPORT_FETCH_STATS_REQUEST = 'SUPPORT_FETCH_STATS_REQUEST';
+export const SUPPORT_FETCH_STATS_SUCCESS = 'SUPPORT_FETCH_STATS_SUCCESS';
+export const SUPPORT_FETCH_STATS_FAILURE = 'SUPPORT_FETCH_STATS_FAILURE';
+
 // ================= TYPES =================
 export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
 
@@ -60,15 +68,17 @@ export interface SupportFetchMyPayload {
 
 export interface SupportFetchAllPayload {
   tickets: SupportTicket[];
-  managers: IUser[];
+  managers?: IUser[];
   pagination: SupportPagination;
 }
 
 // ================= STATE =================
 export interface SupportState {
   loading: boolean;
+  refreshing: boolean;
   myTickets: SupportTicket[];
   tickets: SupportTicket[];
+  statsTickets: SupportTicket[];
   managers: IUser[];
   error: string | null;
   pagination: SupportPagination;
@@ -99,4 +109,10 @@ export type SupportActionTypes =
   | { type: typeof SUPPORT_ASSIGN_MANAGER_FAILURE; payload: string }
   | { type: typeof SUPPORT_DELETE_REQUEST }
   | { type: typeof SUPPORT_DELETE_SUCCESS; payload: string }
-  | { type: typeof SUPPORT_DELETE_FAILURE; payload: string };
+  | { type: typeof SUPPORT_DELETE_FAILURE; payload: string }
+  | { type: typeof SUPPORT_FETCH_MANAGERS_REQUEST }
+  | { type: typeof SUPPORT_FETCH_MANAGERS_SUCCESS; payload: IUser[] }
+  | { type: typeof SUPPORT_FETCH_MANAGERS_FAILURE; payload: string }
+  | { type: typeof SUPPORT_FETCH_STATS_REQUEST }
+  | { type: typeof SUPPORT_FETCH_STATS_SUCCESS; payload: SupportTicket[] }
+  | { type: typeof SUPPORT_FETCH_STATS_FAILURE; payload: string };

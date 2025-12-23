@@ -12,12 +12,26 @@ import {
   SUPPORT_FETCH_ALL_SUCCESS,
   SUPPORT_FETCH_ALL_FAILURE,
   SUPPORT_UPDATE_STATUS_REQUEST,
+  SUPPORT_UPDATE_STATUS_SUCCESS,
   SUPPORT_UPDATE_STATUS_FAILURE,
+  SUPPORT_ASSIGN_MANAGER_REQUEST,
+  SUPPORT_ASSIGN_MANAGER_SUCCESS,
+  SUPPORT_ASSIGN_MANAGER_FAILURE,
   SUPPORT_DELETE_REQUEST,
   SUPPORT_DELETE_FAILURE,
+  SUPPORT_FETCH_MANAGERS_REQUEST,
+  SUPPORT_FETCH_MANAGERS_SUCCESS,
+  SUPPORT_FETCH_MANAGERS_FAILURE,
+  SUPPORT_FETCH_STATS_REQUEST,
+  SUPPORT_FETCH_STATS_SUCCESS,
+  SUPPORT_FETCH_STATS_FAILURE,
 } from '../types/support.types';
 
-import type { SupportTicket, TicketStatus } from '../types/support.types';
+import type {
+  SupportTicket,
+  TicketStatus,
+  SupportFetchAllPayload,
+} from '../types/support.types';
 
 const DEFAULT_LIMIT = 10;
 
@@ -74,22 +88,29 @@ export const fetchMySupportTickets =
 /* ================= ADMIN / MANAGER ================= */
 
 export const fetchAllSupportTickets =
-  (page = 1, limit = DEFAULT_LIMIT) =>
+  (page = 1, limit = DEFAULT_LIMIT, managerId?: string) =>
   async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_FETCH_ALL_REQUEST });
 
     try {
-      const { data } = await api.get(
-        `/api/support?page=${page}&limit=${limit}`
-      );
+      let url = `/api/support?page=${page}&limit=${limit}`;
+      if (managerId) {
+        url += `&assignedManager=${managerId}`;
+      }
+      const { data } = await api.get(url);
+
+      const payload: SupportFetchAllPayload = {
+        tickets: data.tickets,
+        pagination: data.pagination,
+      };
+
+      if (data.managers) {
+        payload.managers = data.managers;
+      }
 
       dispatch({
         type: SUPPORT_FETCH_ALL_SUCCESS,
-        payload: {
-          tickets: data.tickets,
-          pagination: data.pagination,
-          managers: data.managers ?? [],
-        },
+        payload,
       });
     } catch {
       dispatch({
@@ -104,8 +125,15 @@ export const updateSupportTicketStatus =
     dispatch({ type: SUPPORT_UPDATE_STATUS_REQUEST });
 
     try {
-      await api.patch(`/api/support/${ticketId}/status`, { status });
+      const { data } = await api.patch(`/api/support/${ticketId}/status`, {
+        status,
+      });
+      dispatch({
+        type: SUPPORT_UPDATE_STATUS_SUCCESS,
+        payload: data.ticket,
+      });
       dispatch(fetchAllSupportTickets());
+      dispatch(fetchSupportStats());
     } catch {
       dispatch({
         type: SUPPORT_UPDATE_STATUS_FAILURE,
@@ -128,3 +156,58 @@ export const deleteSupportTicket =
       });
     }
   };
+
+export const assignSupportTicket =
+  (ticketId: string, managerId: string) => async (dispatch: AppDispatch) => {
+    dispatch({ type: SUPPORT_ASSIGN_MANAGER_REQUEST });
+
+    try {
+      const { data } = await api.patch(`/api/support/${ticketId}/assign`, {
+        managerId,
+      });
+      dispatch({
+        type: SUPPORT_ASSIGN_MANAGER_SUCCESS,
+        payload: data.ticket,
+      });
+      dispatch(fetchAllSupportTickets());
+      dispatch(fetchSupportStats());
+    } catch (err: any) {
+      dispatch({
+        type: SUPPORT_ASSIGN_MANAGER_FAILURE,
+        payload: err.response?.data?.message || 'Failed to assign manager',
+      });
+    }
+  };
+
+export const fetchManagersForSupport = () => async (dispatch: AppDispatch) => {
+  dispatch({ type: SUPPORT_FETCH_MANAGERS_REQUEST });
+  try {
+    const { data } = await api.get('/api/users?role=manager');
+    dispatch({
+      type: SUPPORT_FETCH_MANAGERS_SUCCESS,
+      payload: data.users || [],
+    });
+  } catch (err: any) {
+    dispatch({
+      type: SUPPORT_FETCH_MANAGERS_FAILURE,
+      payload: err.response?.data?.message || 'Failed to fetch managers',
+    });
+  }
+};
+
+export const fetchSupportStats = () => async (dispatch: AppDispatch) => {
+  dispatch({ type: SUPPORT_FETCH_STATS_REQUEST });
+  try {
+    // Fetch a large number of tickets to get a global picture for distribution
+    const { data } = await api.get('/api/support?limit=1000');
+    dispatch({
+      type: SUPPORT_FETCH_STATS_SUCCESS,
+      payload: data.tickets || [],
+    });
+  } catch (err: any) {
+    dispatch({
+      type: SUPPORT_FETCH_STATS_FAILURE,
+      payload: err.response?.data?.message || 'Failed to fetch support stats',
+    });
+  }
+};
