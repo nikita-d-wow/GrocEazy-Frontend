@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Trash2, ShoppingCart } from 'lucide-react';
+import { Trash2, ShoppingCart, Loader2 } from 'lucide-react';
 
 import {
   removeWishlistItem,
@@ -14,6 +15,18 @@ type Props = {
 
 export default function WishlistCard({ item }: Props) {
   const dispatch = useDispatch<AppDispatch>();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await dispatch(removeWishlistItem(item._id));
+    } catch (e) {
+      // console.error(e);
+      // Only reset if it fails, otherwise item gets removed
+      setIsDeleting(false);
+    }
+  };
 
   const isOutOfStock = item.product.stock < 1;
 
@@ -52,7 +65,18 @@ export default function WishlistCard({ item }: Props) {
       <div className="mt-5 flex gap-3">
         <button
           disabled={isOutOfStock}
-          onClick={() => dispatch(moveWishlistToCart(item._id))}
+          onClick={() =>
+            dispatch(
+              moveWishlistToCart(item._id, {
+                _id: item.product._id,
+                name: item.product.name,
+                price: item.product.price,
+                images: item.product.images,
+                stock: item.product.stock,
+                description: item.product.description,
+              })
+            )
+          }
           className={`
             flex-1 flex items-center justify-center gap-2
             py-2 rounded-xl transition
@@ -68,15 +92,21 @@ export default function WishlistCard({ item }: Props) {
         </button>
 
         <button
-          onClick={() => dispatch(removeWishlistItem(item._id))}
+          onClick={handleDelete}
+          disabled={isDeleting}
           className="
             p-3 rounded-xl cursor-pointer
             bg-red-50 text-red-600
             hover:bg-red-100
             active:scale-95 transition
+            disabled:opacity-70 disabled:cursor-not-allowed
           "
         >
-          <Trash2 size={18} />
+          {isDeleting ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            <Trash2 size={18} />
+          )}
         </button>
       </div>
     </div>

@@ -120,8 +120,8 @@ export function supportReducer(
         loading: false,
         refreshing: false,
         tickets: state.tickets.map((t) =>
-          t._id === action.payload._id ? action.payload : t
-        ),
+          t._id === action.payload._id ? { ...t, ...action.payload } : t
+        ), // Merge payload to keep existing fields if payload is partial
       };
 
     case SUPPORT_FETCH_STATS_SUCCESS:

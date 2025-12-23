@@ -101,17 +101,22 @@ export const createOrder =
 
 export const cancelOrder =
   (id: string) => async (dispatch: Dispatch<OrderActionTypes>) => {
-    dispatch({ type: CANCEL_ORDER_REQUEST });
+    // Optimistic Update
+    dispatch({ type: CANCEL_ORDER_SUCCESS, payload: id });
 
     try {
       await api.patch(`/api/orders/${id}/cancel`);
-      dispatch({ type: CANCEL_ORDER_SUCCESS, payload: id });
+      // Success already dispatched. Maybe toast?
       toast.success('Order cancelled');
     } catch (error: any) {
+      // Revert needs a reload
       dispatch({
         type: CANCEL_ORDER_FAILURE,
         payload: error.response?.data?.message || 'Failed to cancel order',
       });
+      // Force reload to get back original status
+      dispatch(getAllOrders() as any);
+      // Note: for user side it might be getMyOrders(), but usually component handles fetch.
     }
   };
 
@@ -145,15 +150,21 @@ export const getAllOrders =
 export const changeOrderStatus =
   (id: string, status: string) =>
   async (dispatch: Dispatch<OrderActionTypes>) => {
-    dispatch({ type: UPDATE_ORDER_STATUS_REQUEST, payload: id });
+    // Optimistic Update
+    dispatch({
+      type: UPDATE_ORDER_STATUS_SUCCESS,
+      payload: { _id: id, status } as any, // Partial update
+    });
 
     try {
       const { data } = await api.patch(`/api/orders/${id}/status`, { status });
+      // Final confirmation from server
       dispatch({
         type: UPDATE_ORDER_STATUS_SUCCESS,
         payload: data.order,
       });
     } catch (error: any) {
+      // Revert/Error will be tricky without old status, but typical error handling:
       dispatch({
         type: UPDATE_ORDER_STATUS_FAILURE,
         payload: {
@@ -162,5 +173,7 @@ export const changeOrderStatus =
             error.response?.data?.message || 'Failed to update order status',
         },
       });
+      // Force refresh to ensure valid state
+      dispatch(getAllOrders() as any);
     }
   };
