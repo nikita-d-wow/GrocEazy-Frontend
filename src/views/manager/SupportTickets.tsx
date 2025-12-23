@@ -103,7 +103,6 @@ export default function ManagerSupportTickets() {
               currentPage={page}
               totalPages={totalPages}
               onPageChange={(p) => dispatch(fetchAllSupportTickets(p))}
-              isLoading={loading}
             />
           </div>
         )}

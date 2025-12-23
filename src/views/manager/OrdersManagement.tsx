@@ -78,7 +78,6 @@ const OrdersManagement = () => {
                     currentPage={page}
                     totalPages={pagination.pages}
                     onPageChange={(nextPage) => setPage(nextPage)}
-                    isLoading={loading}
                   />
                 </div>
               )}
