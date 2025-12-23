@@ -94,7 +94,7 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       {quantity === 0 ? (
         <button
           onClick={handleAddToCart}
-          className="mt-4 w-full text-green-700 font-bold bg-green-50 py-2 rounded-lg hover:bg-green-100 transition-colors uppercase border border-green-200"
+          className="mt-4 w-full text-green-700 font-bold bg-green-50 py-2 rounded-lg hover:bg-green-100 transition-colors uppercase border border-green-200 cursor-pointer"
         >
           ADD
         </button>

@@ -245,7 +245,7 @@ export default function OrderDetails() {
               </p>
               <button
                 onClick={() => setShowCancelModal(true)}
-                className="w-full py-2.5 rounded-xl border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-colors"
+                className="w-full py-2.5 rounded-xl border border-red-200 text-red-600 font-medium hover:bg-red-50 transition-colors cursor-pointer"
               >
                 Cancel Order
               </button>
@@ -272,13 +272,13 @@ export default function OrderDetails() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowCancelModal(false)}
-                className="flex-1 py-2.5 rounded-xl border border-gray-200 font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 font-medium hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 No, Keep it
               </button>
               <button
                 onClick={handleCancelOrder}
-                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-200"
+                className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-medium hover:bg-red-700 transition-colors shadow-lg shadow-red-200 cursor-pointer"
               >
                 Yes, Cancel
               </button>

@@ -31,6 +31,7 @@ export default function ContactSupport() {
               active:scale-95
               transition-all
               self-start sm:self-auto
+              cursor-pointer
             "
           >
             <Ticket size={18} />

@@ -60,7 +60,7 @@ export default function ProductCard({
       toast.success('Removed from wishlist');
     } else {
       await dispatch(addToWishlist(_id));
-      toast.success('Added from wishlist');
+      toast.success('Added to wishlist');
     }
   };
 
@@ -93,7 +93,7 @@ export default function ProductCard({
         )}
         <button
           onClick={handleWishlistFn}
-          className={`absolute top-2 left-2 p-1.5 rounded-full transition-colors ${
+          className={`absolute top-2 left-2 p-1.5 rounded-full transition-colors cursor-pointer ${
             isInWishlist
               ? 'bg-red-50 text-red-500 hover:bg-red-100'
               : 'bg-white/50 hover:bg-white text-gray-400 hover:text-red-500'
@@ -120,7 +120,7 @@ export default function ProductCard({
               className={`px-6 py-1.5 rounded-lg border font-bold text-sm uppercase transition-colors ${
                 stock === 0
                   ? 'border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50'
-                  : 'border-green-600 text-green-600 hover:bg-green-50'
+                  : 'border-green-600 text-green-600 hover:bg-green-50 cursor-pointer'
               }`}
             >
               {stock === 0 ? 'SOLD OUT' : 'ADD'}
@@ -139,7 +139,7 @@ export default function ProductCard({
                     dispatch(updateCartQty(cartItem!._id, quantity - 1));
                   }
                 }}
-                className="w-6 h-6 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50"
+                className="w-6 h-6 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50 cursor-pointer"
               >
                 <Minus size={14} strokeWidth={3} />
               </button>
@@ -159,7 +159,7 @@ export default function ProductCard({
                 className={`w-6 h-6 flex items-center justify-center rounded text-white shadow-sm transition-colors ${
                   stock !== undefined && quantity >= stock
                     ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-green-700 hover:bg-green-800'
+                    : 'bg-green-700 hover:bg-green-800 cursor-pointer'
                 }`}
               >
                 <Plus size={14} strokeWidth={3} />

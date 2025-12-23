@@ -111,7 +111,7 @@ export default function SupportForm() {
             hover:bg-primary-dark active:scale-95
             transition-all duration-300 shadow-md hover:shadow-xl
             flex items-center justify-center gap-2
-            disabled:opacity-60 disabled:cursor-not-allowed
+            disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer
           "
         >
           <Send size={18} />
