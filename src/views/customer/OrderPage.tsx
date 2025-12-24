@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Loader2, PackageX } from 'lucide-react';
 import OrderCard from '../../components/customer/orders/OrderCard';
@@ -11,14 +11,15 @@ import type { ThunkDispatch } from 'redux-thunk';
 export default function OrdersPage() {
   const dispatch =
     useDispatch<ThunkDispatch<RootState, any, OrderActionTypes>>();
-  const { orders, loading, error } = useSelector(
+  const { orders, pagination, loading, error } = useSelector(
     (state: RootState) => state.order
   );
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    dispatch(getMyOrders());
+    dispatch(getMyOrders(currentPage, 5));
     dispatch(fetchProducts());
-  }, [dispatch]);
+  }, [dispatch, currentPage]);
 
   if (loading) {
     return (
@@ -62,6 +63,39 @@ export default function OrdersPage() {
           {orders.map((order) => (
             <OrderCard key={order._id} order={order} />
           ))}
+
+          {/* Pagination Controls */}
+          {pagination && pagination.pages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-8">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                  currentPage === 1
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:text-green-600'
+                }`}
+              >
+                Previous
+              </button>
+              <span className="text-sm text-gray-600 font-medium">
+                Page {currentPage} of {pagination.pages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, pagination.pages))
+                }
+                disabled={currentPage === pagination.pages}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors ${
+                  currentPage === pagination.pages
+                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:text-green-600'
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

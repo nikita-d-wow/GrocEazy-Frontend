@@ -27,6 +27,29 @@ const STATUS_COLORS = {
   outOfStock: '#dc2626', // red-600
 };
 
+const CustomXAxisTick = ({
+  x,
+  y,
+  payload,
+}: {
+  x: number;
+  y: number;
+  payload: { value: string };
+}) => {
+  const words = payload.value.split(' ');
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={25} textAnchor="middle" fill="#666" fontSize={12}>
+        {words.map((word, index) => (
+          <tspan key={index} x={0} dy={index === 0 ? 0 : 12}>
+            {word}
+          </tspan>
+        ))}
+      </text>
+    </g>
+  );
+};
+
 export const InventoryCharts: FC<InventoryChartsProps> = ({
   products,
   categories,
@@ -95,7 +118,7 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
       {/* Stock Status Pie Chart */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Stock Overview</h3>
-        <div className="h-[300px] w-full">
+        <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -123,15 +146,19 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
         <h3 className="text-lg font-bold text-gray-900 mb-4">
           Stock by Category (Top 8)
         </h3>
-        <div className="h-[300px] w-full">
+        <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={categoryData}>
+            <BarChart
+              data={categoryData}
+              margin={{ top: 10, right: 10, left: -20, bottom: 80 }}
+            >
               <CartesianGrid strokeDasharray="3 3" vertical={false} />
               <XAxis
                 dataKey="name"
-                fontSize={12}
-                tickLine={false}
+                interval={0}
+                tick={<CustomXAxisTick x={0} y={0} payload={{ value: '' }} />}
                 axisLine={false}
+                tickLine={false}
               />
               <YAxis fontSize={12} tickLine={false} axisLine={false} />
               <Tooltip

@@ -31,11 +31,12 @@ interface CreateOrderPayload {
 /* ================= USER ORDERS ================= */
 
 export const getMyOrders =
-  () => async (dispatch: Dispatch<OrderActionTypes>) => {
+  (page = 1, limit = 5) =>
+  async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
 
     try {
-      const { data } = await api.get('/api/orders');
+      const { data } = await api.get(`/api/orders?page=${page}&limit=${limit}`);
 
       dispatch({
         type: FETCH_ORDERS_SUCCESS,
