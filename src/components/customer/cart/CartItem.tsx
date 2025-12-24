@@ -1,5 +1,6 @@
-import { Minus, Plus, Trash2, Heart } from 'lucide-react';
+import { Minus, Plus, Trash2, Heart, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useState } from 'react';
 import type { CartItemProps } from '../../../types/Cart';
 
 interface ExtraProps {
@@ -12,15 +13,19 @@ export default function CartItem({
   removeItem,
   moveToWishlist,
 }: CartItemProps & ExtraProps) {
+  const [loading, setLoading] = useState<'inc' | 'dec' | null>(null);
+
   const handleMoveToWishlist = () => {
+    if (loading) {
+      return;
+    }
     moveToWishlist(item._id, item.productId);
     toast.success('Moved to wishlist ❤️');
   };
 
-  const isIncrementDisabled = item.quantity >= item.stock;
+  const isIncrementDisabled = item.quantity >= item.stock || loading !== null;
 
-  const handleIncrement = () => {
-    // 🔒 HARD STOP — API WILL NOT BE CALLED
+  const handleIncrement = async () => {
     if (isIncrementDisabled) {
       toast.error(
         item.stock === 0
@@ -30,7 +35,25 @@ export default function CartItem({
       return;
     }
 
-    updateQty(item._id, 'inc');
+    setLoading('inc');
+    try {
+      await updateQty(item._id, 'inc');
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleDecrement = async () => {
+    if (item.quantity <= 1 || loading !== null) {
+      return;
+    }
+
+    setLoading('dec');
+    try {
+      await updateQty(item._id, 'dec');
+    } finally {
+      setLoading(null);
+    }
   };
 
   return (
@@ -73,14 +96,18 @@ export default function CartItem({
           <div className="mt-3 flex items-center gap-4 justify-start">
             {item.quantity > 1 && (
               <button
-                onClick={() => updateQty(item._id, 'dec')}
+                onClick={handleDecrement}
                 className="
                   p-2 rounded-lg cursor-pointer
                   bg-red-50 border border-red-200
                   hover:bg-red-100
                 "
               >
-                <Minus size={16} className="text-red-600" />
+                {loading === 'dec' ? (
+                  <Loader2 size={16} className="animate-spin text-red-600" />
+                ) : (
+                  <Minus size={16} className="text-red-600" />
+                )}
               </button>
             )}
 
@@ -89,17 +116,20 @@ export default function CartItem({
             {/* INCREMENT */}
             <button
               onClick={handleIncrement}
-              disabled={isIncrementDisabled}
               className={`
-                p-2 rounded-lg border transition-colors
+                p-2 rounded-lg border cursor-pointer transition-colors
                 ${
                   isIncrementDisabled
-                    ? 'bg-gray-100 border-gray-200 cursor-not-allowed text-gray-400'
-                    : 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700 cursor-pointer'
+                    ? 'bg-gray-100 border-gray-200 text-gray-400'
+                    : 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700'
                 }
               `}
             >
-              <Plus size={16} />
+              {loading === 'inc' ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Plus size={16} />
+              )}
             </button>
           </div>
         </div>

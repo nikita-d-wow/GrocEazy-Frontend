@@ -1,6 +1,6 @@
-import React, { type FC } from 'react';
+import React, { type FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Minus, Plus, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -24,12 +24,19 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
 
   const cartItem = cartItems.find((item) => item.product._id === product._id);
 
-  // ✅ FIX: derived state (no useEffect / useState)
+  // ✅ derived state (unchanged)
   const quantity = cartItem?.quantity ?? 0;
+
+  // 🔒 local loader (NEW)
+  const [loading, setLoading] = useState<'add' | 'inc' | 'dec' | null>(null);
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (loading) {
+      return;
+    }
 
+    setLoading('add');
     const toastId = toast.loading('Adding to cart…');
 
     try {
@@ -40,36 +47,43 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       });
     } catch {
       toast.error('Failed to add to cart', { id: toastId });
+    } finally {
+      setLoading(null);
     }
   };
 
   const handleIncrement = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!cartItem) {
+    if (!cartItem || loading) {
       return;
     }
 
-    await dispatch(updateCartQty(cartItem._id, cartItem.quantity + 1));
-
-    toast.success('Quantity updated', {
-      icon: '➕',
-    });
+    setLoading('inc');
+    try {
+      await dispatch(updateCartQty(cartItem._id, cartItem.quantity + 1));
+      toast.success('Quantity updated', { icon: '➕' });
+    } finally {
+      setLoading(null);
+    }
   };
 
   const handleDecrement = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!cartItem) {
+    if (!cartItem || loading) {
       return;
     }
 
-    if (cartItem.quantity > 1) {
-      await dispatch(updateCartQty(cartItem._id, cartItem.quantity - 1));
-      toast.success('Quantity updated', { icon: '➖' });
-    } else {
-      await dispatch(removeCartItem(cartItem._id));
-      toast('Removed from cart', {
-        icon: '🗑️',
-      });
+    setLoading('dec');
+    try {
+      if (cartItem.quantity > 1) {
+        await dispatch(updateCartQty(cartItem._id, cartItem.quantity - 1));
+        toast.success('Quantity updated', { icon: '➖' });
+      } else {
+        await dispatch(removeCartItem(cartItem._id));
+        toast('Removed from cart', { icon: '🗑️' });
+      }
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -94,29 +108,60 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
       {quantity === 0 ? (
         <button
           onClick={handleAddToCart}
-          className="mt-4 w-full text-green-700 font-bold bg-green-50 py-2 rounded-lg hover:bg-green-100 transition-colors uppercase border border-green-200 cursor-pointer"
+          className="
+            mt-4 w-full py-2 rounded-lg uppercase font-bold
+            bg-green-50 border border-green-200
+            text-green-700 hover:bg-green-100
+            transition-colors cursor-pointer
+            flex items-center justify-center
+          "
         >
-          ADD
+          {loading === 'add' ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            'ADD'
+          )}
         </button>
       ) : (
         <div
           onClick={(e) => e.stopPropagation()}
-          className="mt-4 flex items-center justify-between bg-green-50 rounded-lg px-2 py-1 border border-green-200"
+          className="
+            mt-4 flex items-center justify-between
+            bg-green-50 rounded-lg px-2 py-1
+            border border-green-200
+          "
         >
           <button
             onClick={handleDecrement}
-            className="w-8 h-8 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50"
+            className="
+              w-8 h-8 flex items-center justify-center
+              bg-white rounded shadow-sm
+              hover:bg-gray-50 cursor-pointer
+            "
           >
-            <Minus size={16} strokeWidth={3} />
+            {loading === 'dec' ? (
+              <Loader2 size={16} className="animate-spin text-green-700" />
+            ) : (
+              <Minus size={16} strokeWidth={3} />
+            )}
           </button>
 
           <span className="font-bold text-green-700">{quantity}</span>
 
           <button
             onClick={handleIncrement}
-            className="w-8 h-8 flex items-center justify-center bg-green-600 rounded text-white shadow-sm hover:bg-green-700"
+            className="
+              w-8 h-8 flex items-center justify-center
+              bg-green-600 rounded text-white
+              shadow-sm hover:bg-green-700
+              cursor-pointer
+            "
           >
-            <Plus size={16} strokeWidth={3} />
+            {loading === 'inc' ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <Plus size={16} strokeWidth={3} />
+            )}
           </button>
         </div>
       )}
