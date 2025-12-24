@@ -176,7 +176,7 @@ export default function CartPage() {
                 onPageChange={(newPage) =>
                   dispatch(fetchCart(newPage, PAGE_LIMIT))
                 }
-                // isLoading={loading}
+                isLoading={loading}
               />
             </div>
           )}
