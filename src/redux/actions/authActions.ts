@@ -37,6 +37,7 @@ export const login = (payload: LoginPayload) => {
 
       // store accessToken in localStorage settings
       localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
 
       dispatch({
@@ -76,8 +77,12 @@ export const register = (payload: RegisterPayload) => {
 
 export const logout = () => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken = localStorage.getItem('accessToken');
+
     // Clear local storage immediately
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
 
     // Dispatch logout to clear Redux state immediately to update UI
@@ -85,7 +90,13 @@ export const logout = () => {
 
     try {
       // Attempt server-side logout (optional, best effort)
-      await api.post('/api/auth/logout');
+      if (refreshToken && accessToken) {
+        await api.post(
+          '/api/auth/logout',
+          { refreshToken },
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+      }
     } catch {
       // ignore network error on logout
     }
@@ -102,6 +113,7 @@ export const googleLogin = (token: string) => {
       });
 
       localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
 
       dispatch({

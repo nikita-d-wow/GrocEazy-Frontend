@@ -1,8 +1,9 @@
 // src/redux/types/authTypes.ts
+import type { UserRole } from '../../constants/roles';
 export interface IUser {
   id: string;
   email: string;
-  role: 'customer' | 'manager' | 'admin' | string;
+  role: UserRole | string;
   name?: string;
   phone?: string;
   addresses?: IAddress[];
@@ -22,6 +23,7 @@ export interface IAddress {
 
 export interface ILoginResponse {
   accessToken: string;
+  refreshToken: string;
   user: IUser;
 }
 
