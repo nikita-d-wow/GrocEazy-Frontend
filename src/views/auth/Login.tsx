@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import type { RootState } from '../../redux/rootReducer';
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { UserRole } from '../../constants/roles';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -50,9 +51,9 @@ const Login: React.FC = () => {
 
       if (user.hasPassword === false) {
         navigate('/set-password');
-      } else if (user.role === 'admin') {
+      } else if (user.role === UserRole.ADMIN) {
         navigate('/admin');
-      } else if (user.role === 'manager') {
+      } else if (user.role === UserRole.MANAGER) {
         navigate('/manager');
       } else {
         navigate('/');

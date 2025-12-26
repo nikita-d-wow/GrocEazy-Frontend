@@ -47,7 +47,6 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Filter out auth endpoints to avoid infinite loops
-    // Also user should not be refreshing if they are just tying to login
     if (
       !originalRequest ||
       originalRequest.url?.includes('/auth/login') ||
@@ -76,13 +75,32 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
+      const refreshToken = localStorage.getItem('refreshToken');
+      const accessToken = localStorage.getItem('accessToken');
+
+      if (!refreshToken) {
+        // No refresh token available, logout
+        store.dispatch({ type: AUTH_LOGOUT });
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+
       try {
         // Attempt to refresh token
-        // According to specs: POST /auth/refresh (cookie based)
-        const { data } = await api.post('/api/auth/refresh');
+        // POST /api/auth/refresh with refreshToken in body
+        // AND expired accessToken in Authorization header for blacklisting
+        const { data } = await api.post('/api/auth/refresh', { refreshToken }, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Send expired token for blacklist
+          },
+          _retry: true, // Mark as retry to avoid infinite loop matching in interceptor
+        } as any);
 
         // Update local storage
         localStorage.setItem('accessToken', data.accessToken);
+        if (data.refreshToken) {
+          localStorage.setItem('refreshToken', data.refreshToken);
+        }
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
         }
@@ -99,6 +117,7 @@ api.interceptors.response.use(
 
         // CLEAR EVERYTHING
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
 
         // Dispatch Logout Action

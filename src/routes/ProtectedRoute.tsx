@@ -4,9 +4,11 @@ import type { RootState } from '../redux/rootReducer';
 import type { ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 
+import type { UserRole } from '../constants/roles';
+
 interface Props {
   children?: ReactNode;
-  allowedRoles: string[];
+  allowedRoles: UserRole[];
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: Props) {
@@ -37,7 +39,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
     return <Navigate to="/set-password" replace />;
   }
 
-  if (!allowedRoles.includes(user.role)) {
+  if (!allowedRoles.includes(user.role as UserRole)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

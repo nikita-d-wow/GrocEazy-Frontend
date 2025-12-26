@@ -25,7 +25,8 @@ const token =
 const initialState: AuthState = {
   loading: false,
   accessToken: token || null,
-  user: userJSON ? JSON.parse(userJSON) : null,
+  // Only hydrate user if we have a token. If no token, user is effectively logged out.
+  user: token && userJSON ? JSON.parse(userJSON) : null,
   error: null,
 };
 
