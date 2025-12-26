@@ -77,7 +77,7 @@ export default function OrderCard({ order }: { order: Order }) {
             Total Amount
           </span>
           <span className="font-bold text-gray-900 text-lg">
-            ₹{order.totalAmount}
+            ₹{Number(order.totalAmount).toFixed(2)}
           </span>
         </div>
       </div>

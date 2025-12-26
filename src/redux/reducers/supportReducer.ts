@@ -66,7 +66,6 @@ export function supportReducer(
     case SUPPORT_FETCH_MANAGERS_SUCCESS:
       return {
         ...state,
-        loading: false,
         refreshing: false,
         managers: action.payload,
       };
@@ -127,7 +126,6 @@ export function supportReducer(
     case SUPPORT_FETCH_STATS_SUCCESS:
       return {
         ...state,
-        loading: false,
         refreshing: false,
         statsTickets: action.payload,
       };
@@ -138,7 +136,6 @@ export function supportReducer(
     case SUPPORT_FETCH_STATS_FAILURE:
       return {
         ...state,
-        loading: false,
         refreshing: false,
         error: action.payload,
       };

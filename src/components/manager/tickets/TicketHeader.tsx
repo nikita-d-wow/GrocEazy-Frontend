@@ -33,7 +33,9 @@ export default function TicketHeader({
 
       <TicketStatusSelect
         status={ticket.status}
-        disabled={updating}
+        disabled={
+          updating || ticket.status === 'resolved' || ticket.status === 'closed'
+        }
         onChange={onStatusChange}
       />
     </div>

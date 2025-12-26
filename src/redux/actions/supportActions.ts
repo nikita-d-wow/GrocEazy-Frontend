@@ -49,11 +49,13 @@ export const createSupportTicket =
         type: SUPPORT_CREATE_SUCCESS,
         payload: data.ticket as SupportTicket,
       });
+      return true;
     } catch {
       dispatch({
         type: SUPPORT_CREATE_FAILURE,
         payload: 'Failed to create support ticket',
       });
+      return false;
     }
   };
 

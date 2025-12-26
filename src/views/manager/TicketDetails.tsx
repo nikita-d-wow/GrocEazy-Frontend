@@ -12,6 +12,7 @@ import {
   Hash,
 } from 'lucide-react';
 
+import Loader from '../../components/common/Loader';
 import { selectSupportTickets } from '../../redux/selectors/supportSelectors';
 import {
   fetchAllSupportTickets,
@@ -42,11 +43,14 @@ export default function TicketDetails() {
   if (!ticket) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Ticket not found or loading...</p>
+        <div className="text-center p-8 bg-white/60 backdrop-blur-xl rounded-3xl border border-white/50 shadow-xl animate-fadeIn">
+          <Loader />
+          <p className="text-gray-500 mt-6 font-medium animate-pulse">
+            Fetching ticket details...
+          </p>
           <button
             onClick={() => navigate('/manager/support')}
-            className="text-primary hover:underline"
+            className="mt-8 px-6 py-2 rounded-full border border-primary/30 text-primary hover:bg-primary/5 transition-all text-sm font-semibold"
           >
             Back to Tickets
           </button>
@@ -76,7 +80,7 @@ export default function TicketDetails() {
         </button>
 
         {/* MAIN CARD */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl overflow-hidden relative">
+        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl relative">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-emerald-400" />
 
           <div className="p-8">
@@ -100,7 +104,9 @@ export default function TicketDetails() {
                 <TicketStatusSelect
                   status={ticket.status}
                   onChange={handleStatusChange}
-                  disabled={false} // Allow updates here
+                  disabled={
+                    ticket.status === 'resolved' || ticket.status === 'closed'
+                  }
                 />
               </div>
             </div>

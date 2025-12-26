@@ -16,6 +16,7 @@ import {
 import {
   selectSupportTickets,
   selectSupportManagers,
+  selectSupportRefreshing,
   selectSupportStatsTickets,
 } from '../../redux/selectors/supportSelectors';
 import {
@@ -35,6 +36,7 @@ export default function AdminTicketDetailsPage() {
   const tickets = useSelector(selectSupportTickets);
   const statsTickets = useSelector(selectSupportStatsTickets);
   const managers = useSelector(selectSupportManagers);
+  const refreshing = useSelector(selectSupportRefreshing);
 
   // Combine tickets to find the one we need
   const ticket = useMemo(() => {
@@ -130,24 +132,37 @@ export default function AdminTicketDetailsPage() {
 
             <div className="flex flex-col items-start lg:items-end gap-3 shrink-0">
               <div className="flex gap-2">
-                {Object.entries(STATUS_MAP).map(([status, ui]) => (
-                  <button
-                    key={status}
-                    onClick={() =>
-                      dispatch(
-                        updateSupportTicketStatus(ticket._id, status as any)
-                      )
-                    }
-                    className={`p-2.5 rounded-xl transition-all border ${
-                      ticket.status === status
-                        ? 'bg-primary text-white border-primary shadow-sm'
-                        : 'bg-white text-gray-400 border-gray-100 hover:border-primary/30'
-                    }`}
-                    title={ui.label}
-                  >
-                    {ui.icon}
-                  </button>
-                ))}
+                {Object.entries(STATUS_MAP).map(([status, ui]) => {
+                  const isResolved = ticket.status === 'resolved';
+                  const isCurrent = ticket.status === status;
+                  const isBtnDisabled =
+                    (isResolved && !isCurrent) || refreshing;
+
+                  return (
+                    <button
+                      key={status}
+                      onClick={() =>
+                        !isBtnDisabled &&
+                        dispatch(
+                          updateSupportTicketStatus(ticket._id, status as any)
+                        )
+                      }
+                      disabled={isBtnDisabled}
+                      className={`p-2.5 rounded-xl transition-all border ${
+                        isCurrent
+                          ? 'bg-primary text-white border-primary shadow-sm'
+                          : 'bg-white text-gray-400 border-gray-100'
+                      } ${
+                        isBtnDisabled
+                          ? 'opacity-50 cursor-not-allowed'
+                          : 'hover:border-primary/30 cursor-pointer'
+                      }`}
+                      title={ui.label}
+                    >
+                      {ui.icon}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

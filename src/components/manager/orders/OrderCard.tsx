@@ -27,11 +27,11 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
         rounded-2xl p-4 sm:p-6
         hover:shadow-xl hover:-translate-y-1
         transition-all duration-300 cursor-pointer
-        group relative overflow-hidden
+        group relative
       "
     >
       {/* Decorative Gradient Background on Hover */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl" />
 
       <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         {/* LEFT SECTION: User & ID */}
@@ -75,7 +75,7 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
             </p>
             <p className="text-xl font-black text-primary flex items-center">
               <IndianRupee size={16} className="mt-0.5" />
-              {order.totalAmount}
+              {Number(order.totalAmount).toFixed(2)}
             </p>
           </div>
         </div>
@@ -84,7 +84,9 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
         <div className="flex-shrink-0">
           <OrderStatusSelect
             status={order.status}
-            disabled={order.status === 'Delivered'}
+            disabled={
+              order.status === 'Delivered' || order.status === 'Cancelled'
+            }
             onChange={(status) => onStatusChange(order._id, status)}
           />
         </div>

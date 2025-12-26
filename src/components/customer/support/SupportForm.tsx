@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Send } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -28,15 +29,21 @@ export default function SupportForm() {
   } = useForm<FormValues>();
 
   const onSubmit = async (data: FormValues) => {
-    await dispatch(createSupportTicket(data.subject, data.message));
+    const success = await dispatch(
+      createSupportTicket(data.subject, data.message)
+    );
 
-    if (!error) {
+    if (success) {
       toast.success('Support ticket submitted successfully');
       reset();
-    } else {
-      toast.error(error);
     }
   };
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   return (
     <div

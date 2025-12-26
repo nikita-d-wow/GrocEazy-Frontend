@@ -83,7 +83,7 @@ export default function ManagerOrderDetails() {
         </button>
 
         {/* MAIN CARD */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-3xl overflow-hidden relative">
+        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-3xl relative">
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary to-emerald-400" />
 
           <div className="p-8 md:p-12">
@@ -124,7 +124,9 @@ export default function ManagerOrderDetails() {
                 <OrderStatusSelect
                   status={order.status}
                   onChange={handleStatusChange}
-                  disabled={order.status === 'Delivered'}
+                  disabled={
+                    order.status === 'Delivered' || order.status === 'Cancelled'
+                  }
                 />
               </div>
             </div>
@@ -254,7 +256,7 @@ export default function ManagerOrderDetails() {
                           <span className="text-gray-500">
                             Unit Price:{' '}
                             <span className="font-bold text-gray-700">
-                              ₹{item.unitPrice}
+                              ₹{Number(item.unitPrice).toFixed(2)}
                             </span>
                           </span>
                         </div>
@@ -262,7 +264,7 @@ export default function ManagerOrderDetails() {
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-extrabold text-gray-900">
-                        ₹{item.lineTotal}
+                        ₹{Number(item.lineTotal).toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -277,7 +279,7 @@ export default function ManagerOrderDetails() {
                     Grand Total
                   </p>
                   <p className="text-4xl font-black text-white">
-                    ₹{order.totalAmount}
+                    ₹{Number(order.totalAmount).toFixed(2)}
                   </p>
                 </div>
                 <div className="relative flex items-center gap-3 bg-white/10 px-6 py-3 rounded-2xl border border-white/10 backdrop-blur-sm">

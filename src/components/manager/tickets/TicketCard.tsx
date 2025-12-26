@@ -33,7 +33,7 @@ export default function TicketCard({
         navigate(`/manager/support/${ticket._id}`);
       }}
       className="
-        group relative overflow-hidden
+        group relative
         rounded-2xl border border-white/50
         bg-white/70 backdrop-blur-xl
         p-6 shadow-sm hover:shadow-xl
@@ -45,7 +45,7 @@ export default function TicketCard({
         className="
           absolute inset-0 opacity-0 group-hover:opacity-100
           bg-gradient-to-r from-violet-100/50 via-fuchsia-100/50 to-pink-100/50
-          transition duration-500
+          transition duration-500 rounded-2xl
         "
       />
 

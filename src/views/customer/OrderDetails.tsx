@@ -197,7 +197,7 @@ export default function OrderDetails() {
                       </p>
                     </div>
                     <p className="font-semibold text-gray-900">
-                      ₹{item.unitPrice * item.quantity}
+                      ₹{(item.unitPrice * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 );
@@ -206,7 +206,7 @@ export default function OrderDetails() {
             <div className="mt-4 pt-4 border-t flex justify-between items-center">
               <span className="font-medium text-gray-600">Total Amount</span>
               <span className="text-xl font-bold text-primary">
-                ₹{currentOrder.totalAmount}
+                ₹{Number(currentOrder.totalAmount).toFixed(2)}
               </span>
             </div>
           </div>
