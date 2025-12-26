@@ -21,10 +21,19 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
         type: 'success' | 'error';
         text: string;
     } | null>(null);
+    const [phoneError, setPhoneError] = useState('');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+
+        if (name === 'phone') {
+            if (!validatePhone(value)) {
+                setPhoneError('Please enter a valid phone number (at least 10 digits).');
+            } else {
+                setPhoneError('');
+            }
+        }
     };
 
     const validatePhone = (phone: string) => {
@@ -42,8 +51,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!validatePhone(formData.phone)) {
-            setMessage({ type: 'error', text: 'Please enter a valid phone number (at least 10 digits).' });
+        if (phoneError) {
             return;
         }
 
@@ -99,6 +107,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                             placeholder="+1 234 567 8900"
                         />
                     </div>
+                    {phoneError && <p className="text-red-500 text-xs mt-1">{phoneError}</p>}
                 </div>
 
                 {message && (
@@ -115,7 +124,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
                 <div className="pt-2">
                     <button
                         type="submit"
-                        disabled={isSaving}
+                        disabled={isSaving || !!phoneError}
                         className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSaving ? (

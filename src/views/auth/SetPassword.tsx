@@ -11,9 +11,13 @@ import { fetchUserProfile } from '../../redux/actions/profileActions';
 import { logout } from '../../redux/actions/authActions';
 import { UPDATE_PROFILE_SUCCESS } from '../../redux/types/authTypes';
 
-const passwordSchema = z
+import { passwordSchema } from '../../utils/validationSchemas';
+import PasswordStrengthIndicator from '../../components/auth/PasswordStrengthIndicator';
+import Input from '../../components/common/Input';
+
+const passwordSchemaForm = z
   .object({
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    password: passwordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -21,7 +25,7 @@ const passwordSchema = z
     path: ['confirmPassword'],
   });
 
-type PasswordFormInputs = z.infer<typeof passwordSchema>;
+type PasswordFormInputs = z.infer<typeof passwordSchemaForm>;
 
 export default function SetPassword() {
   const navigate = useNavigate();
@@ -33,10 +37,14 @@ export default function SetPassword() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<PasswordFormInputs>({
-    resolver: zodResolver(passwordSchema),
+    resolver: zodResolver(passwordSchemaForm),
+    mode: 'onChange',
   });
+
+  const password = watch('password');
 
   const onSubmit = async (data: PasswordFormInputs) => {
     setLoading(true);
@@ -54,8 +62,8 @@ export default function SetPassword() {
 
       toast.success('Password set successfully!');
       navigate('/');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to set password');
+    } catch {
+      toast.error('Failed to set password');
     } finally {
       setLoading(false);
     }
@@ -93,46 +101,36 @@ export default function SetPassword() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                New Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  {...register('password')}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Enter new password"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.password.message}
-                </p>
-              )}
+              <Input
+                label="New Password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter new password"
+                error={errors.password?.message}
+                {...register('password')}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="hover:text-gray-600 focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                }
+              />
+              <PasswordStrengthIndicator password={password} />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  {...register('confirmPassword')}
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                  placeholder="Confirm new password"
-                />
+            <Input
+              label="Confirm Password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Confirm new password"
+              error={errors.confirmPassword?.message}
+              {...register('confirmPassword')}
+              rightIcon={
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  className="hover:text-gray-600 focus:outline-none"
                 >
                   {showConfirmPassword ? (
                     <EyeOff size={18} />
@@ -140,13 +138,8 @@ export default function SetPassword() {
                     <Eye size={18} />
                   )}
                 </button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.confirmPassword.message}
-                </p>
-              )}
-            </div>
+              }
+            />
           </div>
 
           <button
