@@ -33,40 +33,49 @@ export default function MyTickets() {
     window.scrollTo(0, 0);
   }, [dispatch, currentPage]);
 
-  if (loading && (!myTickets || myTickets.length === 0)) {
-    return <Loader />;
-  }
-
-  if (!myTickets || myTickets.length === 0) {
-    return (
-      <EmptyState
-        title="No support tickets yet"
-        description="When you contact support, your tickets will appear here."
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10">
       <h1 className="text-3xl font-extrabold text-gray-900 mb-8 tracking-tight">
         My Support Tickets
       </h1>
 
-      <div className="space-y-5">
-        {myTickets.map((ticket: SupportTicket) => (
-          <TicketCard key={ticket._id} ticket={ticket} />
-        ))}
-      </div>
-
-      {pagination.totalPages > 1 && (
-        <div className="mt-10 flex justify-center">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={pagination.totalPages}
-            onPageChange={(p) => dispatch(fetchMySupportTickets(p, PAGE_LIMIT))}
-            isLoading={loading}
-          />
+      {loading && (!myTickets || myTickets.length === 0) ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader />
         </div>
+      ) : !myTickets || myTickets.length === 0 ? (
+        <EmptyState
+          title="No support tickets yet"
+          description="When you contact support, your tickets will appear here."
+          icon={<AlertCircle size={48} className="text-gray-200" />}
+        />
+      ) : (
+        <>
+          <div className="space-y-5">
+            {myTickets.map((ticket: SupportTicket, index) => (
+              <div
+                key={ticket._id}
+                className="animate-slideUp cursor-pointer"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <TicketCard ticket={ticket} />
+              </div>
+            ))}
+          </div>
+
+          {pagination.totalPages > 1 && (
+            <div className="mt-10 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={(p) =>
+                  dispatch(fetchMySupportTickets(p, PAGE_LIMIT))
+                }
+                isLoading={loading}
+              />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

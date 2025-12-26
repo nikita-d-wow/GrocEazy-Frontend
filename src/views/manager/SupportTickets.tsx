@@ -47,27 +47,10 @@ export default function ManagerSupportTickets() {
     }
   };
 
-  if (loading && tickets.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader />
-      </div>
-    );
-  }
-
-  if (!tickets.length) {
-    return (
-      <EmptyState
-        title="No assigned tickets"
-        description="Sit back and relax — nothing to resolve right now ✨"
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen">
       <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
-        <div className="flex items-center gap-4 mb-12">
+        <div className="flex items-center gap-4 mb-12 animate-fadeIn">
           <div className="p-3 bg-white rounded-2xl shadow-sm text-primary">
             <Ticket size={28} />
           </div>
@@ -81,30 +64,52 @@ export default function ManagerSupportTickets() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6">
-          {tickets.map((ticket, index) => (
-            <div
-              key={ticket._id}
-              className="animate-slideUp"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <TicketCard
-                ticket={ticket}
-                updating={updatingId === ticket._id}
-                onStatusChange={(status) => updateStatus(ticket._id, status)}
-              />
-            </div>
-          ))}
-        </div>
-
-        {totalPages > 1 && (
-          <div className="mt-12 flex justify-center">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              onPageChange={(p) => dispatch(fetchAllSupportTickets(p))}
+        {loading && tickets.length === 0 ? (
+          <div className="flex flex-col items-center justify-center min-h-[400px] animate-fadeIn">
+            <Loader />
+            <p className="mt-4 text-gray-500 animate-pulse">
+              Syncing your tickets...
+            </p>
+          </div>
+        ) : tickets.length === 0 ? (
+          <div className="animate-fadeIn">
+            <EmptyState
+              title="No assigned tickets"
+              description="Sit back and relax — nothing to resolve right now ✨"
+              icon={<Ticket size={48} className="text-primary/20" />}
             />
           </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-6">
+              {tickets.map((ticket, index) => (
+                <div
+                  key={ticket._id}
+                  className="animate-slideUp"
+                  style={{ animationDelay: `${index * 30}ms` }}
+                >
+                  <TicketCard
+                    ticket={ticket}
+                    updating={updatingId === ticket._id}
+                    onStatusChange={(status) =>
+                      updateStatus(ticket._id, status)
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="mt-12 flex justify-center">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={(p) => dispatch(fetchAllSupportTickets(p))}
+                  isLoading={loading}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
