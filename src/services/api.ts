@@ -2,16 +2,20 @@ import axios from 'axios';
 import { API_BASE } from '../config';
 import { store } from '../redux/store';
 import { AUTH_LOGOUT } from '../redux/types/authTypes';
+import { AUTH_KEYS } from '../constants/auth';
 
 const api = axios.create({
   baseURL: API_BASE, // e.g. http://localhost:4000
-  withCredentials: true, // Send cookies (refresh token)
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  // withCredentials: true, // No longer needed for cookie-based auth, but harmless if kept. Removing for clarity as per prompt.
 });
 
 // Request Interceptor: Attach Access Token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -20,118 +24,72 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Variables to handle concurrent refreshes
-let isRefreshing = false;
-let failedQueue: Array<{
-  resolve: (value: unknown) => void;
-  reject: (reason?: any) => void;
-}> = [];
-
-// Helper to process the queue
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-
-  failedQueue = [];
-};
-
 // Response Interceptor: Handle 401 & Refresh Token
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Filter out auth endpoints to avoid infinite loops
+    // Check if error is 401 and we haven't retried yet
+    // Also skip auth endpoints to avoid infinite loops
     if (
-      !originalRequest ||
-      originalRequest.url?.includes('/auth/login') ||
-      originalRequest.url?.includes('/auth/register') ||
-      originalRequest.url?.includes('/auth/google') ||
-      originalRequest.url?.includes('/auth/refresh')
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
+      !originalRequest.url?.includes('/auth/register')
     ) {
-      return Promise.reject(error);
-    }
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        // If already refreshing, queue this request
-        return new Promise(function (resolve, reject) {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return api(originalRequest);
-          })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
-      }
-
       originalRequest._retry = true;
-      isRefreshing = true;
-
-      const refreshToken = localStorage.getItem('refreshToken');
-      const accessToken = localStorage.getItem('accessToken');
-
-      if (!refreshToken) {
-        // No refresh token available, logout
-        store.dispatch({ type: AUTH_LOGOUT });
-        window.location.href = '/login';
-        return Promise.reject(error);
-      }
 
       try {
-        // Attempt to refresh token
-        // POST /api/auth/refresh with refreshToken in body
-        // AND expired accessToken in Authorization header for blacklisting
-        const { data } = await api.post('/api/auth/refresh', { refreshToken }, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`, // Send expired token for blacklist
-          },
-          _retry: true, // Mark as retry to avoid infinite loop matching in interceptor
-        } as any);
-
-        // Update local storage
-        localStorage.setItem('accessToken', data.accessToken);
-        if (data.refreshToken) {
-          localStorage.setItem('refreshToken', data.refreshToken);
-        }
-        if (data.user) {
-          localStorage.setItem('user', JSON.stringify(data.user));
+        const refreshToken = localStorage.getItem(AUTH_KEYS.REFRESH_TOKEN);
+        if (!refreshToken) {
+          throw new Error("No refresh token available");
         }
 
-        // Process queue with new token
-        processQueue(null, data.accessToken);
+        // Call Refresh Endpoint
+        // Pass the OLD Access Token in the header (if available) for blacklisting
+        const oldAccess = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
 
-        // Retry original request
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        const res = await axios.post(`${API_BASE}/api/auth/refresh`,
+          { refreshToken },
+          {
+            headers: {
+              Authorization: oldAccess ? `Bearer ${oldAccess}` : undefined,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+
+        // Save New Tokens
+        const { accessToken, refreshToken: newRefresh } = res.data;
+        localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, accessToken);
+        // Sometimes backend might rotate refresh token too
+        if (newRefresh) {
+          localStorage.setItem(AUTH_KEYS.REFRESH_TOKEN, newRefresh);
+        }
+
+        // Retry Original Request with new token
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
+
       } catch (refreshError) {
-        // Refresh failed (e.g. invalid/expired refresh token)
-        processQueue(refreshError, null);
+        // Refresh Failed (Expired or Invalid) -> Logout User
+        console.error("Session expired:", refreshError);
 
-        // CLEAR EVERYTHING
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
+        // Clear Storage
+        localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
+        localStorage.removeItem(AUTH_KEYS.REFRESH_TOKEN);
+        localStorage.removeItem(AUTH_KEYS.USER);
 
-        // Dispatch Logout Action
+        // Dispatch Logout
         store.dispatch({ type: AUTH_LOGOUT });
 
-        // Redirect to Login
+        // Redirect
         window.location.href = '/login';
 
         return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
       }
     }
-
     return Promise.reject(error);
   }
 );
