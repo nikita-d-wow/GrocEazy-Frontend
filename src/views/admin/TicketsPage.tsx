@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Calendar, User } from 'lucide-react';
+import { ShieldCheck, Calendar, User, SearchX } from 'lucide-react';
 
 import {
   fetchAllSupportTickets,
@@ -21,6 +21,7 @@ import {
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
+import FilterSelect from '../../components/common/FilterSelect';
 import TicketAssignSelect from '../../components/admin/tickets/TicketAssignSelect';
 import ManagerTicketStats from '../../components/admin/analytics/ManagerTicketStats';
 
@@ -42,6 +43,8 @@ export default function AdminSupportTickets() {
   const statsTickets = useSelector(selectSupportStatsTickets);
   const { page, totalPages, total } = useSelector(selectSupportPagination);
 
+  const [statusFilter, setStatusFilter] = useState('all');
+
   useEffect(() => {
     dispatch(fetchAllSupportTickets(page, PAGE_LIMIT));
 
@@ -52,6 +55,22 @@ export default function AdminSupportTickets() {
     dispatch(fetchSupportStats());
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, page, managers.length]);
+
+  const filterOptions = useMemo(() => {
+    const options = Object.keys(STATUS_MAP).map((status) => ({
+      value: status,
+      label: STATUS_MAP[status as keyof typeof STATUS_MAP].label,
+      icon: STATUS_MAP[status as keyof typeof STATUS_MAP].icon,
+    }));
+    return [{ value: 'all', label: 'All Statuses' }, ...options];
+  }, []);
+
+  const filteredTickets = useMemo(() => {
+    if (statusFilter === 'all') {
+      return tickets;
+    }
+    return tickets.filter((ticket) => ticket.status === statusFilter);
+  }, [tickets, statusFilter]);
 
   return (
     <div className="min-h-screen relative">
@@ -64,11 +83,21 @@ export default function AdminSupportTickets() {
 
       <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
         {/* HEADER */}
-        <div className="flex items-center gap-3 mb-12">
-          <ShieldCheck className="text-indigo-600" size={28} />
-          <h1 className="text-3xl font-semibold text-gray-800">
-            Support Tickets
-          </h1>
+        <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+          <div className="flex items-center gap-3">
+            <ShieldCheck className="text-indigo-600" size={28} />
+            <h1 className="text-3xl font-semibold text-gray-800">
+              Support Tickets
+            </h1>
+          </div>
+
+          <FilterSelect
+            label="Filter by Status"
+            value={statusFilter}
+            options={filterOptions}
+            onChange={setStatusFilter}
+            className="md:w-64"
+          />
         </div>
 
         {loading && tickets.length === 0 ? (
@@ -96,119 +125,143 @@ export default function AdminSupportTickets() {
             />
 
             {/* LIST */}
-            <div className="space-y-8 mt-10">
-              {tickets.map((ticket: SupportTicket, index: number) => {
-                const statusUI = STATUS_MAP[ticket.status];
+            {filteredTickets.length > 0 ? (
+              <div className="space-y-8 mt-10">
+                {filteredTickets.map((ticket: SupportTicket, index: number) => {
+                  const statusUI = STATUS_MAP[ticket.status];
 
-                return (
-                  <div
-                    key={ticket._id}
-                    style={{
-                      zIndex: tickets.length - index,
-                      animationDelay: `${index * 50}ms`,
-                    }}
-                    onClick={(e) => {
-                      if (
-                        (e.target as HTMLElement).closest('.assignee-select')
-                      ) {
-                        return;
-                      }
-                      navigate(`/admin/support/${ticket._id}`);
-                    }}
-                    className="
-                      animate-slideUp
-                      relative
-                      rounded-2xl
-                      bg-white/60 backdrop-blur-xl
-                      border border-white/70
-                      shadow-lg
-                      transition-all duration-300
-                      hover:shadow-2xl hover:bg-primary/5
-                      cursor-pointer
-                    "
-                  >
-                    <div className="p-6 sm:p-8">
-                      {/* TOP */}
-                      <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
-                        <div className="min-w-0 flex-1">
-                          <Link to={`/admin/support/${ticket._id}`}>
-                            <h2 className="text-lg font-semibold text-gray-800 hover:text-indigo-600 transition-colors">
-                              {ticket.subject}
-                            </h2>
-                          </Link>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Ticket ID • {ticket._id}
-                          </p>
-                        </div>
-
-                        <span
-                          className={`
-                            flex items-center gap-2
-                            px-4 py-1.5 rounded-full text-xs font-medium
-                            ${statusUI.color}
-                          `}
-                        >
-                          {statusUI.icon}
-                          {statusUI.label}
-                        </span>
-                      </div>
-
-                      {/* DESCRIPTION */}
-                      <p className="mt-5 text-sm text-gray-700 line-clamp-2">
-                        {ticket.description}
-                      </p>
-
-                      {/* META */}
-                      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-gray-100 pt-6">
-                        {/* CREATOR */}
-                        <div className="flex items-center gap-3 bg-slate-50/50 p-3 rounded-xl">
-                          <div className="w-9 h-9 rounded-full bg-white border flex items-center justify-center text-indigo-600">
-                            <User size={18} />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[10px] uppercase text-gray-400 font-bold">
-                              Raised By
-                            </p>
-                            <p className="font-semibold text-gray-800 truncate">
-                              {ticket.user?.name || 'Customer'}
-                            </p>
-                            <p className="text-xs text-gray-500 truncate">
-                              {ticket.user?.email}
+                  return (
+                    <div
+                      key={ticket._id}
+                      style={{
+                        zIndex: filteredTickets.length - index,
+                        animationDelay: `${index * 50}ms`,
+                      }}
+                      onClick={(e) => {
+                        if (
+                          (e.target as HTMLElement).closest('.assignee-select')
+                        ) {
+                          return;
+                        }
+                        navigate(`/admin/support/${ticket._id}`);
+                      }}
+                      className="
+                        animate-slideUp
+                        relative
+                        rounded-2xl
+                        bg-white/60 backdrop-blur-xl
+                        border border-white/70
+                        shadow-lg
+                        transition-all duration-300
+                        hover:shadow-2xl hover:bg-primary/5
+                        cursor-pointer
+                      "
+                    >
+                      <div className="p-6 sm:p-8">
+                        {/* TOP */}
+                        <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
+                          <div className="min-w-0 flex-1">
+                            <Link to={`/admin/support/${ticket._id}`}>
+                              <h2 className="text-lg font-semibold text-gray-800 hover:text-indigo-600 transition-colors">
+                                {ticket.subject}
+                              </h2>
+                            </Link>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Ticket ID • {ticket._id}
                             </p>
                           </div>
-                        </div>
 
-                        {/* ASSIGNMENT – FIXED */}
-                        <div className="relative assignee-select">
-                          <p className="text-[10px] uppercase text-gray-400 font-bold mb-1 ml-1">
-                            Assignee
-                          </p>
-                          <TicketAssignSelect
-                            ticketId={ticket._id}
-                            currentManager={ticket.assignedManager}
-                            managers={managers}
-                          />
-                        </div>
-
-                        {/* DATE */}
-                        <div>
-                          <p className="text-[10px] uppercase text-gray-400 font-bold mb-1 ml-1">
-                            Created At
-                          </p>
-                          <span className="flex items-center gap-2 text-gray-700">
-                            <Calendar size={14} />
-                            {new Date(ticket.createdAt).toLocaleDateString()}
+                          <span
+                            className={`
+                              flex items-center gap-2
+                              px-4 py-1.5 rounded-full text-xs font-medium
+                              ${statusUI.color}
+                            `}
+                          >
+                            {statusUI.icon}
+                            {statusUI.label}
                           </span>
+                        </div>
+
+                        {/* DESCRIPTION */}
+                        <p className="mt-5 text-sm text-gray-700 line-clamp-2">
+                          {ticket.description}
+                        </p>
+
+                        {/* META */}
+                        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-gray-100 pt-6">
+                          {/* CREATOR */}
+                          <div className="flex items-center gap-3 bg-slate-50/50 p-3 rounded-xl">
+                            <div className="w-9 h-9 rounded-full bg-white border flex items-center justify-center text-indigo-600">
+                              <User size={18} />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] uppercase text-gray-400 font-bold">
+                                Raised By
+                              </p>
+                              <p className="font-semibold text-gray-800 truncate">
+                                {ticket.user?.name || 'Customer'}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {ticket.user?.email}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* ASSIGNMENT – FIXED */}
+                          <div className="relative assignee-select">
+                            <p className="text-[10px] uppercase text-gray-400 font-bold mb-1 ml-1">
+                              Assignee
+                            </p>
+                            <TicketAssignSelect
+                              ticketId={ticket._id}
+                              currentManager={ticket.assignedManager}
+                              managers={managers}
+                            />
+                          </div>
+
+                          {/* DATE */}
+                          <div>
+                            <p className="text-[10px] uppercase text-gray-400 font-bold mb-1 ml-1">
+                              Created At
+                            </p>
+                            <span className="flex items-center gap-2 text-gray-700">
+                              <Calendar size={14} />
+                              {new Date(ticket.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="mt-10 h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl animate-fadeIn">
+                <div className="p-4 bg-gray-100 rounded-full text-gray-400">
+                  <SearchX size={48} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">
+                    No matches found
+                  </h3>
+                  <p className="text-gray-500 max-w-xs mx-auto">
+                    No tickets currently match the "
+                    {filterOptions.find((o) => o.value === statusFilter)?.label}
+                    " status on this page.
+                  </p>
+                  <button
+                    onClick={() => setStatusFilter('all')}
+                    className="mt-4 text-indigo-600 font-semibold hover:underline"
+                  >
+                    Clear filter
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* PAGINATION */}
-            {totalPages > 1 && (
+            {totalPages > 1 && statusFilter === 'all' && (
               <div className="mt-12 flex justify-center">
                 <Pagination
                   currentPage={page}

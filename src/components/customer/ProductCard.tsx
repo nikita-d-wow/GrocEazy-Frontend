@@ -39,10 +39,12 @@ export default function ProductCard({
   const wishlistItems = useSelector(selectWishlistItems);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const cartItem = items.find(
-    (item: CartItem) =>
-      item.product?._id === _id || (item.product as any) === _id
-  );
+  const cartItem = items.find((item: CartItem) => {
+    const prodId =
+      item.product?._id ||
+      (typeof item.product === 'string' ? item.product : null);
+    return prodId === _id;
+  });
   const quantity = cartItem ? cartItem.quantity : 0;
 
   const wishlistItem = wishlistItems.find((item) => item.product._id === _id);
@@ -150,10 +152,12 @@ export default function ProductCard({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (quantity === 1) {
-                    dispatch(removeCartItem(cartItem!._id));
-                  } else {
-                    dispatch(updateCartQty(cartItem!._id, quantity - 1));
+                  if (quantity > 0 && cartItem) {
+                    if (quantity === 1) {
+                      dispatch(removeCartItem(cartItem._id));
+                    } else {
+                      dispatch(updateCartQty(cartItem._id, quantity - 1));
+                    }
                   }
                 }}
                 className="w-6 h-6 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50 cursor-pointer"
@@ -166,8 +170,10 @@ export default function ProductCard({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (stock !== undefined && cartItem && quantity < stock) {
-                    dispatch(updateCartQty(cartItem._id, quantity + 1));
+                  if (stock !== undefined && quantity < stock) {
+                    if (cartItem) {
+                      dispatch(updateCartQty(cartItem._id, quantity + 1));
+                    }
                   } else if (stock !== undefined && quantity >= stock) {
                     toast.error('Maximum available stock reached');
                   }

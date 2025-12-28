@@ -69,16 +69,22 @@ export function cartReducer(
       };
 
     case CART_ADD_ITEM: {
-      // Check if item already exists (safety check)
-      const existingItem = state.items.find(
-        (item) => item.product._id === action.payload.product._id
+      const getProductId = (item: any) =>
+        item.product?._id ||
+        (typeof item.product === 'string' ? item.product : null);
+
+      const targetProductId = getProductId(action.payload);
+
+      // Check if item already exists
+      const existingItemIndex = state.items.findIndex(
+        (item) => getProductId(item) === targetProductId
       );
 
-      if (existingItem) {
+      if (existingItemIndex > -1) {
         return {
           ...state,
-          items: state.items.map((item) =>
-            item.product._id === action.payload.product._id
+          items: state.items.map((item, index) =>
+            index === existingItemIndex
               ? { ...item, quantity: item.quantity + action.payload.quantity }
               : item
           ),

@@ -17,7 +17,10 @@ import {
   removeCartItem,
 } from '../../redux/actions/cartActions';
 
-import { addToWishlist } from '../../redux/actions/wishlistActions';
+import {
+  fetchWishlist,
+  addToWishlist,
+} from '../../redux/actions/wishlistActions';
 
 import {
   selectCartItems,
@@ -25,6 +28,7 @@ import {
   selectCartTotal,
   selectCartPagination,
 } from '../../redux/selectors/cartSelectors';
+import { selectWishlistItems } from '../../redux/selectors/wishlistSelectors';
 
 import type { AppDispatch } from '../../redux/store';
 import type { RootState } from '../../redux/rootReducer';
@@ -51,6 +55,7 @@ export default function CartPage() {
 
   const loading = useSelector(selectCartLoading);
   const cartItems = useSelector(selectCartItems);
+  const wishlistItems = useSelector(selectWishlistItems);
   const total = useSelector(selectCartTotal);
   const { page, totalPages } = useSelector(selectCartPagination);
 
@@ -58,6 +63,7 @@ export default function CartPage() {
   useEffect(() => {
     if (user) {
       dispatch(fetchCart(page, PAGE_LIMIT));
+      dispatch(fetchWishlist(1, 100)); // Fetch wishlist for cross-check
       window.scrollTo(0, 0);
     }
   }, [dispatch, user, page]);
@@ -154,6 +160,9 @@ export default function CartPage() {
                 <CartItem
                   key={item._id}
                   item={item}
+                  isInWishlist={wishlistItems.some(
+                    (wi) => wi.product?._id === item.productId
+                  )}
                   updateQty={updateQty}
                   removeItem={removeItem}
                   moveToWishlist={moveToWishlist}

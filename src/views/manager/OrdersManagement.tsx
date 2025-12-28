@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../redux/rootReducer';
 import {
@@ -9,7 +9,9 @@ import {
 import OrderCard from '../../components/manager/orders/OrderCard';
 import Loader from '../../components/common/Loader';
 import Pagination from '../../components/common/Pagination';
-import { Package } from 'lucide-react';
+import FilterSelect from '../../components/common/FilterSelect';
+import { Package, SearchX } from 'lucide-react';
+import { ORDER_STATUS_META } from '../../utils/orderStatus';
 
 const PAGE_SIZE = 5;
 
@@ -20,17 +22,34 @@ const OrdersManagement = () => {
   );
 
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     dispatch(getAllOrders(page, PAGE_SIZE));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, page]);
 
+  // Client-side filtering
+  const filteredOrders = useMemo(() => {
+    if (statusFilter === 'all') {
+      return orders;
+    }
+    return orders.filter((order) => order.status === statusFilter);
+  }, [orders, statusFilter]);
+
+  const filterOptions = useMemo(() => {
+    const options = Object.keys(ORDER_STATUS_META).map((status) => ({
+      value: status,
+      label: status,
+    }));
+    return [{ value: 'all', label: 'All Statuses' }, ...options];
+  }, []);
+
   return (
     <div className="min-h-screen bg-transparent px-6 sm:px-12 lg:px-20 py-10 animate-fadeIn">
       <div className="max-w-[1400px] mx-auto space-y-10">
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="flex items-center gap-4">
             <div className="p-4 bg-white rounded-3xl shadow-sm text-primary border border-gray-100">
               <Package size={32} />
@@ -44,6 +63,14 @@ const OrdersManagement = () => {
               </p>
             </div>
           </div>
+
+          <FilterSelect
+            label="Filter by Status"
+            value={statusFilter}
+            options={filterOptions}
+            onChange={setStatusFilter}
+            className="md:w-64"
+          />
         </div>
 
         {/* Content Area */}
@@ -52,10 +79,10 @@ const OrdersManagement = () => {
             <div className="h-[400px] flex items-center justify-center">
               <Loader />
             </div>
-          ) : orders.length > 0 ? (
+          ) : filteredOrders.length > 0 ? (
             <>
               <div className="grid grid-cols-1 gap-8">
-                {orders.map((order, index) => (
+                {filteredOrders.map((order, index) => (
                   <div
                     key={order._id}
                     className="animate-slideUp"
@@ -72,7 +99,7 @@ const OrdersManagement = () => {
               </div>
 
               {/* Standard Pagination Component */}
-              {pagination && pagination.pages > 1 && (
+              {pagination && pagination.pages > 1 && statusFilter === 'all' && (
                 <div className="pt-10 flex justify-center">
                   <Pagination
                     currentPage={page}
@@ -86,16 +113,31 @@ const OrdersManagement = () => {
           ) : (
             <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl">
               <div className="p-4 bg-gray-100 rounded-full text-gray-400">
-                <Package size={48} />
+                {statusFilter === 'all' ? (
+                  <Package size={48} />
+                ) : (
+                  <SearchX size={48} />
+                )}
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-800">
-                  No orders found
+                  {statusFilter === 'all'
+                    ? 'No orders found'
+                    : 'No matches found'}
                 </h3>
                 <p className="text-gray-500 max-w-xs mx-auto">
-                  When customers place orders, they will appear here for you to
-                  manage.
+                  {statusFilter === 'all'
+                    ? 'When customers place orders, they will appear here for you to manage.'
+                    : `No orders currently match the "${statusFilter}" status on this page.`}
                 </p>
+                {statusFilter !== 'all' && (
+                  <button
+                    onClick={() => setStatusFilter('all')}
+                    className="mt-4 text-primary font-semibold hover:underline cursor-pointer"
+                  >
+                    Clear filter
+                  </button>
+                )}
               </div>
             </div>
           )}

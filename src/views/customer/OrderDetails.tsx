@@ -90,7 +90,7 @@ export default function OrderDetails() {
       <div className="flex items-center gap-4 mb-8">
         <Link
           to="/orders"
-          className="p-2 hover:bg-gray-100 rounded-full transition"
+          className="p-2 hover:bg-gray-100 rounded-full transition cursor-pointer"
         >
           <ChevronLeft size={24} className="text-gray-600" />
         </Link>

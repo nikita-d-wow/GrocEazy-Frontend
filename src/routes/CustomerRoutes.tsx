@@ -14,6 +14,7 @@ import WishlistPage from '../views/customer/WishlistPage';
 import ProfilePage from '../views/customer/ProfilePage';
 import OrderDetails from '../views/customer/OrderDetails';
 import MyTickets from '../views/customer/MyTickets';
+import TicketDetails from '../views/customer/TicketDetails';
 import ProtectedRoute from './ProtectedRoute';
 import SetPassword from '../views/auth/SetPassword';
 import ForgotPassword from '../views/auth/ForgotPassword';
@@ -43,6 +44,7 @@ export const CustomerRoutes = (
       <Route path="/products/:id" element={<ProductDetailsPage />} />
 
       <Route path="/customer/tickets" element={<MyTickets />} />
+      <Route path="/customer/tickets/:id" element={<TicketDetails />} />
     </Route>
 
     <Route
