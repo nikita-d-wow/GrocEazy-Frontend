@@ -11,9 +11,10 @@ import type { AppDispatch } from '../../../redux/store';
 
 type Props = {
   item: any;
+  isInCart?: boolean;
 };
 
-export default function WishlistCard({ item }: Props) {
+export default function WishlistCard({ item, isInCart }: Props) {
   const dispatch = useDispatch<AppDispatch>();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -29,6 +30,7 @@ export default function WishlistCard({ item }: Props) {
   };
 
   const isOutOfStock = item.product.stock < 1;
+  const isMoveDisabled = isOutOfStock || isInCart;
 
   return (
     <div
@@ -64,7 +66,7 @@ export default function WishlistCard({ item }: Props) {
 
       <div className="mt-5 flex gap-3">
         <button
-          disabled={isOutOfStock}
+          disabled={isMoveDisabled}
           onClick={() =>
             dispatch(
               moveWishlistToCart(item._id, {
@@ -81,14 +83,22 @@ export default function WishlistCard({ item }: Props) {
             flex-1 flex items-center justify-center gap-2
             py-2 rounded-xl transition
             ${
-              isOutOfStock
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              isMoveDisabled
+                ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                 : 'bg-primary text-white hover:bg-primary-dark active:scale-95 cursor-pointer'
             }
           `}
         >
-          <ShoppingCart size={18} />
-          {isOutOfStock ? 'Out of Stock' : 'Move to Cart'}
+          {isInCart ? (
+            <ShoppingCart size={18} className="text-gray-400" />
+          ) : (
+            <ShoppingCart size={18} />
+          )}
+          {isOutOfStock
+            ? 'Out of Stock'
+            : isInCart
+              ? 'Already in Cart'
+              : 'Move to Cart'}
         </button>
 
         <button

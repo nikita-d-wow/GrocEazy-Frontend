@@ -68,7 +68,7 @@ const Pagination: FC<PaginationProps> = ({
           p-2 rounded-lg border border-gray-200
           text-primary hover:bg-primary/10
           disabled:opacity-40 disabled:cursor-not-allowed
-          transition-colors
+          transition-colors cursor-pointer
         "
       >
         <ChevronLeft className="w-5 h-5" />
@@ -92,7 +92,7 @@ const Pagination: FC<PaginationProps> = ({
                   ? 'bg-primary text-white shadow-md'
                   : 'border border-gray-200 text-gray-700 hover:bg-primary/10 hover:text-primary'
               }
-              disabled:opacity-40 disabled:cursor-not-allowed
+              disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer
             `}
           >
             {page}
@@ -109,7 +109,7 @@ const Pagination: FC<PaginationProps> = ({
           p-2 rounded-lg border border-gray-200
           text-primary hover:bg-primary/10
           disabled:opacity-40 disabled:cursor-not-allowed
-          transition-colors
+          transition-colors cursor-pointer
         "
       >
         <ChevronRight className="w-5 h-5" />

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 
 import { fetchWishlist } from '../../redux/actions/wishlistActions';
+import { fetchCart } from '../../redux/actions/cartActions';
 
 import {
   selectWishlistItems,
@@ -33,6 +34,7 @@ export default function WishlistPage() {
   useEffect(() => {
     if (user) {
       dispatch(fetchWishlist(page, PAGE_LIMIT));
+      dispatch(fetchCart(1, 100)); // Fetch cart to check for existing items
       window.scrollTo(0, 0);
     }
   }, [dispatch, user, page]);

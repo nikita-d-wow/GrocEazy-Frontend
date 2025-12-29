@@ -4,19 +4,22 @@ import { useState } from 'react';
 import type { CartItemProps } from '../../../types/Cart';
 
 interface ExtraProps {
+  isInWishlist?: boolean;
   moveToWishlist: (_cartId: string, _productId: string) => void;
 }
 
 export default function CartItem({
   item,
+  isInWishlist,
   updateQty,
   removeItem,
   moveToWishlist,
 }: CartItemProps & ExtraProps) {
   const [loading, setLoading] = useState<'inc' | 'dec' | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   const handleMoveToWishlist = () => {
-    if (loading) {
+    if (loading || isInWishlist) {
       return;
     }
     moveToWishlist(item._id, item.productId);
@@ -53,6 +56,18 @@ export default function CartItem({
       await updateQty(item._id, 'dec');
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (isRemoving) {
+      return;
+    }
+    setIsRemoving(true);
+    try {
+      await removeItem(item._id);
+    } catch (error) {
+      setIsRemoving(false);
     }
   };
 
@@ -149,14 +164,22 @@ export default function CartItem({
       >
         <button
           onClick={handleMoveToWishlist}
-          className="
+          disabled={isInWishlist}
+          className={`
             inline-flex items-center gap-2
-            text-primary text-sm font-medium
-            hover:underline cursor-pointer
-          "
+            text-sm font-medium transition-colors
+            ${
+              isInWishlist
+                ? 'text-pink-500 cursor-default'
+                : 'text-primary hover:underline cursor-pointer'
+            }
+          `}
         >
-          <Heart size={14} />
-          Wishlist
+          <Heart
+            size={14}
+            className={isInWishlist ? 'fill-pink-500 text-pink-500' : ''}
+          />
+          {isInWishlist ? 'In Wishlist' : 'Wishlist'}
         </button>
 
         <div className="flex items-center gap-3">
@@ -165,10 +188,15 @@ export default function CartItem({
           </p>
 
           <button
-            onClick={() => removeItem(item._id)}
-            className="text-red-500 hover:text-red-700 cursor-pointer"
+            onClick={handleRemove}
+            disabled={isRemoving}
+            className="text-red-500 hover:text-red-700 cursor-pointer disabled:opacity-50 transition-all"
           >
-            <Trash2 size={18} />
+            {isRemoving ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Trash2 size={18} />
+            )}
           </button>
         </div>
       </div>

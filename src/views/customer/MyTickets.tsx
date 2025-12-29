@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { AlertCircle, Clock, CheckCircle2, SearchX } from 'lucide-react';
 
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
+import FilterSelect from '../../components/common/FilterSelect';
 
 import { fetchMySupportTickets } from '../../redux/actions/supportActions';
 import {
@@ -21,23 +23,69 @@ const PAGE_LIMIT = 4;
 
 export default function MyTickets() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
   const myTickets = useSelector(selectSupportMyTickets);
   const loading = useSelector(selectSupportLoading);
   const pagination = useSelector(selectSupportPagination);
 
   const currentPage = pagination?.page || 1;
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     dispatch(fetchMySupportTickets(currentPage, PAGE_LIMIT));
     window.scrollTo(0, 0);
   }, [dispatch, currentPage]);
 
+  const filterOptions = [
+    { value: 'all', label: 'All Statuses' },
+    {
+      value: 'open',
+      label: 'Open',
+      icon: <AlertCircle size={16} className="text-yellow-600" />,
+    },
+    {
+      value: 'in_progress',
+      label: 'In Progress',
+      icon: <Clock size={16} className="text-blue-600" />,
+    },
+    {
+      value: 'resolved',
+      label: 'Resolved',
+      icon: <CheckCircle2 size={16} className="text-green-600" />,
+    },
+  ];
+
+  const filteredTickets = useMemo(() => {
+    if (!myTickets) {
+      return [];
+    }
+    if (statusFilter === 'all') {
+      return myTickets;
+    }
+    return myTickets.filter((ticket) => ticket.status === statusFilter);
+  }, [myTickets, statusFilter]);
+
   return (
     <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-8 tracking-tight">
-        My Support Tickets
-      </h1>
+      <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fadeIn">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            My Support Tickets
+          </h1>
+          <p className="text-gray-500 mt-1 font-medium">
+            View and track your support requests
+          </p>
+        </div>
+
+        <FilterSelect
+          label="Filter by Status"
+          value={statusFilter}
+          options={filterOptions}
+          onChange={setStatusFilter}
+          className="md:w-64"
+        />
+      </div>
 
       {loading && (!myTickets || myTickets.length === 0) ? (
         <div className="flex items-center justify-center py-20">
@@ -51,19 +99,44 @@ export default function MyTickets() {
         />
       ) : (
         <>
-          <div className="space-y-5">
-            {myTickets.map((ticket: SupportTicket, index) => (
-              <div
-                key={ticket._id}
-                className="animate-slideUp cursor-pointer"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <TicketCard ticket={ticket} />
+          {filteredTickets.length > 0 ? (
+            <div className="space-y-5">
+              {filteredTickets.map((ticket: SupportTicket, index) => (
+                <div
+                  key={ticket._id}
+                  className="animate-slideUp cursor-pointer"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                  onClick={() => navigate(`/customer/tickets/${ticket._id}`)}
+                >
+                  <TicketCard ticket={ticket} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl animate-fadeIn">
+              <div className="p-4 bg-gray-100 rounded-full text-gray-400">
+                <SearchX size={48} />
               </div>
-            ))}
-          </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">
+                  No matches found
+                </h3>
+                <p className="text-gray-500 max-w-xs mx-auto">
+                  No tickets currently match the "
+                  {filterOptions.find((o) => o.value === statusFilter)?.label}"
+                  status on this page.
+                </p>
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className="mt-4 text-primary font-semibold hover:underline"
+                >
+                  Clear filter
+                </button>
+              </div>
+            </div>
+          )}
 
-          {pagination.totalPages > 1 && (
+          {pagination.totalPages > 1 && statusFilter === 'all' && (
             <div className="mt-10 flex justify-center">
               <Pagination
                 currentPage={currentPage}

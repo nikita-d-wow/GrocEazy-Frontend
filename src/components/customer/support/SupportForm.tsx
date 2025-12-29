@@ -10,6 +10,8 @@ import {
   selectSupportLoading,
   selectSupportError,
 } from '../../../redux/selectors/supportSelectors';
+import Input from '../../common/Input';
+import TextArea from '../../common/TextArea';
 
 interface FormValues {
   subject: string;
@@ -59,55 +61,21 @@ export default function SupportForm() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {/* Subject */}
-        <div className="relative group">
-          <label className="text-sm font-medium text-gray-700">Subject</label>
-
-          <input
-            {...register('subject', { required: 'Subject is required' })}
-            placeholder="Enter subject"
-            className="
-              w-full mt-2 px-4 py-3 rounded-lg bg-white
-              border border-gray-300
-              focus:outline-none
-              focus:border-primary
-              focus:ring-2 focus:ring-primary/30
-              shadow-sm transition-all duration-300
-              group-hover:shadow-md
-            "
-          />
-
-          {errors.subject && (
-            <p className="text-red-500 text-sm mt-1 animate-fadeIn">
-              {errors.subject.message}
-            </p>
-          )}
-        </div>
+        <Input
+          label="Subject"
+          {...register('subject', { required: 'Subject is required' })}
+          placeholder="Enter subject"
+          error={errors.subject?.message}
+        />
 
         {/* Message */}
-        <div className="relative group">
-          <label className="text-sm font-medium text-gray-700">Message</label>
-
-          <textarea
-            {...register('message', { required: 'Message cannot be empty' })}
-            rows={6}
-            placeholder="Describe your issue..."
-            className="
-              w-full mt-2 px-4 py-3 rounded-lg bg-white
-              border border-gray-300
-              focus:outline-none
-              focus:border-primary
-              focus:ring-2 focus:ring-primary/30
-              shadow-sm transition-all duration-300
-              group-hover:shadow-md
-            "
-          />
-
-          {errors.message && (
-            <p className="text-red-500 text-sm mt-1 animate-fadeIn">
-              {errors.message.message}
-            </p>
-          )}
-        </div>
+        <TextArea
+          label="Message"
+          {...register('message', { required: 'Message cannot be empty' })}
+          rows={6}
+          placeholder="Describe your issue..."
+          error={errors.message?.message}
+        />
 
         {/* Submit */}
         <button
