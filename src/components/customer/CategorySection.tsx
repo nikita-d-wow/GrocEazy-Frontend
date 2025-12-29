@@ -4,6 +4,7 @@ import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { fetchCategories } from '../../redux/actions/categoryActions';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 import CategoryCard from './CategoryCard';
+import Skeleton from '../common/Skeleton';
 import { categoryBgVariants } from '../../utils/colors';
 
 export default function CategoriesSection() {
@@ -11,8 +12,10 @@ export default function CategoriesSection() {
   const categories = useSelector(selectCategories);
 
   useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    if (categories.length === 0) {
+      dispatch(fetchCategories());
+    }
+  }, [dispatch, categories.length]);
 
   // Filter out deleted categories
   const visibleCategories = categories
@@ -20,7 +23,7 @@ export default function CategoriesSection() {
     .slice(0, 8); // Show max 8 categories
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16 animate-fadeIn">
       <div className="mb-8">
         <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
           Shop By Category
@@ -29,8 +32,18 @@ export default function CategoriesSection() {
       </div>
 
       {visibleCategories.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-2xl">
-          <p className="text-gray-500">Loading categories...</p>
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-6">
+          {[...Array(8)].map((_, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <Skeleton
+                variant="rect"
+                width={80}
+                height={80}
+                className="mb-3 rounded-xl"
+              />
+              <Skeleton variant="text" width={60} />
+            </div>
+          ))}
         </div>
       ) : (
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-6">

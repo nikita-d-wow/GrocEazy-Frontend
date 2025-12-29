@@ -1,7 +1,7 @@
-import type { FC } from 'react';
-import { useEffect, useState, useMemo } from 'react';
+import React, { type FC, useEffect, useState, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { Search, Package, AlertTriangle, CheckCircle } from 'lucide-react';
+import { useDebounce } from '../../customhooks/useDebounce';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { fetchProducts } from '../../redux/actions/productActions';
@@ -19,6 +19,76 @@ import EmptyState from '../../components/common/EmptyState';
 import { InventoryCharts } from './InventoryCharts';
 import { InventoryAlertsModal } from './InventoryAlertsModal';
 
+const InventoryRow = React.memo(
+  ({
+    product,
+    categoryName,
+    status,
+  }: {
+    product: any;
+    categoryName: string;
+    status: any;
+  }) => {
+    const StatusIcon = status.icon;
+    return (
+      <tr className="hover:bg-gray-50/50">
+        <td className="px-6 py-4">
+          <div className="flex items-center space-x-4">
+            <div className="h-10 w-10 rounded-lg bg-gray-100 p-1 flex-shrink-0">
+              <img
+                className="h-full w-full rounded-md object-cover"
+                src={
+                  product.images?.[0] ||
+                  `https://ui-avatars.com/api/?name=${product.name}`
+                }
+                alt={product.name}
+                loading="lazy"
+                width={40}
+                height={40}
+              />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">
+                {product.name}
+              </div>
+              {product.size && (
+                <div className="text-xs text-gray-500">{product.size}</div>
+              )}
+            </div>
+          </div>
+        </td>
+
+        <td className="px-6 py-4">
+          <span className="text-sm text-gray-600">{categoryName}</span>
+        </td>
+
+        <td className="px-6 py-4">
+          <span className="text-sm font-medium text-gray-900">
+            ₹{product.price.toFixed(2)}
+          </span>
+        </td>
+
+        <td className="px-6 py-4">
+          <span className={`text-sm font-bold ${status.color.split(' ')[0]}`}>
+            {product.stock}
+          </span>
+        </td>
+
+        <td className="px-6 py-4">
+          <span
+            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}
+          >
+            <StatusIcon size={12} />
+            {status.label}
+          </span>
+        </td>
+      </tr>
+    );
+  }
+);
+
+InventoryRow.displayName = 'InventoryRow';
+
 const Inventory: FC = () => {
   const dispatch = useAppDispatch();
   const products = useSelector(selectProducts);
@@ -26,23 +96,59 @@ const Inventory: FC = () => {
   const loading = useSelector(selectProductLoading);
 
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
+
+  // Incremental Rendering State
+  const [visibleCount, setVisibleCount] = useState(20);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     dispatch(fetchProducts());
     dispatch(fetchCategories());
   }, [dispatch]);
+
   const filteredProducts = useMemo(
     () =>
       products.filter(
         (p) =>
-          p && p.name && p.name.toLowerCase().includes(searchTerm.toLowerCase())
+          p &&
+          p.name &&
+          p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
       ),
-    [products, searchTerm]
+    [products, debouncedSearchTerm]
   );
 
+  // Intersection Observer for Infinite Scroll effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          visibleCount < filteredProducts.length
+        ) {
+          setVisibleCount((prev) => prev + 20);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [filteredProducts.length, visibleCount]);
+
+  // Reset visible count when search term changes (Adjust state during render to avoid Effect)
+  const [lastSearch, setLastSearch] = useState(debouncedSearchTerm);
+  if (debouncedSearchTerm !== lastSearch) {
+    setLastSearch(debouncedSearchTerm);
+    setVisibleCount(20);
+  }
+
   const getStockStatus = (stock: number, threshold: number = 5) => {
-    if (stock === 0) {
+    if (Number(stock) === 0) {
       return {
         label: 'Out of Stock',
         color: 'text-red-600 bg-red-50',
@@ -63,9 +169,19 @@ const Inventory: FC = () => {
     };
   };
 
-  if (loading && products.length === 0) {
-    return <Loader fullScreen />;
-  }
+  const getCategoryId = (p: any) => {
+    if (typeof p.categoryId === 'object' && p.categoryId !== null) {
+      return (p.categoryId as { _id: string })._id;
+    }
+    if (typeof p.categoryId === 'string' && p.categoryId) {
+      return p.categoryId;
+    }
+    if (typeof p.category === 'object' && p.category !== null) {
+      return (p.category as { _id: string })._id;
+    }
+    return p.category;
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <InventoryAlertsModal
@@ -104,7 +220,14 @@ const Inventory: FC = () => {
         </div>
       </div>
 
-      {filteredProducts.length === 0 ? (
+      {loading && products.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-20 flex flex-col items-center justify-center">
+          <Loader size="lg" />
+          <p className="text-gray-500 mt-4 animate-pulse font-medium">
+            Loading inventory...
+          </p>
+        </div>
+      ) : filteredProducts.length === 0 ? (
         <EmptyState
           title="No Products Found"
           description={
@@ -138,101 +261,43 @@ const Inventory: FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredProducts.map((product) => {
+                {filteredProducts.slice(0, visibleCount).map((product) => {
                   const status = getStockStatus(
                     product.stock,
                     product.lowStockThreshold
                   );
-                  const StatusIcon = status.icon;
-
-                  // Handle both populated categoryId/category object and string IDs
-                  const getCategoryId = (p: typeof product) => {
-                    // Check categoryId field first
-                    if (
-                      typeof p.categoryId === 'object' &&
-                      p.categoryId !== null
-                    ) {
-                      return (p.categoryId as { _id: string })._id;
-                    }
-                    if (typeof p.categoryId === 'string' && p.categoryId) {
-                      return p.categoryId;
-                    }
-                    // Check category field
-                    if (typeof p.category === 'object' && p.category !== null) {
-                      return (p.category as { _id: string })._id;
-                    }
-                    return p.category;
-                  };
-
                   const catId = getCategoryId(product);
-
                   const categoryName =
                     categories.find((c) => c._id === catId)?.name || 'N/A';
 
                   return (
-                    <tr
+                    <InventoryRow
                       key={product._id}
-                      className="hover:bg-gray-50/50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="h-10 w-10 rounded-lg bg-gray-100 p-1 flex-shrink-0">
-                            <img
-                              className="h-full w-full rounded-md object-cover"
-                              src={
-                                product.images?.[0] ||
-                                `https://ui-avatars.com/api/?name=${product.name}`
-                              }
-                              alt={product.name}
-                            />
-                          </div>
-                          <div>
-                            <div className="text-sm font-semibold text-gray-900">
-                              {product.name}
-                            </div>
-                            {product.size && (
-                              <div className="text-xs text-gray-500">
-                                {product.size}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <span className="text-sm text-gray-600">
-                          {categoryName}
-                        </span>
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-medium text-gray-900">
-                          ₹{product.price.toFixed(2)}
-                        </span>
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <span
-                          className={`text-sm font-bold ${status.color.split(' ')[0]}`}
-                        >
-                          {product.stock}
-                        </span>
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}
-                        >
-                          <StatusIcon size={12} />
-                          {status.label}
-                        </span>
-                      </td>
-                    </tr>
+                      product={product}
+                      categoryName={categoryName}
+                      status={status}
+                    />
                   );
                 })}
               </tbody>
             </table>
           </div>
+
+          {/* Intersection trigger at the bottom */}
+          {visibleCount < filteredProducts.length && (
+            <div
+              ref={loaderRef}
+              className="p-4 flex justify-center border-t border-gray-50"
+            >
+              <Loader size="sm" />
+            </div>
+          )}
+
+          {loading && products.length > 0 && (
+            <div className="p-4 flex justify-center border-t border-gray-50">
+              <Loader size="sm" />
+            </div>
+          )}
         </div>
       )}
     </div>

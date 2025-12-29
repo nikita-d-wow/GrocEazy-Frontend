@@ -13,20 +13,28 @@ import {
 /**
  * Fetch all categories
  */
-export const fetchCategories = () => async (dispatch: AppDispatch) => {
-  dispatch(setLoading(true));
-  dispatch(setError(null));
-  try {
-    const categories = await categoryApi.getCategories();
-    dispatch(setCategories(categories));
-  } catch (error: any) {
-    dispatch(
-      setError(error.response?.data?.message || 'Failed to fetch categories')
-    );
-  } finally {
-    dispatch(setLoading(false));
-  }
-};
+export const fetchCategories =
+  () => async (dispatch: AppDispatch, getState: () => any) => {
+    const { categories, loading } = getState().category;
+
+    // Cache check: skip if loading or we already have categories
+    if (loading || categories.length > 0) {
+      return;
+    }
+
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    try {
+      const categories = await categoryApi.getCategories();
+      dispatch(setCategories(categories));
+    } catch (error: any) {
+      dispatch(
+        setError(error.response?.data?.message || 'Failed to fetch categories')
+      );
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
 /**
  * Create a new category

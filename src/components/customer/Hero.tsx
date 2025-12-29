@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+//import { motion } from 'framer-motion';
 import banner1 from '../../assets/banner_veggies.jpg';
 import banner2 from '../../assets/banner_grocery_2.png';
+import { getOptimizedImage } from '../../utils/imageUtils';
 import Button from '../common/Button';
 
 const SLIDES = [
@@ -61,8 +62,11 @@ export default function Hero() {
           >
             {/* Image */}
             <img
-              src={slide.image}
+              src={getOptimizedImage(slide.image, 1280)}
               alt="Banner"
+              loading="eager"
+              // @ts-expect-error - fetchpriority is not yet in standard React types
+              fetchpriority="high"
               className="absolute inset-0 w-full h-full object-cover"
             />
 
@@ -112,16 +116,7 @@ export default function Hero() {
                   <ChevronRight className="w-3 h-3 sm:w-5 sm:h-5 ml-1" />
                 }
               >
-                <motion.span
-                  initial={{ x: -100 }}
-                  animate={{ x: 100 }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 1.5,
-                    ease: 'linear',
-                  }}
-                  className="absolute inset-0 w-1/3 h-full bg-white/20 skew-x-[-20deg]"
-                />
+                <div className="btn-shimmer" />
                 Shop Now
               </Button>
             </div>

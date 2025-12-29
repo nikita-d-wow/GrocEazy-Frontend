@@ -57,7 +57,7 @@ export default function Header() {
         navigate(`/products?${newParams.toString()}`, { replace: true });
         setOpen(false); // Close mobile menu
       }
-    }, 500);
+    }, 700);
 
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps

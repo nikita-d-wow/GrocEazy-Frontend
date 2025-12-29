@@ -20,7 +20,7 @@ export default function CustomerLayout() {
       <Header />
 
       {/* PAGE CONTAINER */}
-      <main className="min-h-screen">
+      <main className="min-h-screen pt-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <Outlet />
         </div>

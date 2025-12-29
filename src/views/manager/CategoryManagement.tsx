@@ -1,8 +1,15 @@
-import type { FC } from 'react';
-import { useEffect, useState, useMemo } from 'react';
+import React, {
+  type FC,
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
 import { useSelector } from 'react-redux';
 import { Plus, Edit2, Trash2, Search, Layers } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useDebounce } from '../../customhooks/useDebounce';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
@@ -23,6 +30,74 @@ import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 
+const CategoryRow = React.memo(
+  ({
+    category,
+    onEdit,
+    onDelete,
+  }: {
+    category: Category;
+    onEdit: (category: Category) => void;
+    onDelete: (id: string) => void;
+  }) => {
+    return (
+      <tr className="hover:bg-gray-50/50">
+        <td className="px-6 py-4">
+          <div className="flex items-center space-x-4">
+            <div className="h-12 w-12 rounded-xl bg-gray-100 p-1 flex-shrink-0">
+              <img
+                className="h-full w-full rounded-lg object-cover"
+                src={
+                  category.image ||
+                  `https://ui-avatars.com/api/?name=${category.name}`
+                }
+                alt={category.name}
+                loading="lazy"
+                width={48}
+                height={48}
+              />
+            </div>
+            <div>
+              <div className="text-sm font-semibold text-gray-900">
+                {category.name}
+              </div>
+            </div>
+          </div>
+        </td>
+
+        <td className="px-6 py-4">
+          <span className="text-sm text-gray-600">
+            {new Date(category.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </span>
+        </td>
+
+        <td className="px-6 py-4 text-right">
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={() => onEdit(category)}
+              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
+            >
+              <Edit2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onDelete(category._id)}
+              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </td>
+      </tr>
+    );
+  }
+);
+
+CategoryRow.displayName = 'CategoryRow';
+
 const CategoryManagement: FC = () => {
   const dispatch = useAppDispatch();
 
@@ -32,6 +107,11 @@ const CategoryManagement: FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // Incremental Rendering State
+  const [visibleCount, setVisibleCount] = useState(20);
+  const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -43,34 +123,61 @@ const CategoryManagement: FC = () => {
         !c.isDeleted &&
         c &&
         c.name &&
-        c.name.toLowerCase().includes(searchTerm.toLowerCase())
+        c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
-  }, [categories, searchTerm]);
+  }, [categories, debouncedSearchTerm]);
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      try {
-        await dispatch(deleteCategory(id));
-        toast.success('Category deleted successfully');
-      } catch {
-        toast.error('Failed to delete category');
-      }
+  // Intersection Observer for Infinite Scroll effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          visibleCount < filteredCategories.length
+        ) {
+          setVisibleCount((prev) => prev + 20);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
     }
-  };
 
-  const handleEdit = (category: Category) => {
+    return () => observer.disconnect();
+  }, [filteredCategories.length, visibleCount]);
+
+  // Reset visible count when search term changes (Adjust state during render to avoid Effect)
+  const [lastSearch, setLastSearch] = useState(debouncedSearchTerm);
+  if (debouncedSearchTerm !== lastSearch) {
+    setLastSearch(debouncedSearchTerm);
+    setVisibleCount(20);
+  }
+
+  const handleDelete = useCallback(
+    async (id: string) => {
+      if (window.confirm('Are you sure you want to delete this category?')) {
+        try {
+          await dispatch(deleteCategory(id));
+          toast.success('Category deleted successfully');
+        } catch {
+          toast.error('Failed to delete category');
+        }
+      }
+    },
+    [dispatch]
+  );
+
+  const handleEdit = useCallback((category: Category) => {
     setEditingCategory(category);
     setIsFormOpen(true);
-  };
+  }, []);
 
-  const handleAddNew = () => {
+  const handleAddNew = useCallback(() => {
     setEditingCategory(null);
     setIsFormOpen(true);
-  };
-
-  if (loading && categories.length === 0) {
-    return <Loader fullScreen />;
-  }
+  }, []);
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
@@ -90,8 +197,8 @@ const CategoryManagement: FC = () => {
         </Button>
       </div>
 
-      {/* Search + Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Search Bar */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
         <div className="p-4 border-b border-gray-100">
           <div className="max-w-md">
             <Input
@@ -102,23 +209,32 @@ const CategoryManagement: FC = () => {
             />
           </div>
         </div>
+      </div>
 
-        {filteredCategories.length === 0 ? (
-          <EmptyState
-            title="No Categories Found"
-            description={
-              searchTerm
-                ? `No categories match "${searchTerm}"`
-                : 'Create categories to organize your products.'
-            }
-            icon={<Layers className="w-12 h-12" />}
-            action={
-              !searchTerm
-                ? { label: 'Add Category', onClick: handleAddNew }
-                : undefined
-            }
-          />
-        ) : (
+      {loading && categories.length === 0 ? (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-20 flex flex-col items-center justify-center">
+          <Loader size="lg" />
+          <p className="text-gray-500 mt-4 animate-pulse font-medium">
+            Loading categories...
+          </p>
+        </div>
+      ) : filteredCategories.length === 0 ? (
+        <EmptyState
+          title="No Categories Found"
+          description={
+            searchTerm
+              ? `No categories match "${searchTerm}"`
+              : 'Create categories to organize your products.'
+          }
+          icon={<Layers className="w-12 h-12" />}
+          action={
+            !searchTerm
+              ? { label: 'Add Category', onClick: handleAddNew }
+              : undefined
+          }
+        />
+      ) : (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
@@ -135,67 +251,35 @@ const CategoryManagement: FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredCategories.map((category) => (
-                  <tr
+                {filteredCategories.slice(0, visibleCount).map((category) => (
+                  <CategoryRow
                     key={category._id}
-                    className="hover:bg-gray-50/50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-4">
-                        <div className="h-12 w-12 rounded-xl bg-gray-100 p-1">
-                          <img
-                            className="h-full w-full rounded-lg object-cover"
-                            src={
-                              category.image ||
-                              `https://ui-avatars.com/api/?name=${category.name}`
-                            }
-                            alt={category.name}
-                          />
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold text-gray-900">
-                            {category.name}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">
-                        {new Date(category.createdAt).toLocaleDateString(
-                          'en-US',
-                          {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                          }
-                        )}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end space-x-2">
-                        <button
-                          onClick={() => handleEdit(category)}
-                          className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(category._id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                    category={category}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
                 ))}
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+
+          {/* Intersection trigger at the bottom */}
+          {visibleCount < filteredCategories.length && (
+            <div
+              ref={loaderRef}
+              className="p-4 flex justify-center border-t border-gray-50"
+            >
+              <Loader size="sm" />
+            </div>
+          )}
+
+          {loading && categories.length > 0 && (
+            <div className="p-4 flex justify-center border-t border-gray-50">
+              <Loader size="sm" />
+            </div>
+          )}
+        </div>
+      )}
 
       {isFormOpen && (
         <CategoryForm
