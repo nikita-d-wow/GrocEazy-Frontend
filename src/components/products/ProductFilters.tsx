@@ -5,8 +5,9 @@ import { fetchCategories } from '../../redux/actions/categoryActions';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import type { Category } from '../../types/Category';
 import PriceRangeSlider from '../common/PriceRangeSlider';
+import type { RootState } from '../../redux/store';
 
-interface FilterState {
+export interface FilterState {
   selectedCategory: string | null;
   searchQuery: string;
   priceRange: [number, number];
@@ -15,12 +16,14 @@ interface FilterState {
 
 interface Props {
   filters: FilterState;
-  setFilters: (filters: FilterState) => void;
+  setFilters: (updates: FilterState) => void;
 }
 
 const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
   const dispatch = useAppDispatch();
-  const { categories, loading } = useSelector((state: any) => state.category);
+  const { categories, loading } = useSelector(
+    (state: RootState) => state.category
+  );
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -29,7 +32,6 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
   const handleCategoryChange = (categoryId: string) => {
     setFilters({
       ...filters,
-      searchQuery: '', // Reset search bar text immediately
       selectedCategory:
         filters.selectedCategory === categoryId ? null : categoryId,
     });
@@ -67,7 +69,6 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
                 setFilters({
                   ...filters,
                   selectedCategory: null,
-                  searchQuery: '',
                 })
               }
             >

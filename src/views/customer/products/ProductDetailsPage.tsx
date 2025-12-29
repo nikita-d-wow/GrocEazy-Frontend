@@ -28,6 +28,7 @@ import { selectCartItems } from '../../../redux/selectors/cartSelectors';
 
 import ProductCard from '../../../components/customer/ProductCard';
 import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
+import { getOptimizedImage } from '../../../utils/imageUtils';
 import type { RootState } from '../../../redux/store';
 
 const ProductDetailsPage: FC = () => {
@@ -43,7 +44,10 @@ const ProductDetailsPage: FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
-    dispatch(fetchProducts());
+    // If we have very few products (e.g. from a filtered search), refresh the full list
+    // to ensure fallback sections like "Top 10" have data.
+    dispatch(fetchProducts(products.length < 5));
+
     if (id) {
       dispatch(fetchSimilarProducts(id));
     }
@@ -52,7 +56,7 @@ const ProductDetailsPage: FC = () => {
       dispatch(fetchCart());
     }
     window.scrollTo(0, 0);
-  }, [dispatch, id, user]);
+  }, [dispatch, id, user, products.length]);
 
   const product = products.find((p) => p._id === id);
 
@@ -72,7 +76,7 @@ const ProductDetailsPage: FC = () => {
     }
     try {
       await dispatch(addToCart(product._id, 1));
-      toast.success(`Item added to cart`);
+      toast.success('Item added to cart');
     } catch {
       toast.error('Failed to add to cart');
     }
@@ -84,12 +88,6 @@ const ProductDetailsPage: FC = () => {
         dispatch(updateCartQty(cartItem._id, cartQuantity + 1));
       } else {
         toast.error('Maximum available stock reached');
-      }
-    } else if (product) {
-      if (product.stock > 0) {
-        dispatch(addToCart(product._id, 1));
-      } else {
-        toast.error('Product is out of stock');
       }
     }
   };
@@ -108,7 +106,7 @@ const ProductDetailsPage: FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh]">
         <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-500">Loading details...</p>
+        <p className="text-gray-500 font-medium">Loading details...</p>
       </div>
     );
   }
@@ -123,21 +121,21 @@ const ProductDetailsPage: FC = () => {
       ? (product.categoryId as any)._id
       : product.categoryId;
 
-  // Recommendations Logic is now handled by Redux / API fetch
-  // const similarProducts and const topProducts are selected from store above
-
   return (
     <div className="bg-gray-50 min-h-screen pb-24 font-sans text-gray-900">
       {/* Breadcrumb Header */}
       <div className="bg-white border-b shadow-sm overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm text-gray-500 overflow-x-auto whitespace-nowrap no-scrollbar">
-          <Link to="/" className="hover:text-green-600 shrink-0">
+          <Link
+            to="/"
+            className="hover:text-green-600 shrink-0 transition-colors"
+          >
             Home
           </Link>
           <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
           <Link
             to={`/products?category=${categoryId}`}
-            className="hover:text-green-600 shrink-0"
+            className="hover:text-green-600 shrink-0 transition-colors"
           >
             {categoryName}
           </Link>
@@ -154,26 +152,29 @@ const ProductDetailsPage: FC = () => {
           <div className="bg-white rounded-3xl p-6 border-b md:border border-gray-100 shadow-sm md:sticky md:top-32">
             <div className="relative mb-6 flex justify-center h-[350px] md:h-[450px]">
               <img
-                src={product.images[selectedImage] || product.images[0]}
+                src={getOptimizedImage(
+                  product.images[selectedImage] || product.images[0],
+                  1000
+                )}
                 alt={product.name}
-                className="h-full object-contain"
+                className="h-full object-contain hover:scale-105 transition-transform duration-500"
               />
             </div>
 
             {product.images.length > 1 && (
-              <div className="flex gap-3 justify-center overflow-x-auto pb-2">
+              <div className="flex gap-3 justify-center overflow-x-auto pb-2 no-scrollbar">
                 {product.images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`w-16 h-16 rounded-xl border-2 p-1 transition-all ${
+                    className={`w-16 h-16 rounded-xl border-2 p-1 transition-all flex-shrink-0 ${
                       idx === selectedImage
-                        ? 'border-green-600 scale-110'
-                        : 'border-gray-200 hover:border-green-300'
+                        ? 'border-green-600 scale-110 shadow-md'
+                        : 'border-gray-100 hover:border-green-300'
                     }`}
                   >
                     <img
-                      src={img}
+                      src={getOptimizedImage(img, 200)}
                       className="w-full h-full object-contain rounded-lg"
                       alt="thumbnail"
                     />
@@ -185,11 +186,10 @@ const ProductDetailsPage: FC = () => {
 
           {/* RIGHT: Details */}
           <div className="pt-6 md:pt-0">
-            {/* Title Block */}
             <div className="mb-6">
               <Link
                 to={`/products?category=${categoryId}`}
-                className="text-sm font-bold text-gray-500 hover:text-green-600 mb-1 block"
+                className="text-sm font-bold text-gray-500 hover:text-green-600 mb-1 block transition-colors"
               >
                 View all by {categoryName}
               </Link>
@@ -197,7 +197,6 @@ const ProductDetailsPage: FC = () => {
                 {product.name}
               </h1>
 
-              {/* 10 MINS TAG */}
               <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg w-fit mb-4">
                 <Clock className="w-4 h-4 text-gray-700" />
                 <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">
@@ -209,7 +208,6 @@ const ProductDetailsPage: FC = () => {
                 {product.size}
               </div>
 
-              {/* Price & Add to Cart Row */}
               <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8 border-b pb-8 border-gray-100">
                 <div className="text-3xl font-bold text-gray-900">
                   ₹{product.price}
@@ -218,7 +216,6 @@ const ProductDetailsPage: FC = () => {
                   </span>
                 </div>
 
-                {/* Add to Cart Button Logic - BLINKIT STYLE */}
                 <div className="w-full sm:w-40">
                   {cartQuantity === 0 ? (
                     <button
@@ -229,18 +226,18 @@ const ProductDetailsPage: FC = () => {
                       {product.stock > 0 ? 'ADD' : 'Out of Stock'}
                     </button>
                   ) : (
-                    <div className="flex items-center justify-between w-full bg-green-700 text-white rounded-xl shadow-lg font-bold">
+                    <div className="flex items-center justify-between w-full bg-green-700 text-white rounded-xl shadow-lg font-bold overflow-hidden">
                       <button
                         onClick={decrementCart}
-                        className="p-3 hover:bg-green-800 rounded-l-xl transition cursor-pointer"
+                        className="p-3 hover:bg-green-800 transition-colors flex-1 flex justify-center"
                       >
                         <Minus className="w-5 h-5" />
                       </button>
-                      <span className="text-lg">{cartQuantity}</span>
+                      <span className="text-lg px-2">{cartQuantity}</span>
                       <button
                         onClick={incrementCart}
                         disabled={cartQuantity >= product.stock}
-                        className="p-3 hover:bg-green-800 rounded-r-xl transition disabled:opacity-50 cursor-pointer"
+                        className="p-3 hover:bg-green-800 transition-colors flex-1 flex justify-center disabled:opacity-50"
                       >
                         <Plus className="w-5 h-5" />
                       </button>
@@ -249,7 +246,6 @@ const ProductDetailsPage: FC = () => {
                 </div>
               </div>
 
-              {/* Description */}
               {product.description && (
                 <div className="mb-8 border-b pb-8 border-gray-100">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
@@ -261,13 +257,11 @@ const ProductDetailsPage: FC = () => {
                 </div>
               )}
 
-              {/* Why Shop From Us - Optimized Content */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
                 <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">
                   Why shop from GrocEazy?
                 </h3>
                 <div className="space-y-6">
-                  {/* Delivery */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-emerald-100/50">
                       ⚡
@@ -283,7 +277,6 @@ const ProductDetailsPage: FC = () => {
                     </div>
                   </div>
 
-                  {/* Prices */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-amber-100/50">
                       🏷️
@@ -299,7 +292,6 @@ const ProductDetailsPage: FC = () => {
                     </div>
                   </div>
 
-                  {/* Curated */}
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-purple-100/50">
                       ✨
@@ -309,9 +301,8 @@ const ProductDetailsPage: FC = () => {
                         Curated for Every Occasion
                       </h4>
                       <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
-                        Whether it’s your morning coffee, a midday snack, or
-                        your nightly skincare routine, find an exhaustive range
-                        of products tailored to your lifestyle.
+                        Find an exhaustive range of products tailored to your
+                        lifestyle and needs.
                       </p>
                     </div>
                   </div>
@@ -321,18 +312,13 @@ const ProductDetailsPage: FC = () => {
           </div>
         </div>
 
-        {/* Similar Products */}
+        {/* Similar Products Section */}
         {similarProducts.length > 0 && (
-          <div className="mt-16">
+          <div className="mt-16 animate-fadeIn">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl md:text-2xl font-bold text-gray-900">
                 Similar Products
               </h2>
-              {similarProducts.length > 6 && (
-                <span className="text-xs text-green-600 font-semibold md:hidden">
-                  Scroll right →
-                </span>
-              )}
             </div>
             <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto pb-4 no-scrollbar">
               {similarProducts.map((p, idx) => (
@@ -351,35 +337,45 @@ const ProductDetailsPage: FC = () => {
           </div>
         )}
 
-        {/* Top 10 Products (People Also Bought) */}
-        {topProducts.length > 0 && (
-          <div className="mt-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-                Top 10 Products
-              </h2>
-              {topProducts.length > 5 && (
+        {/* Top 10 Products Section with Fallback */}
+        {(() => {
+          // Robust fallback: use topProducts if available, otherwise use general products
+          const baseList = topProducts.length > 0 ? topProducts : products;
+
+          // Filter out current product and limit to 10
+          const displayTop = baseList.filter((p) => p._id !== id).slice(0, 10);
+
+          if (displayTop.length === 0) {
+            return null;
+          }
+
+          return (
+            <div className="mt-12 animate-fadeIn">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                  Top 10 Products
+                </h2>
                 <span className="text-xs text-green-600 font-semibold md:hidden">
                   Scroll right →
                 </span>
-              )}
+              </div>
+              <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto pb-4 no-scrollbar">
+                {displayTop.map((p, idx) => (
+                  <div key={p._id} className="min-w-[160px] sm:min-w-0">
+                    <ProductCard
+                      _id={p._id}
+                      name={p.name}
+                      image={p.images[0]}
+                      price={p.price}
+                      stock={p.stock}
+                      index={idx}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-4 overflow-x-auto pb-4 no-scrollbar">
-              {topProducts.slice(0, 10).map((p, idx) => (
-                <div key={p._id} className="min-w-[160px] sm:min-w-0">
-                  <ProductCard
-                    _id={p._id}
-                    name={p.name}
-                    image={p.images[0]}
-                    price={p.price}
-                    stock={p.stock}
-                    index={idx}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       <FloatingCartBar />

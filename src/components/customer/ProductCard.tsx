@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { getOptimizedImage } from '../../utils/imageUtils';
 import type { RootState } from '../../redux/store';
 import type { CartItem } from '../../redux/types/cartTypes';
 import React from 'react';
@@ -77,9 +78,6 @@ export default function ProductCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.03, duration: 0.3 }}
       whileHover={{ y: -5 }}
       onClick={() => navigate(`/products/${_id}`)}
       className="bg-white rounded-2xl p-4 shadow-md hover:shadow-xl transition-all cursor-pointer group h-full flex flex-col"
@@ -88,10 +86,13 @@ export default function ProductCard({
         className={`relative bg-gray-50 rounded-xl p-4 mb-3 overflow-hidden h-40 flex items-center justify-center`}
       >
         <img
-          src={image}
+          src={getOptimizedImage(image, 400)} // Request 400px for card
           alt={name}
-          className="w-full h-full object-contain group-hover:scale-110 transition-transform mix-blend-multiply"
+          loading={index > 4 ? 'lazy' : 'eager'}
+          className="w-full h-full object-contain group-hover:scale-110 transition-transform mix-blend-multiply relative z-10"
         />
+        {/* Interior placeholder to bridge gap before image arrives */}
+        <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-xl" />
         {stock !== undefined && stock < 10 && stock > 0 && (
           <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
             Low

@@ -1,6 +1,5 @@
 import type { AppDispatch } from '../store';
 import type { ProductFormData } from '../../types/Product';
-import toast from 'react-hot-toast';
 import * as productApi from '../../services/productApi';
 import {
   setProducts,
@@ -16,20 +15,29 @@ import {
 /**
  * Fetch all products
  */
-export const fetchProducts = () => async (dispatch: AppDispatch) => {
-  dispatch(setLoading(true));
-  dispatch(setError(null));
-  try {
-    const products = await productApi.getProducts();
-    dispatch(setProducts(products));
-  } catch (error: any) {
-    dispatch(
-      setError(error.response?.data?.message || 'Failed to fetch products')
-    );
-  } finally {
-    dispatch(setLoading(false));
-  }
-};
+export const fetchProducts =
+  (force = false) =>
+  async (dispatch: AppDispatch, getState: () => any) => {
+    const { products, loading } = getState().product;
+
+    // Cache check: skip if loading or if we already have products and not forcing
+    if (loading || (products.length > 0 && !force)) {
+      return;
+    }
+
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    try {
+      const products = await productApi.getProducts();
+      dispatch(setProducts(products));
+    } catch (error: any) {
+      dispatch(
+        setError(error.response?.data?.message || 'Failed to fetch products')
+      );
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
 /**
  * Fetch products by category
@@ -113,15 +121,16 @@ export const deleteProduct = (id: string) => async (dispatch: AppDispatch) => {
  */
 export const fetchSimilarProducts =
   (id: string) => async (dispatch: AppDispatch) => {
-    dispatch(setLoading(true));
+    // Optimized: Fetch in background without blocking global loading state
     try {
       const products = await productApi.getSimilarProducts(id);
       dispatch(setSimilarProducts(products));
     } catch (error: any) {
-      toast.error('Error fetching similar products:', error);
-      // Don't set main error state to avoid blocking main UI
-    } finally {
-      dispatch(setLoading(false));
+      dispatch(
+        setError(
+          error.response?.data?.message || 'Failed to fetch similar products'
+        )
+      );
     }
   };
 
@@ -134,7 +143,11 @@ export const fetchTopProducts = () => async (dispatch: AppDispatch) => {
     const products = await productApi.getTopProducts();
     dispatch(setTopProducts(products));
   } catch (error: any) {
-    toast.error('Error fetching top products:', error);
+    dispatch(
+      setError(error.response?.data?.message || 'Failed to fetch top products')
+    );
+    // Fallback: set empty if failed, UI will handle with products fallback
+    dispatch(setTopProducts([]));
   } finally {
     dispatch(setLoading(false));
   }

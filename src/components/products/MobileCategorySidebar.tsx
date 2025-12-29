@@ -15,19 +15,32 @@ export default function MobileCategorySidebar({
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
+    let isMounted = true;
+
     api
       .get('/api/categories')
       .then((res) => {
-        // Handle both response formats: { categories: [...] } or just [...]
+        if (!isMounted) {
+          return;
+        }
+
         const categoriesData = (
           Array.isArray(res.data) ? res.data : res.data.categories || []
         ).filter((cat: Category) => cat.isActive !== false);
+
         setCategories(categoriesData);
       })
-      .catch((err) => {
-        toast.error('Failed to fetch categories:', err);
-        setCategories([]); // Set empty array on error
+      .catch(() => {
+        if (!isMounted) {
+          return;
+        }
+        toast.error('Failed to fetch categories');
+        setCategories([]);
       });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

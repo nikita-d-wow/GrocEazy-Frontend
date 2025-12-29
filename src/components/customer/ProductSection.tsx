@@ -9,8 +9,8 @@ import {
 } from '../../redux/selectors/productSelectors';
 import ProductCard from './ProductCard';
 import Button from '../common/Button';
-import Loader from '../common/Loader';
 import EmptyState from '../common/EmptyState';
+import Skeleton from '../common/Skeleton';
 import { ArrowRight, PackageX } from 'lucide-react';
 
 export default function ProductsSection() {
@@ -20,8 +20,10 @@ export default function ProductsSection() {
   const loading = useSelector(selectProductLoading);
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    if (products.length === 0) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, products.length]);
 
   // Show only first 8 products
   const displayProducts = products
@@ -31,8 +33,26 @@ export default function ProductsSection() {
   // Initial loading state (only if no products)
   if (loading && products.length === 0) {
     return (
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16 flex justify-center">
-        <Loader size="lg" />
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16">
+        <div className="flex items-center justify-between mb-8">
+          <Skeleton variant="rect" width={200} height={40} />
+          <Skeleton variant="rect" width={100} height={32} />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl p-4 border border-gray-100 flex flex-col h-80"
+            >
+              <Skeleton width="100%" height={160} className="mb-4 rounded-xl" />
+              <Skeleton variant="text" width="80%" />
+              <div className="mt-auto flex justify-between">
+                <Skeleton width={60} height={24} />
+                <Skeleton width={80} height={32} />
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
     );
   }

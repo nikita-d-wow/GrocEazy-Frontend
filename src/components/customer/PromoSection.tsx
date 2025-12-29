@@ -6,6 +6,7 @@ import { fetchCategories } from '../../redux/actions/categoryActions';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 import breakfastBanner from '../../assets/breakfast banner.jpg';
 import veggiesBanner from '../../assets/banner 4.jpg';
+import { getOptimizedImage } from '../../utils/imageUtils';
 
 export default function PromoSection() {
   const navigate = useNavigate();
@@ -36,8 +37,11 @@ export default function PromoSection() {
           className="relative h-48 sm:h-56 rounded-3xl overflow-hidden shadow-md group cursor-pointer hover:shadow-xl transition-all"
         >
           <img
-            src={veggiesBanner}
+            src={getOptimizedImage(veggiesBanner, 800)}
             alt="Fresh Produce"
+            loading="eager"
+            // @ts-expect-error - fetchpriority is not yet in standard React types
+            fetchpriority="high"
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center px-8">
@@ -53,8 +57,11 @@ export default function PromoSection() {
           className="relative h-48 sm:h-56 rounded-3xl overflow-hidden shadow-md group cursor-pointer hover:shadow-xl transition-all"
         >
           <img
-            src={breakfastBanner}
+            src={getOptimizedImage(breakfastBanner, 800)}
             alt="Healthy Breakfast"
+            loading="eager"
+            // @ts-expect-error - fetchpriority is not yet in standard React types
+            fetchpriority="high"
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center px-8">

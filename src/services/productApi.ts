@@ -1,5 +1,6 @@
 import api from './api';
 import type { Product, ProductFormData } from '../types/Product';
+import toast from 'react-hot-toast';
 
 /**
  * Get all products (public endpoint)
@@ -171,10 +172,31 @@ export const getSimilarProducts = async (
 export const getTopProducts = async (
   limit: number = 10
 ): Promise<Product[]> => {
-  const response = await api.get<Product[] | { products: Product[] }>(
-    `/api/products/recommendations/top-10?limit=${limit}`
-  );
-  return Array.isArray(response.data)
-    ? response.data
-    : (response.data as any).products || response.data;
+  try {
+    const response = await api.get<any>(
+      `/api/products/recommendations/top-10?limit=${limit}`
+    );
+
+    // Support various backend response formats
+    const resData = response.data;
+    if (Array.isArray(resData)) {
+      return resData;
+    }
+    if (resData && typeof resData === 'object') {
+      if (Array.isArray(resData.products)) {
+        return resData.products;
+      }
+      if (Array.isArray(resData.data)) {
+        return resData.data;
+      }
+      if (Array.isArray(resData.topProducts)) {
+        return resData.topProducts;
+      }
+    }
+
+    return [];
+  } catch (error) {
+    toast.error('Failed to fetch top products');
+    return [];
+  }
 };
