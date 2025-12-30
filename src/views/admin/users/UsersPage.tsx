@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Eye, Search, SlidersHorizontal, UserX, UserCheck } from 'lucide-react';
 import { getUsers, updateUserStatus } from '../../../redux/actions/userActions';
@@ -27,12 +27,15 @@ export default function UsersPage() {
     dispatch(getUsers(page, roleFilter, submittedSearch));
   }, [dispatch, page, roleFilter, submittedSearch]);
 
-  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  // Debounce search query
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
       setPage(1);
       setSubmittedSearch(searchQuery);
-    }
-  };
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   const handleStatusToggle = (userId: string, currentStatus: boolean) => {
     if (
@@ -80,7 +83,6 @@ export default function UsersPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={handleSearch}
                 placeholder="Search users..."
                 className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
