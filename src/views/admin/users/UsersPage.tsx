@@ -84,16 +84,21 @@ export default function UsersPage() {
           </div>
 
           {/* Filters */}
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search users..."
-                className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-              />
+          <div className="flex items-end gap-3">
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+                Search
+              </span>
+              <div className="relative">
+                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search users..."
+                  className="pl-10 pr-4 py-2.5 bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-64 shadow-sm hover:shadow-md transition-all duration-300"
+                />
+              </div>
             </div>
 
             <FilterSelect
