@@ -90,7 +90,7 @@ export default function UsersPage() {
                 Search
               </span>
               <div className="relative group">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-500 group-hover:text-primary transition-colors" />
                 <input
                   type="text"
                   value={searchQuery}
