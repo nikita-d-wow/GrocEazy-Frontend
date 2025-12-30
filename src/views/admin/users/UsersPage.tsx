@@ -89,14 +89,14 @@ export default function UsersPage() {
               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
                 Search
               </span>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <div className="relative group">
+                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search users..."
-                  className="pl-10 pr-4 py-2.5 bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-64 shadow-sm hover:shadow-md transition-all duration-300"
+                  className="pl-10 pr-4 py-2.5 bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl text-sm font-semibold text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-64 shadow-sm hover:shadow-md transition-all duration-300"
                 />
               </div>
             </div>
