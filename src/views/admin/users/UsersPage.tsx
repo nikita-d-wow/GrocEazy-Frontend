@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Eye, Search, SlidersHorizontal, UserX, UserCheck } from 'lucide-react';
+import { Eye, Search, UserX, UserCheck } from 'lucide-react';
 import { getUsers, updateUserStatus } from '../../../redux/actions/userActions';
 import type { RootState } from '../../../redux/rootReducer';
 import type { ThunkDispatch } from 'redux-thunk';
@@ -8,6 +8,14 @@ import type { UserActionTypes } from '../../../redux/types/userTypes';
 
 import type { User } from '../../../redux/types/userTypes';
 import UserDetailsModal from './UserDetailsModal';
+import FilterSelect from '../../../components/common/FilterSelect';
+
+const ROLE_OPTIONS = [
+  { value: 'all', label: 'All Roles' },
+  { value: 'customer', label: 'Customer' },
+  { value: 'manager', label: 'Manager' },
+  { value: 'admin', label: 'Admin' },
+];
 
 export default function UsersPage() {
   const dispatch =
@@ -88,22 +96,16 @@ export default function UsersPage() {
               />
             </div>
 
-            <div className="flex items-center gap-2 border px-3 py-2 rounded-lg bg-white">
-              <SlidersHorizontal size={16} className="text-gray-500" />
-              <select
-                value={roleFilter}
-                onChange={(e) => {
-                  setRoleFilter(e.target.value);
-                  setPage(1);
-                }}
-                className="bg-transparent text-sm font-medium outline-none text-gray-700"
-              >
-                <option value="">All Roles</option>
-                <option value="customer">Customer</option>
-                <option value="manager">Manager</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
+            <FilterSelect
+              label="Filter by Role"
+              value={roleFilter || 'all'}
+              options={ROLE_OPTIONS}
+              onChange={(val) => {
+                setRoleFilter(val === 'all' ? '' : val);
+                setPage(1);
+              }}
+              className="w-48"
+            />
           </div>
         </div>
 
