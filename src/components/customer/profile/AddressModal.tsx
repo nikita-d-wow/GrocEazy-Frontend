@@ -79,7 +79,7 @@ export default function AddressModal({
         if (!formData.country || formData.country.length < 2) {
             newErrors.country = 'Country must be at least 2 characters';
         }
-        // Basic Zip Code validation (5 digits minimum)
+        // Basic Zip Code validation (6 digits minimum)
         const zipRegex = /^\d{6}(-\d{6})?$/;
 
         if (!formData.zipCode || !zipRegex.test(formData.zipCode) || /^0+$/.test(formData.zipCode)) {
