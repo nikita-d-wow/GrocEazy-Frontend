@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import { X, Save } from 'lucide-react';
 import type { IAddress } from '../../../redux/types/authTypes';
 
@@ -52,7 +52,7 @@ export default function AddressModal({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData, isOpen]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
         setFormData((prev) => ({
             ...prev,
@@ -80,7 +80,7 @@ export default function AddressModal({
             newErrors.country = 'Country must be at least 2 characters';
         }
         // Basic Zip Code validation (5 digits minimum)
-        const zipRegex = /^\d{5}(-\d{4})?$/;
+        const zipRegex = /^\d{6}(-\d{6})?$/;
 
         if (!formData.zipCode || !zipRegex.test(formData.zipCode)) {
             newErrors.zipCode = 'Invalid Zip Code (e.g. 10001)';
@@ -90,7 +90,7 @@ export default function AddressModal({
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
             onSave(formData);
@@ -98,7 +98,9 @@ export default function AddressModal({
         }
     };
 
-    if (!isOpen) return null;
+    if (!isOpen) {
+        return null;
+    }
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
