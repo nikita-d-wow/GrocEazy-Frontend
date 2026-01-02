@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
@@ -16,13 +16,16 @@ const Pagination: FC<PaginationProps> = ({
   className = '',
   isLoading = false,
 }) => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentPage]);
+
   const handlePageChange = (page: number) => {
     if (isLoading || page < 1 || page > totalPages) {
       return;
     }
 
     onPageChange(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   if (totalPages <= 1) {
