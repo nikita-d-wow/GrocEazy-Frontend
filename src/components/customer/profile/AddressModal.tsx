@@ -82,7 +82,7 @@ export default function AddressModal({
         // Basic Zip Code validation (5 digits minimum)
         const zipRegex = /^\d{6}(-\d{6})?$/;
 
-        if (!formData.zipCode || !zipRegex.test(formData.zipCode)) {
+        if (!formData.zipCode || !zipRegex.test(formData.zipCode) || /^0+$/.test(formData.zipCode)) {
             newErrors.zipCode = 'Invalid Zip Code (e.g. 10001)';
         }
 
