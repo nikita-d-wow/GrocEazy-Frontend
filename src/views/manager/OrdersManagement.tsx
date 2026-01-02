@@ -26,7 +26,6 @@ const OrdersManagement = () => {
 
   useEffect(() => {
     dispatch(getAllOrders(page, PAGE_SIZE));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, page]);
 
   // Client-side filtering

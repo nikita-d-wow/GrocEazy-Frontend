@@ -13,7 +13,7 @@ import { useDebounce } from '../../customhooks/useDebounce';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
-  fetchProducts,
+  fetchManagerProducts,
   deleteProduct as deleteProductAction,
 } from '../../redux/actions/productActions';
 import {
@@ -28,6 +28,13 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import FilterSelect from '../../components/common/FilterSelect';
+
+const STATUS_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' },
+];
 
 // Memoized Row Component to prevent unnecessary re-renders
 const ProductRow = React.memo(
@@ -41,7 +48,9 @@ const ProductRow = React.memo(
     onDelete: (id: string) => void;
   }) => {
     return (
-      <tr className="hover:bg-gray-50/50">
+      <tr
+        className={`hover:bg-gray-50/50 transition-opacity ${!product.isActive ? 'opacity-60' : ''}`}
+      >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
             <div className="h-12 w-12 rounded-xl bg-gray-100 p-1 flex-shrink-0">
@@ -141,6 +150,7 @@ const ProductManagement: FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -149,18 +159,28 @@ const ProductManagement: FC = () => {
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    dispatch(fetchProducts());
+    dispatch(fetchManagerProducts(1, 20, true));
   }, [dispatch]);
 
   const filteredProducts = useMemo(
     () =>
-      products.filter(
-        (p) =>
-          p &&
-          p.name &&
-          p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-      ),
-    [products, debouncedSearchTerm]
+      products.filter((p) => {
+        if (!p || !p.name) {
+          return false;
+        }
+
+        const matchesSearch = p.name
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase());
+
+        const matchesStatus =
+          statusFilter === 'all' ||
+          (statusFilter === 'active' && p.isActive) ||
+          (statusFilter === 'inactive' && !p.isActive);
+
+        return matchesSearch && matchesStatus;
+      }),
+    [products, debouncedSearchTerm, statusFilter]
   );
 
   // Intersection Observer for Infinite Scroll effect
@@ -228,14 +248,23 @@ const ProductManagement: FC = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
         <div className="p-4 border-b border-gray-100">
-          <div className="max-w-md">
-            <Input
-              placeholder="Search products..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              leftIcon={<Search className="w-5 h-5" />}
+          <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
+            <div className="flex-1 max-w-md w-full">
+              <Input
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                leftIcon={<Search className="w-5 h-5" />}
+              />
+            </div>
+            <FilterSelect
+              label="Filter by Status"
+              options={STATUS_OPTIONS}
+              value={statusFilter}
+              onChange={setStatusFilter}
+              className="w-full md:w-48"
             />
           </div>
         </div>

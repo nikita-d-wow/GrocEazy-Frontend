@@ -40,6 +40,34 @@ export const fetchProducts =
   };
 
 /**
+ * Fetch all products for manager (includes inactive)
+ */
+export const fetchManagerProducts =
+  (page = 1, limit = 20, force = false) =>
+  async (dispatch: AppDispatch, getState: () => any) => {
+    const { products, loading } = getState().product;
+
+    // Cache check: skip if loading or if we already have products and not forcing
+    // However, if we are specifically asking for a page, we should probably fetch.
+    if (loading || (products.length > 0 && !force && page === 1)) {
+      return;
+    }
+
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    try {
+      const products = await productApi.getManagerProducts(page, limit);
+      dispatch(setProducts(products));
+    } catch (error: any) {
+      dispatch(
+        setError(error.response?.data?.message || 'Failed to fetch products')
+      );
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+/**
  * Fetch products by category
  */
 export const fetchProductsByCategory =
