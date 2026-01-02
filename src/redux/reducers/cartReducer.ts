@@ -6,6 +6,7 @@ import {
   CART_UPDATE_ITEM,
   CART_REMOVE_ITEM,
   CART_ADD_ITEM,
+  CART_ADD_ITEM_SUCCESS,
 } from '../types/cartTypes';
 
 import type { CartState, CartActionTypes } from '../types/cartTypes';
@@ -13,6 +14,7 @@ import type { CartState, CartActionTypes } from '../types/cartTypes';
 const initialState: CartState = {
   loading: false,
   items: [],
+  itemMap: {},
   error: null,
   pagination: {
     page: 1,
@@ -20,6 +22,23 @@ const initialState: CartState = {
     total: 0,
     totalPages: 1,
   },
+};
+
+const getProductId = (item: {
+  productId?: string | { _id?: string };
+  product?: string | { _id?: string };
+}): string => {
+  const prod = item.productId || item.product;
+  if (!prod) {
+    return '';
+  }
+  if (typeof prod === 'string') {
+    return prod;
+  }
+  if (typeof prod === 'object') {
+    return String(prod._id || prod);
+  }
+  return String(prod);
 };
 
 export function cartReducer(
@@ -30,13 +49,23 @@ export function cartReducer(
     case CART_FETCH_REQUEST:
       return { ...state, loading: true, error: null };
 
-    case CART_FETCH_SUCCESS:
+    case CART_FETCH_SUCCESS: {
+      const newItemMap = { ...state.itemMap };
+      action.payload.items.forEach((item) => {
+        const prodId = getProductId(item);
+        if (prodId) {
+          newItemMap[prodId] = item;
+        }
+      });
+
       return {
         ...state,
         loading: false,
         items: action.payload.items,
+        itemMap: newItemMap,
         pagination: action.payload.pagination,
       };
+    }
 
     case CART_FETCH_FAILURE:
       return { ...state, loading: false, error: action.payload };
@@ -45,58 +74,101 @@ export function cartReducer(
       return {
         ...state,
         items: [],
+        itemMap: {},
         pagination: { ...initialState.pagination },
       };
 
-    case CART_UPDATE_ITEM:
-      return {
-        ...state,
-        items: state.items.map((item) =>
-          item._id === action.payload.cartId
-            ? { ...item, quantity: action.payload.quantity }
-            : item
-        ),
-      };
+    case CART_UPDATE_ITEM: {
+      const { cartId, quantity } = action.payload;
+      const updatedItems = state.items.map((item) =>
+        item._id === cartId ? { ...item, quantity } : item
+      );
 
-    case CART_REMOVE_ITEM:
+      const newItemMap = { ...state.itemMap };
+      Object.keys(newItemMap).forEach((prodId) => {
+        if (newItemMap[prodId]._id === cartId) {
+          newItemMap[prodId] = { ...newItemMap[prodId], quantity };
+        }
+      });
+
       return {
         ...state,
-        items: state.items.filter((item) => item._id !== action.payload),
+        items: updatedItems,
+        itemMap: newItemMap,
+      };
+    }
+
+    case CART_REMOVE_ITEM: {
+      const cartId = action.payload;
+      const newItemMap = { ...state.itemMap };
+      Object.keys(newItemMap).forEach((prodId) => {
+        if (newItemMap[prodId]._id === cartId) {
+          delete newItemMap[prodId];
+        }
+      });
+
+      return {
+        ...state,
+        items: state.items.filter((item) => item._id !== cartId),
+        itemMap: newItemMap,
         pagination: {
           ...state.pagination,
           total: state.pagination.total - 1,
         },
       };
+    }
 
     case CART_ADD_ITEM: {
-      const getProductId = (item: any) =>
-        item.product?._id ||
-        (typeof item.product === 'string' ? item.product : null);
-
       const targetProductId = getProductId(action.payload);
+      if (!targetProductId) {
+        return state;
+      }
 
-      // Check if item already exists
-      const existingItemIndex = state.items.findIndex(
-        (item) => getProductId(item) === targetProductId
-      );
+      const existingItem = state.itemMap[targetProductId];
 
-      if (existingItemIndex > -1) {
+      if (existingItem) {
+        const updatedItem = {
+          ...existingItem,
+          quantity: existingItem.quantity + action.payload.quantity,
+        };
+        const updatedItems = state.items.map((item) =>
+          getProductId(item) === targetProductId ? updatedItem : item
+        );
+
         return {
           ...state,
-          items: state.items.map((item, index) =>
-            index === existingItemIndex
-              ? { ...item, quantity: item.quantity + action.payload.quantity }
-              : item
-          ),
+          items: updatedItems,
+          itemMap: {
+            ...state.itemMap,
+            [targetProductId]: updatedItem,
+          },
         };
       }
 
       return {
         ...state,
         items: [...state.items, action.payload],
+        itemMap: {
+          ...state.itemMap,
+          [targetProductId]: action.payload,
+        },
         pagination: {
           ...state.pagination,
           total: state.pagination.total + 1,
+        },
+      };
+    }
+
+    case CART_ADD_ITEM_SUCCESS: {
+      const { tempId, item } = action.payload;
+      const prodId = getProductId(item);
+
+      return {
+        ...state,
+        items: state.items.map((i) => (i._id === tempId ? item : i)),
+        itemMap: {
+          ...state.itemMap,
+          [prodId]: item,
         },
       };
     }

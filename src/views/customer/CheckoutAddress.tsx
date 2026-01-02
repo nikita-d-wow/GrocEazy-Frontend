@@ -1,6 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { MapPin, Plus, CheckCircle } from 'lucide-react';
+import {
+  MapPin,
+  Plus,
+  CheckCircle,
+  ChevronLeft,
+  AlertCircle,
+  ArrowRight,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
@@ -32,6 +39,13 @@ const CheckoutAddress = () => {
   );
 
   const selectedAddress = addresses.find((a) => a._id === selectedAddressId);
+
+  /* ---------------- STOCK VALIDATION ---------------- */
+  const isStockValid = useMemo(
+    () =>
+      cartItems.every((item) => item.quantity <= (item.product?.stock ?? 0)),
+    [cartItems]
+  );
 
   if (!user) {
     return null;
@@ -80,13 +94,53 @@ const CheckoutAddress = () => {
   /* ---------------- RENDER ---------------- */
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
-      {/* PAGE HEADER */}
-      <header className="mb-10">
-        <h1 className="text-3xl font-bold text-gray-900">Delivery Address</h1>
-        <p className="text-gray-500 mt-2 max-w-2xl">
-          Select the address where you want your order delivered.
-        </p>
-      </header>
+      {/* PAGE HEADER WITH BACK BUTTON */}
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          onClick={() => navigate('/checkout')}
+          className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-600 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
+          title="Back to Order Summary"
+        >
+          <ChevronLeft
+            size={22}
+            className="group-hover:-translate-x-0.5 transition-transform"
+          />
+        </button>
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Delivery Address
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Select the address where you want your order delivered.
+          </p>
+        </div>
+      </div>
+
+      {!isStockValid && (
+        <div className="mb-8 overflow-hidden relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 blur-xl group-hover:opacity-100 opacity-60 transition-opacity" />
+          <div className="relative p-5 glass-card border-red-200/50 bg-red-50/80 backdrop-blur-md rounded-3xl flex items-start gap-4 text-red-700 shadow-xl shadow-red-500/5 animate-fadeDown">
+            <div className="p-2.5 bg-red-100 rounded-2xl text-red-600 shadow-inner">
+              <AlertCircle size={24} />
+            </div>
+            <div>
+              <p className="font-bold text-lg leading-tight mb-1">
+                Stock Availability Issue
+              </p>
+              <p className="text-sm text-red-600/80 font-medium">
+                Items in your cart have changed availability. Please return to
+                your cart to review and update quantities.
+              </p>
+              <button
+                onClick={() => navigate('/cart')}
+                className="mt-3 text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all text-red-700"
+              >
+                Return to Cart <ArrowRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-8">
         {/* ================= LEFT ================= */}
@@ -96,7 +150,7 @@ const CheckoutAddress = () => {
               onClick={() => navigate('/profile?tab=address')}
               className="inline-flex items-center gap-2 px-4 py-2
                          bg-primary text-white text-sm font-medium
-                         rounded-xl hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
+                         rounded-xl hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] cursor-pointer"
             >
               <Plus size={16} />
               Add New Address
@@ -173,15 +227,17 @@ const CheckoutAddress = () => {
           </div>
 
           <button
-            disabled={!selectedAddressId || cartItems.length === 0}
+            disabled={
+              !selectedAddressId || cartItems.length === 0 || !isStockValid
+            }
             onClick={handlePlaceOrder}
-            className="mt-6 w-full bg-primary text-white
-                       py-3 rounded-xl font-medium
-                       hover:bg-primary-dark transition
-                       disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
-                       shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98]"
+            className={`mt-6 w-full py-3 rounded-xl font-medium transition active:scale-[0.98] shadow-lg ${
+              !selectedAddressId || cartItems.length === 0 || !isStockValid
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                : 'bg-primary text-white hover:bg-primary-dark shadow-primary/20 hover:shadow-primary/40 cursor-pointer'
+            }`}
           >
-            Place Order
+            {isStockValid ? 'Place Order' : 'Adjust Stock to Order'}
           </button>
         </aside>
       </div>

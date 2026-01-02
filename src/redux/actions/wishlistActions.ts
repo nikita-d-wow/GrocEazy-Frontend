@@ -1,11 +1,14 @@
 import api from '../../services/api';
 import type { AppDispatch } from '../store';
+import type { RootState } from '../rootReducer';
 import {
   WISHLIST_FETCH_REQUEST,
   WISHLIST_FETCH_SUCCESS,
   WISHLIST_FETCH_FAILURE,
   WISHLIST_REMOVE_ITEM,
   WISHLIST_ADD_ITEM,
+  WISHLIST_ADD_ITEM_SUCCESS,
+  type WishlistProduct,
 } from '../types/wishlistTypes';
 
 const DEFAULT_LIMIT = 12;
@@ -38,18 +41,25 @@ export const fetchWishlist =
   };
 
 export const removeWishlistItem =
-  (wishlistId: string) => async (dispatch: AppDispatch, getState: any) => {
-    await api.delete(`/api/wishlist/${wishlistId}`);
-
-    // Optimistic / Fast update: Remove local item immediately
+  (wishlistId: string) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    // Optimistic Update: Remove local item immediately
     dispatch({
       type: WISHLIST_REMOVE_ITEM,
       payload: wishlistId,
     });
 
-    // Background re-fetch to sync pagination
-    const { page, limit } = getState().wishlist.pagination;
-    dispatch(fetchWishlist(page, limit, true));
+    try {
+      await api.delete(`/api/wishlist/${wishlistId}`);
+
+      // Background re-fetch to sync pagination / data
+      const { page, limit } = getState().wishlist.pagination;
+      dispatch(fetchWishlist(page, limit, true));
+    } catch {
+      // Revert if it fails
+      const { page, limit } = getState().wishlist.pagination;
+      dispatch(fetchWishlist(page, limit, true));
+    }
   };
 
 interface OptimisticProduct {
@@ -63,7 +73,7 @@ interface OptimisticProduct {
 
 export const moveWishlistToCart =
   (wishlistId: string, product?: OptimisticProduct) =>
-  async (dispatch: AppDispatch, getState: any) => {
+  async (dispatch: AppDispatch, getState: () => RootState) => {
     // Optimistic Update
     if (product) {
       dispatch({
@@ -97,7 +107,7 @@ export const moveWishlistToCart =
 
       // Sync cart too
       // dispatch(fetchCart(...)) handled by component or parallel action if needed
-    } catch (e) {
+    } catch {
       // Revert if needed
       const { page, limit } = getState().wishlist.pagination;
       dispatch(fetchWishlist(page, limit, true));
@@ -106,21 +116,33 @@ export const moveWishlistToCart =
 
 export const addToWishlist =
   (productId: string, product?: OptimisticProduct) =>
-  async (dispatch: AppDispatch, getState: any) => {
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    const tempId = `temp-${Date.now()}`;
     // Optimistic Add
     if (product) {
       dispatch({
         type: WISHLIST_ADD_ITEM,
         payload: {
-          _id: `temp-${Date.now()}`,
+          _id: tempId,
           productId,
-          product,
+          product: product as WishlistProduct,
         },
       });
     }
 
     try {
-      await api.post('/api/wishlist', { productId });
+      const { data } = await api.post('/api/wishlist', { productId });
+
+      if (data.success && data.item) {
+        dispatch({
+          type: WISHLIST_ADD_ITEM_SUCCESS,
+          payload: {
+            tempId,
+            item: data.item,
+          },
+        });
+      }
+
       const { page, limit } = getState().wishlist.pagination;
       dispatch(fetchWishlist(page, limit, true));
     } catch {

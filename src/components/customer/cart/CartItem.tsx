@@ -1,11 +1,11 @@
-import { Minus, Plus, Trash2, Heart, Loader2 } from 'lucide-react';
+import { Minus, Plus, Trash2, Heart, Loader2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import type { CartItemProps } from '../../../types/Cart';
 
 interface ExtraProps {
   isInWishlist?: boolean;
-  moveToWishlist: (_cartId: string, _productId: string) => void;
+  moveToWishlist: (cartId: string, productId: string) => void;
 }
 
 export default function CartItem({
@@ -27,6 +27,7 @@ export default function CartItem({
   };
 
   const isIncrementDisabled = item.quantity >= item.stock || loading !== null;
+  const isDecrementDisabled = item.quantity <= 1 || loading !== null;
 
   const handleIncrement = async () => {
     if (isIncrementDisabled) {
@@ -47,7 +48,7 @@ export default function CartItem({
   };
 
   const handleDecrement = async () => {
-    if (item.quantity <= 1 || loading !== null) {
+    if (isDecrementDisabled) {
       return;
     }
 
@@ -66,7 +67,7 @@ export default function CartItem({
     setIsRemoving(true);
     try {
       await removeItem(item._id);
-    } catch (error) {
+    } catch {
       setIsRemoving(false);
     }
   };
@@ -107,36 +108,63 @@ export default function CartItem({
             </span>
           </p>
 
+          <div className="mt-3 flex flex-wrap gap-2">
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm shadow-sm ${
+                item.stock > 0
+                  ? 'bg-green-50/50 border-green-100 text-green-700'
+                  : 'bg-red-50/50 border-red-100 text-red-700'
+              }`}
+            >
+              <div
+                className={`w-1.5 h-1.5 rounded-full animate-pulse ${item.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}
+              />
+              {item.stock > 0 ? `In Stock: ${item.stock}` : 'Out of Stock'}
+            </div>
+
+            {item.quantity > item.stock && (
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 text-red-700 text-[10px] font-bold uppercase tracking-wider shadow-sm animate-pulse">
+                <AlertCircle size={10} className="text-orange-600" />
+                Insufficient Stock
+              </div>
+            )}
+          </div>
+
           {/* QUANTITY */}
           <div className="mt-3 flex items-center gap-4 justify-start">
-            {item.quantity > 1 && (
-              <button
-                onClick={handleDecrement}
-                className="
-                  p-2 rounded-lg cursor-pointer
-                  bg-red-50 border border-red-200
-                  hover:bg-red-100
-                "
-              >
-                {loading === 'dec' ? (
-                  <Loader2 size={16} className="animate-spin text-red-600" />
-                ) : (
-                  <Minus size={16} className="text-red-600" />
-                )}
-              </button>
-            )}
+            <button
+              onClick={handleDecrement}
+              disabled={isDecrementDisabled}
+              className={`
+                p-2 rounded-lg border transition-all active:scale-95
+                ${
+                  isDecrementDisabled
+                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                    : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100 cursor-pointer shadow-sm'
+                }
+              `}
+            >
+              {loading === 'dec' ? (
+                <Loader2 size={16} className="animate-spin text-red-600" />
+              ) : (
+                <Minus size={16} />
+              )}
+            </button>
 
-            <span className="font-semibold text-gray-900">{item.quantity}</span>
+            <span className="font-semibold text-gray-900 tabular-nums">
+              {item.quantity}
+            </span>
 
             {/* INCREMENT */}
             <button
               onClick={handleIncrement}
+              disabled={isIncrementDisabled}
               className={`
-                p-2 rounded-lg border cursor-pointer transition-colors
+                p-2 rounded-lg border transition-all active:scale-95
                 ${
                   isIncrementDisabled
-                    ? 'bg-gray-100 border-gray-200 text-gray-400'
-                    : 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700'
+                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                    : 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700 cursor-pointer shadow-sm'
                 }
               `}
             >
@@ -167,19 +195,25 @@ export default function CartItem({
           disabled={isInWishlist}
           className={`
             inline-flex items-center gap-2
-            text-sm font-medium transition-colors
+            px-3 py-1.5 rounded-xl
+            text-xs font-bold uppercase tracking-wide transition-all duration-300
             ${
               isInWishlist
-                ? 'text-pink-500 cursor-default'
-                : 'text-primary hover:underline cursor-pointer'
+                ? 'bg-red-50 text-red-500 border border-red-100 shadow-sm cursor-default'
+                : 'bg-white text-gray-400 border border-gray-100 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50 hover:shadow-md cursor-pointer'
             }
           `}
         >
           <Heart
             size={14}
-            className={isInWishlist ? 'fill-pink-500 text-pink-500' : ''}
+            fill={isInWishlist ? 'currentColor' : 'none'}
+            className={
+              isInWishlist
+                ? 'animate-bounce'
+                : 'group-hover:scale-110 transition-transform'
+            }
           />
-          {isInWishlist ? 'In Wishlist' : 'Wishlist'}
+          {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
         </button>
 
         <div className="flex items-center gap-3">

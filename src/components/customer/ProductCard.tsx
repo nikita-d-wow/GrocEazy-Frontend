@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { getOptimizedImage } from '../../utils/imageUtils';
 import type { RootState } from '../../redux/store';
-import type { CartItem } from '../../redux/types/cartTypes';
 import React from 'react';
 import { motion } from 'framer-motion';
 // import { categoryBgVariants } from '../../utils/colors';
@@ -15,7 +14,6 @@ import {
   addToWishlist,
   removeWishlistItem,
 } from '../../redux/actions/wishlistActions';
-import { selectWishlistItems } from '../../redux/selectors/wishlistSelectors';
 import { useSelector } from 'react-redux';
 import { Plus, Minus, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -36,20 +34,17 @@ export default function ProductCard({
 }: Props) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { items } = useSelector((state: RootState) => state.cart);
-  const wishlistItems = useSelector(selectWishlistItems);
+  const { itemMap } = useSelector((state: RootState) => state.cart);
+  const { idMap: wishlistIdMap } = useSelector(
+    (state: RootState) => state.wishlist
+  );
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const cartItem = items.find((item: CartItem) => {
-    const prodId =
-      item.product?._id ||
-      (typeof item.product === 'string' ? item.product : null);
-    return prodId === _id;
-  });
+  const cartItem = itemMap[_id];
   const quantity = cartItem ? cartItem.quantity : 0;
 
-  const wishlistItem = wishlistItems.find((item) => item.product._id === _id);
-  const isInWishlist = !!wishlistItem;
+  const wishlistId = wishlistIdMap[_id];
+  const isInWishlist = !!wishlistId;
 
   const handleWishlistFn = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -59,7 +54,7 @@ export default function ProductCard({
     }
 
     if (isInWishlist) {
-      await dispatch(removeWishlistItem(wishlistItem!._id));
+      await dispatch(removeWishlistItem(wishlistId));
       toast.success('Removed from wishlist');
     } else {
       await dispatch(
@@ -94,18 +89,18 @@ export default function ProductCard({
         {/* Interior placeholder to bridge gap before image arrives */}
         <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-xl" />
         {stock !== undefined && stock < 10 && stock > 0 && (
-          <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+          <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider z-20">
             Low
           </span>
         )}
         {stock === 0 && (
-          <span className="absolute top-2 right-2 bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+          <span className="absolute top-2 right-2 bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider z-20">
             Sold Out
           </span>
         )}
         <button
           onClick={handleWishlistFn}
-          className={`absolute top-2 left-2 p-1.5 rounded-full transition-colors cursor-pointer ${
+          className={`absolute top-2 left-2 p-1.5 rounded-full transition-colors cursor-pointer z-20 ${
             isInWishlist
               ? 'bg-red-50 text-red-500 hover:bg-red-100'
               : 'bg-white/50 hover:bg-white text-gray-400 hover:text-red-500'
@@ -124,14 +119,14 @@ export default function ProductCard({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (stock > 0) {
+                if ((stock ?? 1) > 0) {
                   dispatch(
                     addToCart(_id, 1, {
                       _id,
                       name,
                       price,
                       images: [image],
-                      stock,
+                      stock: stock ?? 0,
                     })
                   );
                 }

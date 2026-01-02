@@ -1,11 +1,23 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import Header from '../components/customer/Header';
 import Footer from '../components/customer/Footer';
 import type { RootState } from '../redux/rootReducer';
+import type { AppDispatch } from '../redux/store';
+import { fetchCart } from '../redux/actions/cartActions';
+import { fetchWishlist } from '../redux/actions/wishlistActions';
 
 export default function CustomerLayout() {
+  const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (user?.role === 'customer') {
+      dispatch(fetchCart(1, 100)); // Populate cart itemMap
+      dispatch(fetchWishlist(1, 500, true)); // Populate wishlist idMap (silently)
+    }
+  }, [dispatch, user]);
 
   if (user?.role === 'admin') {
     return <Navigate to="/admin" replace />;

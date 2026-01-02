@@ -171,10 +171,9 @@ const ProductsPage: FC = () => {
   }
 
   return (
-    <div className="relative">
-      <div className="absolute inset-0 opacity-80 pointer-events-none" />
+    <div className="relative bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 relative z-10 transition-all duration-300">
-        <div className="bg-gray-50 min-h-screen">
+        <div className="bg-white">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
             <div>
