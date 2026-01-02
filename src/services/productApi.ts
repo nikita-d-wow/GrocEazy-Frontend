@@ -14,6 +14,20 @@ export const getProducts = async (): Promise<Product[]> => {
 };
 
 /**
+ * Get all products (manager endpoint - includes inactive)
+ */
+export const getManagerProducts = async (
+  page: number = 1,
+  limit: number = 20
+): Promise<Product[]> => {
+  const response = await api.get<Product[] | { products: Product[] }>(
+    `/api/products/manager/all?page=${page}&limit=${limit}`
+  );
+  // Backend might return { products: [...] } or just the array
+  return Array.isArray(response.data) ? response.data : response.data.products;
+};
+
+/**
  * Get products by category
  */
 export const getProductsByCategory = async (

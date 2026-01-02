@@ -16,8 +16,40 @@ const Pagination: FC<PaginationProps> = ({
   className = '',
   isLoading = false,
 }) => {
+  const scrollToTop = () => {
+    // Strategic timeout to wait for any DOM/layout shifts
+    setTimeout(() => {
+      try {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'smooth',
+        });
+
+        // Fallback for document scrolling
+        if (document.documentElement) {
+          document.documentElement.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+          });
+        }
+
+        // Final fallback for body scrolling
+        if (document.body) {
+          document.body.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+          });
+        }
+      } catch (err) {
+        // Ultimate fallback to instant jump if smooth scroll options fail
+        window.scrollTo(0, 0);
+      }
+    }, 100);
+  };
+
   useEffect(() => {
-    window.scrollTo(0, 0);
+    scrollToTop();
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {
@@ -25,6 +57,7 @@ const Pagination: FC<PaginationProps> = ({
       return;
     }
 
+    scrollToTop();
     onPageChange(page);
   };
 

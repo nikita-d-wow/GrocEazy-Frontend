@@ -197,12 +197,13 @@ export default function UsersPage() {
                               <span
                                 className={`
                                 text-[10px] px-2 py-0.5 rounded-full font-medium border
-                                ${user.role === 'admin'
+                                ${
+                                  user.role === 'admin'
                                     ? 'bg-purple-50 text-purple-700 border-purple-200'
                                     : user.role === 'manager'
                                       ? 'bg-blue-50 text-blue-700 border-blue-200'
                                       : 'bg-green-50 text-green-700 border-green-200'
-                                  }
+                                }
                             `}
                               >
                                 {user.role.charAt(0).toUpperCase() +
@@ -216,12 +217,13 @@ export default function UsersPage() {
                         <span
                           className={`
                                       px-2.5 py-1 rounded-full text-xs font-semibold border
-                                      ${user.role === 'admin'
-                              ? 'bg-purple-50 text-purple-700 border-purple-200'
-                              : user.role === 'manager'
-                                ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                : 'bg-green-50 text-green-700 border-green-200'
-                            }
+                                      ${
+                                        user.role === 'admin'
+                                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                          : user.role === 'manager'
+                                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                            : 'bg-green-50 text-green-700 border-green-200'
+                                      }
                                   `}
                         >
                           {user.role.charAt(0).toUpperCase() +
@@ -253,12 +255,13 @@ export default function UsersPage() {
                           }
                           className={`
                           p-2 rounded-full transition-colors 
-                          ${user.role === 'admin'
+                          ${
+                            user.role === 'admin'
                               ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'
                               : user.isActive
                                 ? 'hover:bg-red-50 text-red-600'
                                 : 'hover:bg-green-50 text-green-600'
-                            }
+                          }
                         `}
                           title={
                             user.role === 'admin'
@@ -293,7 +296,7 @@ export default function UsersPage() {
           {pagination && pagination.pages > 1 && (
             <div className="border-t border-gray-200 px-6 py-4 flex justify-center">
               <Pagination
-                currentPage={pagination.page}
+                currentPage={page}
                 totalPages={pagination.pages}
                 onPageChange={setPage}
                 isLoading={loading}

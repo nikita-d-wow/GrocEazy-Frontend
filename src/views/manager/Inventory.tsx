@@ -4,7 +4,7 @@ import { Search, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useDebounce } from '../../customhooks/useDebounce';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
-import { fetchProducts } from '../../redux/actions/productActions';
+import { fetchManagerProducts } from '../../redux/actions/productActions';
 import { fetchCategories } from '../../redux/actions/categoryActions';
 import {
   selectProducts,
@@ -31,7 +31,9 @@ const InventoryRow = React.memo(
   }) => {
     const StatusIcon = status.icon;
     return (
-      <tr className="hover:bg-gray-50/50">
+      <tr
+        className={`hover:bg-gray-50/50 transition-opacity ${!product.isActive ? 'opacity-60' : ''}`}
+      >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
             <div className="h-10 w-10 rounded-lg bg-gray-100 p-1 flex-shrink-0">
@@ -104,7 +106,7 @@ const Inventory: FC = () => {
   const loaderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    dispatch(fetchProducts());
+    dispatch(fetchManagerProducts());
     dispatch(fetchCategories());
   }, [dispatch]);
 

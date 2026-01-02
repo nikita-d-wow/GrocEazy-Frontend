@@ -53,7 +53,6 @@ export default function AdminSupportTickets() {
     }
 
     dispatch(fetchSupportStats());
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, page, managers.length]);
 
   const filterOptions = useMemo(() => {

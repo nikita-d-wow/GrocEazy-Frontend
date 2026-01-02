@@ -5,9 +5,7 @@
   font-family: 'Outfit', sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+/* Global scroll-behavior removed to avoid conflict with JS scrollTo */
 
 /* Custom Scrollbar for a premium feel */
 ::-webkit-scrollbar {

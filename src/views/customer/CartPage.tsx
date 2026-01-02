@@ -64,7 +64,6 @@ export default function CartPage() {
     if (user) {
       dispatch(fetchCart(page, PAGE_LIMIT));
       dispatch(fetchWishlist(1, 100)); // Fetch wishlist for cross-check
-      window.scrollTo(0, 0);
     }
   }, [dispatch, user, page]);
 

@@ -34,7 +34,6 @@ export default function ManagerSupportTickets() {
 
   useEffect(() => {
     dispatch(fetchAllSupportTickets(page));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, page]);
 
   const updateStatus = async (id: string, status: TicketStatus) => {
