@@ -102,7 +102,7 @@ export default function WishlistPage() {
                 <Heart size={24} className="text-red-500 fill-red-500" />
               </div>
               <h1 className="text-4xl font-black text-gray-900 tracking-tight">
-                My <span className="text-primary">Wishlist</span>
+                My Wishlist
               </h1>
             </div>
             <p className="text-gray-500 font-medium flex items-center gap-2">

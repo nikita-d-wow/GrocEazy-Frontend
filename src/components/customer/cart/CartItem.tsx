@@ -1,11 +1,12 @@
+import React, { useState } from 'react';
 import { Minus, Plus, Trash2, Heart, Loader2, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { CartItemProps } from '../../../types/Cart';
 
 interface ExtraProps {
   isInWishlist?: boolean;
-  moveToWishlist: (cartId: string, productId: string) => void;
+  moveToWishlist: (_cartId: string, _productId: string) => void;
 }
 
 export default function CartItem({
@@ -15,10 +16,12 @@ export default function CartItem({
   removeItem,
   moveToWishlist,
 }: CartItemProps & ExtraProps) {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<'inc' | 'dec' | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
 
-  const handleMoveToWishlist = () => {
+  const handleMoveToWishlist = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (loading || isInWishlist) {
       return;
     }
@@ -29,7 +32,8 @@ export default function CartItem({
   const isIncrementDisabled = item.quantity >= item.stock || loading !== null;
   const isDecrementDisabled = item.quantity <= 1 || loading !== null;
 
-  const handleIncrement = async () => {
+  const handleIncrement = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isIncrementDisabled) {
       toast.error(
         item.stock === 0
@@ -47,7 +51,8 @@ export default function CartItem({
     }
   };
 
-  const handleDecrement = async () => {
+  const handleDecrement = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isDecrementDisabled) {
       return;
     }
@@ -60,7 +65,8 @@ export default function CartItem({
     }
   };
 
-  const handleRemove = async () => {
+  const handleRemove = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (isRemoving) {
       return;
     }
@@ -74,6 +80,7 @@ export default function CartItem({
 
   return (
     <div
+      onClick={() => navigate(`/products/${item.productId}`)}
       className="
         bg-white p-4 sm:p-6
         rounded-2xl sm:rounded-3xl
@@ -81,6 +88,7 @@ export default function CartItem({
         shadow-sm
         transition
         flex flex-col sm:flex-row gap-4 sm:gap-6
+        cursor-pointer
       "
     >
       {/* LEFT */}

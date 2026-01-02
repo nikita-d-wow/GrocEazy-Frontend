@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Trash2, ShoppingCart, Loader2, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   removeWishlistItem,
@@ -17,9 +18,11 @@ type Props = {
 
 export default function WishlistCard({ item, isInCart }: Props) {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsDeleting(true);
     try {
       await dispatch(removeWishlistItem(item._id));
@@ -33,6 +36,7 @@ export default function WishlistCard({ item, isInCart }: Props) {
 
   return (
     <div
+      onClick={() => navigate(`/products/${item.product._id}`)}
       className="
         group relative
         bg-white/40 backdrop-blur-2xl
@@ -43,6 +47,7 @@ export default function WishlistCard({ item, isInCart }: Props) {
         transition-all duration-500
         hover:-translate-y-2
         flex flex-col h-full
+        cursor-pointer
       "
     >
       {/* IMAGE CONTAINER */}
@@ -94,7 +99,8 @@ export default function WishlistCard({ item, isInCart }: Props) {
       <div className="mt-6 flex gap-3">
         <button
           disabled={isMoveDisabled}
-          onClick={() =>
+          onClick={(e) => {
+            e.stopPropagation();
             dispatch(
               moveWishlistToCart(item._id, {
                 _id: item.product._id,
@@ -104,8 +110,8 @@ export default function WishlistCard({ item, isInCart }: Props) {
                 stock: item.product.stock,
                 description: item.product.description,
               })
-            )
-          }
+            );
+          }}
           className={`
             flex-1 flex items-center justify-center gap-2
             py-3 rounded-2xl font-bold text-sm transition-all duration-300
