@@ -6,6 +6,7 @@ export const CART_CLEAR = 'CART_CLEAR';
 export const CART_UPDATE_ITEM = 'CART_UPDATE_ITEM';
 export const CART_REMOVE_ITEM = 'CART_REMOVE_ITEM';
 export const CART_ADD_ITEM = 'CART_ADD_ITEM';
+export const CART_ADD_ITEM_SUCCESS = 'CART_ADD_ITEM_SUCCESS';
 
 /* ======================
    CART DATA TYPES
@@ -45,6 +46,7 @@ export interface CartPagination {
 export interface CartState {
   loading: boolean;
   items: CartItem[];
+  itemMap: Record<string, CartItem>; // productId -> CartItem
   error: string | null;
   pagination: CartPagination;
 }
@@ -69,4 +71,8 @@ export type CartActionTypes =
       payload: { cartId: string; quantity: number };
     }
   | { type: typeof CART_REMOVE_ITEM; payload: string }
-  | { type: typeof CART_ADD_ITEM; payload: CartItem };
+  | { type: typeof CART_ADD_ITEM; payload: CartItem }
+  | {
+      type: typeof CART_ADD_ITEM_SUCCESS;
+      payload: { tempId: string; item: CartItem };
+    };

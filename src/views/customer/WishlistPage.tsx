@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Heart } from 'lucide-react';
+import { Heart, Sparkles, ChevronLeft } from 'lucide-react';
 
 import { fetchWishlist } from '../../redux/actions/wishlistActions';
 import { fetchCart } from '../../redux/actions/cartActions';
@@ -45,7 +45,11 @@ export default function WishlistPage() {
         <EmptyState
           title="Please Log In"
           description="You need to be logged in to view your wishlist."
-          icon={<Heart size={48} className="text-gray-400" />}
+          icon={
+            <div className="p-4 bg-gray-50 rounded-full">
+              <Heart size={48} className="text-gray-300" />
+            </div>
+          }
           action={{
             label: 'Sign In',
             onClick: () => navigate('/login'),
@@ -67,30 +71,71 @@ export default function WishlistPage() {
     return (
       <div className="min-h-[70vh] flex items-center justify-center px-6">
         <EmptyState
-          icon={<Heart size={48} className="text-pink-400" />}
+          icon={
+            <div className="relative group">
+              <div className="absolute inset-0 bg-red-400 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+              <Heart
+                size={64}
+                className="text-red-500 relative fill-red-50 drop-shadow-xl animate-pulse"
+              />
+            </div>
+          }
           title="Your wishlist is empty"
           description="Save items you love and find them here 💖"
+          action={{
+            label: 'Continue Shopping',
+            onClick: () => navigate('/products'),
+          }}
         />
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-gray-900">Your Wishlist</h1>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* HEADER SECTION */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fadeDown">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2.5 bg-red-50 rounded-2xl border border-red-100 shadow-sm">
+                <Heart size={24} className="text-red-500 fill-red-500" />
+              </div>
+              <h1 className="text-4xl font-black text-gray-900 tracking-tight">
+                My Wishlist
+              </h1>
+            </div>
+            <p className="text-gray-500 font-medium flex items-center gap-2">
+              <Sparkles size={14} className="text-yellow-500" />
+              Keep track of products you want to buy later
+            </p>
+          </div>
 
-      <WishlistGrid items={items} />
-
-      {totalPages > 1 && (
-        <div className="mt-10 flex justify-center">
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            onPageChange={(p) => dispatch(fetchWishlist(p, PAGE_LIMIT))}
-            isLoading={loading}
-          />
+          <button
+            onClick={() => navigate('/products')}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
+          >
+            <ChevronLeft
+              size={18}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
+            Continue Shopping
+          </button>
         </div>
-      )}
+
+        <WishlistGrid items={items} />
+
+        {totalPages > 1 && (
+          <div className="mt-10 flex justify-center">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(p) => dispatch(fetchWishlist(p, PAGE_LIMIT))}
+              isLoading={loading}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

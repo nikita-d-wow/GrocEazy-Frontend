@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import type { CartItem } from '../../../redux/types/cartTypes';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ChevronRight, Minus, Plus, Clock } from 'lucide-react';
+import { ChevronRight, Minus, Plus, Clock, Heart } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
@@ -18,6 +18,10 @@ import {
   removeCartItem,
   fetchCart,
 } from '../../../redux/actions/cartActions';
+import {
+  addToWishlist,
+  removeWishlistItem,
+} from '../../../redux/actions/wishlistActions';
 
 import {
   selectProducts,
@@ -40,6 +44,9 @@ const ProductDetailsPage: FC = () => {
   const topProducts = useSelector(selectTopProducts);
   const cartItems = useSelector(selectCartItems);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { idMap: wishlistIdMap } = useSelector(
+    (state: RootState) => state.wishlist
+  );
 
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -65,6 +72,36 @@ const ProductDetailsPage: FC = () => {
     (item: CartItem) => (item.product?._id || item.product) === product?._id
   );
   const cartQuantity = cartItem?.quantity ?? 0;
+
+  const wishlistId = wishlistIdMap[product?._id || ''];
+  const isInWishlist = !!wishlistId;
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      toast.error('Please login to use wishlist');
+      return;
+    }
+    if (!product) {
+      return;
+    }
+
+    if (isInWishlist) {
+      await dispatch(removeWishlistItem(wishlistId));
+      toast.success('Removed from wishlist');
+    } else {
+      await dispatch(
+        addToWishlist(product._id, {
+          _id: product._id,
+          name: product.name,
+          price: product.price,
+          images: product.images,
+          stock: product.stock,
+          description: product.description,
+        })
+      );
+      toast.success('Added to wishlist');
+    }
+  };
 
   const handleAddToCart = async () => {
     if (!product) {
@@ -113,16 +150,16 @@ const ProductDetailsPage: FC = () => {
 
   const categoryName =
     typeof product.categoryId === 'object'
-      ? (product.categoryId as any).name
+      ? (product.categoryId as { name: string }).name
       : 'Groceries';
 
   const categoryId =
     typeof product.categoryId === 'object'
-      ? (product.categoryId as any)._id
+      ? (product.categoryId as { _id: string })._id
       : product.categoryId;
 
   return (
-    <div className="bg-gray-50 min-h-screen pb-24 font-sans text-gray-900">
+    <div className="bg-white min-h-screen pb-24 font-sans text-gray-900">
       {/* Breadcrumb Header */}
       <div className="bg-white border-b shadow-sm overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm text-gray-500 overflow-x-auto whitespace-nowrap no-scrollbar">
@@ -197,11 +234,27 @@ const ProductDetailsPage: FC = () => {
                 {product.name}
               </h1>
 
-              <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg w-fit mb-4">
-                <Clock className="w-4 h-4 text-gray-700" />
-                <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">
-                  10 MINS
-                </span>
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg w-fit">
+                  <Clock className="w-4 h-4 text-gray-700" />
+                  <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                    10 MINS
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleWishlistToggle}
+                  className={`p-2.5 rounded-xl transition-all shadow-sm ${
+                    isInWishlist
+                      ? 'bg-red-50 text-red-500 border border-red-100'
+                      : 'bg-white text-gray-400 border border-gray-100 hover:text-red-500'
+                  }`}
+                >
+                  <Heart
+                    size={22}
+                    fill={isInWishlist ? 'currentColor' : 'none'}
+                  />
+                </button>
               </div>
 
               <div className="text-lg font-medium text-gray-500 mb-6">

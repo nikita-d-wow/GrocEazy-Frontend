@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Wallet, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Wallet, ArrowRight, ChevronLeft, AlertCircle } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
 
@@ -13,8 +13,18 @@ const Checkout = () => {
 
   if (!items.length) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Your cart is empty
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <div className="p-4 bg-gray-50 rounded-full">
+          <ChevronLeft
+            size={48}
+            className="text-gray-300 cursor-pointer hover:text-primary transition-colors"
+            onClick={() => navigate('/cart')}
+          />
+        </div>
+        <p className="text-gray-500 font-medium text-lg">Your cart is empty</p>
+        <Link to="/cart" className="text-primary hover:underline font-semibold">
+          Go to Cart
+        </Link>
       </div>
     );
   }
@@ -26,8 +36,61 @@ const Checkout = () => {
   const delivery = subtotal > 499 ? 0 : 40;
   const total = subtotal + delivery;
 
+  const isStockValid = items.every(
+    (item) => item.quantity <= (item.product.stock ?? 0)
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
+      {/* HEADER WITH BACK BUTTON */}
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          onClick={() => navigate('/cart')}
+          className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-600 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
+          title="Back to Cart"
+        >
+          <ChevronLeft
+            size={22}
+            className="group-hover:-translate-x-0.5 transition-transform"
+          />
+        </button>
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            Checkout
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Review and confirm your order items
+          </p>
+        </div>
+      </div>
+
+      {!isStockValid && (
+        <div className="mb-8 overflow-hidden relative group">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 blur-xl group-hover:opacity-100 opacity-60 transition-opacity" />
+          <div className="relative p-5 glass-card border-red-200/50 bg-red-50/80 backdrop-blur-md rounded-3xl flex items-start gap-4 text-red-700 shadow-xl shadow-red-500/5 animate-fadeDown">
+            <div className="p-2.5 bg-red-100 rounded-2xl text-red-600 shadow-inner">
+              <AlertCircle size={24} />
+            </div>
+            <div>
+              <p className="font-bold text-lg leading-tight mb-1">
+                Stock Availability Issue
+              </p>
+              <p className="text-sm text-red-600/80 font-medium">
+                Some items in your cart are no longer available in the
+                quantities you've selected. Please return to your cart to make
+                adjustments before you can complete this purchase.
+              </p>
+              <button
+                onClick={() => navigate('/cart')}
+                className="mt-3 text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all text-red-700 cursor-pointer hover:underline"
+              >
+                Return to Cart <ArrowRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-3 gap-8">
         {/* LEFT */}
         <div className="lg:col-span-2 glass-card p-6">
@@ -35,27 +98,43 @@ const Checkout = () => {
             Order Summary
           </h2>
 
-          {items.map((item) => (
-            <div
-              key={item.product._id}
-              className="flex items-center gap-4 py-4 border-b border-gray-100 last:border-0"
-            >
-              <img
-                src={item.product.images?.[0]}
-                alt={item.product.name}
-                className="w-16 h-16 rounded-lg object-cover shadow-sm"
-              />
+          {items.map((item) => {
+            const hasStockIssue = item.quantity > (item.product.stock ?? 0);
+            return (
+              <div
+                key={item.product._id}
+                className={`flex items-center gap-4 py-4 border-b border-gray-100 last:border-0 ${
+                  hasStockIssue ? 'bg-red-50/50 -mx-4 px-4 rounded-lg' : ''
+                }`}
+              >
+                <img
+                  src={item.product.images?.[0]}
+                  alt={item.product.name}
+                  className="w-16 h-16 rounded-lg object-cover shadow-sm"
+                />
 
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">{item.product.name}</p>
-                <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                <div className="flex-1">
+                  <p className="font-medium text-gray-900">
+                    {item.product.name}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm text-gray-500">
+                      Qty: {item.quantity}
+                    </p>
+                    {hasStockIssue && (
+                      <span className="text-xs font-bold text-red-600 uppercase">
+                        Insufficient Stock: {item.product.stock ?? 0} left
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <p className="font-semibold text-gray-900">
+                  ₹{(item.product.price * item.quantity).toFixed(2)}
+                </p>
               </div>
-
-              <p className="font-semibold text-gray-900">
-                ₹{(item.product.price * item.quantity).toFixed(2)}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* RIGHT */}
@@ -98,9 +177,20 @@ const Checkout = () => {
                 state: { paymentMethod, total },
               })
             }
-            className="mt-6 w-full bg-primary text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] cursor-pointer"
+            disabled={!isStockValid}
+            className={`mt-6 w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition shadow-lg transition-all active:scale-[0.98] ${
+              !isStockValid
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                : 'bg-primary text-white hover:bg-primary-dark shadow-primary/20 hover:shadow-primary/40 cursor-pointer'
+            }`}
           >
-            Continue <ArrowRight size={18} />
+            {isStockValid ? (
+              <>
+                Continue <ArrowRight size={18} />
+              </>
+            ) : (
+              'Adjust Stock to Continue'
+            )}
           </button>
         </div>
       </div>

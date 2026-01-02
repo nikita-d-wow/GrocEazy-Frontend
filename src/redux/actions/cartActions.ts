@@ -8,8 +8,11 @@ import {
   CART_UPDATE_ITEM,
   CART_REMOVE_ITEM,
   CART_ADD_ITEM,
+  CART_ADD_ITEM_SUCCESS,
+  type CartProduct,
 } from '../types/cartTypes';
 import type { AppDispatch } from '../store';
+import type { RootState } from '../rootReducer';
 
 const DEFAULT_LIMIT = 5;
 
@@ -42,7 +45,7 @@ export const fetchCart =
 
 /* ================= UPDATE QUANTITY ================= */
 export const updateCartQty = (cartId: string, quantity: number) => {
-  return async (dispatch: AppDispatch, getState: any) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
     // Optimistic update
     dispatch({
       type: CART_UPDATE_ITEM,
@@ -56,12 +59,12 @@ export const updateCartQty = (cartId: string, quantity: number) => {
 
       await api.put(`/api/cart/${cartId}`, { quantity });
 
-      // Background sync to ensure total price is correct etc
+      // Background sync
       const { page, limit } = getState().cart.pagination;
       dispatch(fetchCart(page, limit));
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to update quantity');
-      // Revert would be good here, for now just re-fetching
+    } catch (err: unknown) {
+      const error = err as any;
+      toast.error(error.response?.data?.message || 'Failed to update quantity');
       const { page, limit } = getState().cart.pagination;
       dispatch(fetchCart(page, limit));
     }
@@ -70,7 +73,7 @@ export const updateCartQty = (cartId: string, quantity: number) => {
 
 /* ================= REMOVE ITEM ================= */
 export const removeCartItem = (cartId: string) => {
-  return async (dispatch: AppDispatch, getState: any) => {
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
     // Optimistic remove
     dispatch({
       type: CART_REMOVE_ITEM,
@@ -84,9 +87,9 @@ export const removeCartItem = (cartId: string) => {
       dispatch(fetchCart(page, limit));
 
       toast.success('Item removed from cart');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to remove item');
-      // Revert if needed
+    } catch (err: unknown) {
+      const error = err as any;
+      toast.error(error.response?.data?.message || 'Failed to remove item');
       const { page, limit } = getState().cart.pagination;
       dispatch(fetchCart(page, limit));
     }
@@ -100,8 +103,9 @@ export const clearCart = () => {
       await api.delete('/api/cart');
       dispatch({ type: CART_CLEAR });
       toast.success('Cart cleared');
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to clear cart');
+    } catch (err: unknown) {
+      const error = err as any;
+      toast.error(error.response?.data?.message || 'Failed to clear cart');
     }
   };
 };
@@ -120,20 +124,22 @@ export const addToCart = (
   quantity = 1,
   product?: OptimisticProduct
 ) => {
-  return async (dispatch: AppDispatch, getState: any) => {
-    const { auth, cart } = getState();
+  return async (dispatch: AppDispatch, getState: () => RootState) => {
+    const { auth } = getState();
 
     if (!auth.user) {
       toast.error('Please log in to add items to cart');
       return;
     }
 
+    const tempId = `temp-${Date.now()}`;
+
     // Optimistic Update
     if (product) {
       dispatch({
         type: CART_ADD_ITEM,
         payload: {
-          _id: `temp-${Date.now()}`, // Temporary ID
+          _id: tempId,
           productId: product._id,
           quantity,
           lineTotal: product.price * quantity,
@@ -149,15 +155,31 @@ export const addToCart = (
     }
 
     try {
-      await api.post('/api/cart', { productId, quantity });
+      const { data } = await api.post('/api/cart', { productId, quantity });
 
-      dispatch(fetchCart(cart.pagination.page, cart.pagination.limit));
+      if (data.success && data.item) {
+        dispatch({
+          type: CART_ADD_ITEM_SUCCESS,
+          payload: {
+            tempId,
+            item: {
+              ...data.item,
+              productId: data.item.productId._id || data.item.productId,
+              product: data.item.productId as CartProduct,
+            },
+          },
+        });
+      }
+
       if (!product) {
         toast.success('Added to cart');
       }
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to add item to cart');
-      // Revert if needed, but fetchCart usually fixes it
+    } catch (err: unknown) {
+      const error = err as any;
+      toast.error(
+        error.response?.data?.message || 'Failed to add item to cart'
+      );
+      const { cart } = getState();
       dispatch(fetchCart(cart.pagination.page, cart.pagination.limit));
     }
   };
