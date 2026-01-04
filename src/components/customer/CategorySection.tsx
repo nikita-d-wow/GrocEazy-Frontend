@@ -18,8 +18,14 @@ export default function CategoriesSection() {
   }, [dispatch, categories.length]);
 
   // Filter out deleted categories
-  const visibleCategories = categories
+  // Filter out deleted categories and sort by creation date (earliest first)
+  const visibleCategories = [...categories]
     .filter((cat) => !cat.isDeleted && cat.isActive !== false)
+    .sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateA - dateB;
+    })
     .slice(0, 8); // Show max 8 categories
 
   return (

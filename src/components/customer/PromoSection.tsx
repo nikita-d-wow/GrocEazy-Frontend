@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+// Force re-index
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../redux/actions/useDispatch';

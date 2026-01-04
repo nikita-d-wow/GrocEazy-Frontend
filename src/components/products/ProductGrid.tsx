@@ -2,9 +2,21 @@ import type { FC } from 'react';
 import ProductCard from '../customer/ProductCard';
 import type { Product } from '../../types/Product';
 
+import { motion } from 'framer-motion';
+
 interface Props {
   products: Product[];
 }
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
 const ProductGrid: FC<Props> = ({ products }) => {
   if (!products || products.length === 0) {
@@ -16,7 +28,13 @@ const ProductGrid: FC<Props> = ({ products }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <motion.div
+      key={products.length > 0 ? products[0]._id : 'empty'}
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+    >
       {products.map((product, index) => (
         <ProductCard
           key={product._id}
@@ -28,7 +46,7 @@ const ProductGrid: FC<Props> = ({ products }) => {
           index={index}
         />
       ))}
-    </div>
+    </motion.div>
   );
 };
 

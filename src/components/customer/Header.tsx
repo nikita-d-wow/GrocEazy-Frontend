@@ -8,6 +8,8 @@ import type { RootState } from '../../redux/store';
 import { logout } from '../../redux/actions/authActions';
 import UserProfileDropdown from './UserProfileDropdown';
 import { adminNav, managerNav, customerNav } from '../../utils/navitems';
+import { selectCartItems } from '../../redux/selectors/cartSelectors';
+import { selectWishlistItems } from '../../redux/selectors/wishlistSelectors';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -17,6 +19,11 @@ export default function Header() {
   });
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
+  const cartItems = useSelector(selectCartItems);
+  const wishlistItems = useSelector(selectWishlistItems);
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const wishlistCount = wishlistItems.length;
 
   // 1. Sync state FROM URL (Handles browser back/forward and external navigations)
   React.useEffect(() => {
@@ -169,7 +176,14 @@ export default function Header() {
                     : 'hover:bg-pink-50 text-gray-500 hover:text-pink-500'
                 }`}
               >
-                <Heart className="w-5 h-5" />
+                <div className="relative">
+                  <Heart className="w-5 h-5" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </div>
               </Link>
 
               <Link
@@ -180,7 +194,14 @@ export default function Header() {
                     : 'hover:bg-green-50 text-gray-500 hover:text-green-600'
                 }`}
               >
-                <ShoppingCart className="w-5 h-5" />
+                <div className="relative">
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
               </Link>
             </div>
           )}
@@ -210,7 +231,14 @@ export default function Header() {
                     : 'text-gray-500 hover:bg-pink-50 hover:text-pink-500'
                 }`}
               >
-                <Heart className="w-6 h-6" />
+                <div className="relative">
+                  <Heart className="w-6 h-6" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </div>
               </Link>
               <Link
                 to="/cart"
@@ -220,7 +248,14 @@ export default function Header() {
                     : 'text-gray-500 hover:bg-green-50 hover:text-green-600'
                 }`}
               >
-                <ShoppingCart className="w-6 h-6" />
+                <div className="relative">
+                  <ShoppingCart className="w-6 h-6" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
               </Link>
             </>
           )}

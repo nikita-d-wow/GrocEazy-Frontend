@@ -17,35 +17,10 @@ const Pagination: FC<PaginationProps> = ({
   isLoading = false,
 }) => {
   const scrollToTop = () => {
-    // Strategic timeout to wait for any DOM/layout shifts
+    // Immediate scroll (auto) feels faster for paginated data
     setTimeout(() => {
-      try {
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: 'smooth',
-        });
-
-        // Fallback for document scrolling
-        if (document.documentElement) {
-          document.documentElement.scrollTo({
-            top: 0,
-            behavior: 'smooth',
-          });
-        }
-
-        // Final fallback for body scrolling
-        if (document.body) {
-          document.body.scrollTo({
-            top: 0,
-            behavior: 'smooth',
-          });
-        }
-      } catch (err) {
-        // Ultimate fallback to instant jump if smooth scroll options fail
-        window.scrollTo(0, 0);
-      }
-    }, 100);
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    }, 50);
   };
 
   useEffect(() => {
@@ -56,8 +31,6 @@ const Pagination: FC<PaginationProps> = ({
     if (isLoading || page < 1 || page > totalPages) {
       return;
     }
-
-    scrollToTop();
     onPageChange(page);
   };
 
@@ -94,47 +67,52 @@ const Pagination: FC<PaginationProps> = ({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className={`flex items-center justify-center gap-2 ${className}`}>
+    <div className={`flex items-center justify-center gap-3 ${className}`}>
       {/* Previous */}
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={currentPage === 1 || isLoading}
         aria-label="Previous page"
         className="
-          p-2 rounded-lg border border-gray-200
-          text-primary hover:bg-primary/10
-          disabled:opacity-40 disabled:cursor-not-allowed
-          transition-colors cursor-pointer
+          p-2.5 rounded-xl border border-gray-100 bg-white
+          text-gray-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200
+          disabled:opacity-30 disabled:cursor-not-allowed
+          transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer
         "
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
 
       {/* Page Numbers */}
-      {pageNumbers.map((page, idx) =>
-        page === '...' ? (
-          <span key={`ellipsis-${idx}`} className="px-2 text-gray-400">
-            ...
-          </span>
-        ) : (
-          <button
-            key={page}
-            onClick={() => handlePageChange(page as number)}
-            disabled={isLoading}
-            className={`
-              min-w-[40px] h-10 px-3 rounded-lg font-medium transition-all
-              ${
-                currentPage === page
-                  ? 'bg-primary text-white shadow-md'
-                  : 'border border-gray-200 text-gray-700 hover:bg-primary/10 hover:text-primary'
-              }
-              disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer
-            `}
-          >
-            {page}
-          </button>
-        )
-      )}
+      <div className="flex items-center gap-2">
+        {pageNumbers.map((page, idx) =>
+          page === '...' ? (
+            <span
+              key={`ellipsis-${idx}`}
+              className="px-1 text-gray-300 font-bold self-end pb-1"
+            >
+              ...
+            </span>
+          ) : (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page as number)}
+              disabled={isLoading}
+              className={`
+                min-w-[42px] h-[42px] px-2 rounded-xl font-bold transition-all duration-300
+                ${
+                  currentPage === page
+                    ? 'bg-[#bbf7d0] text-green-900 shadow-sm scale-110 border border-green-200'
+                    : 'bg-white border border-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-600 hover:border-green-100'
+                }
+                disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer
+              `}
+            >
+              {page}
+            </button>
+          )
+        )}
+      </div>
 
       {/* Next */}
       <button
@@ -142,10 +120,10 @@ const Pagination: FC<PaginationProps> = ({
         disabled={currentPage === totalPages || isLoading}
         aria-label="Next page"
         className="
-          p-2 rounded-lg border border-gray-200
-          text-primary hover:bg-primary/10
-          disabled:opacity-40 disabled:cursor-not-allowed
-          transition-colors cursor-pointer
+          p-2.5 rounded-xl border border-gray-100 bg-white
+          text-gray-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200
+          disabled:opacity-30 disabled:cursor-not-allowed
+          transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer
         "
       >
         <ChevronRight className="w-5 h-5" />

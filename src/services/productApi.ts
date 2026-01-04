@@ -3,14 +3,43 @@ import type { Product, ProductFormData } from '../types/Product';
 import toast from 'react-hot-toast';
 
 /**
- * Get all products (public endpoint)
+ * Get all products (public endpoint with pagination)
  */
-export const getProducts = async (): Promise<Product[]> => {
-  const response = await api.get<Product[] | { products: Product[] }>(
-    '/api/products'
-  );
-  // Backend might return { products: [...] } or just the array
-  return Array.isArray(response.data) ? response.data : response.data.products;
+export const getProducts = async (
+  page?: number,
+  limit?: number,
+  search?: string,
+  categoryId?: string,
+  minPrice?: number,
+  maxPrice?: number,
+  sortBy?: string
+): Promise<any> => {
+  const url = `/api/products?`;
+  const params = new URLSearchParams();
+  if (page) {
+    params.append('page', page.toString());
+  }
+  if (limit) {
+    params.append('limit', limit.toString());
+  }
+  if (search) {
+    params.append('search', search);
+  }
+  if (categoryId) {
+    params.append('categoryId', categoryId);
+  }
+  if (minPrice !== undefined) {
+    params.append('minPrice', minPrice.toString());
+  }
+  if (maxPrice !== undefined) {
+    params.append('maxPrice', maxPrice.toString());
+  }
+  if (sortBy) {
+    params.append('sortBy', sortBy);
+  }
+
+  const response = await api.get<any>(`${url}${params.toString()}`);
+  return response.data;
 };
 
 /**
@@ -18,13 +47,20 @@ export const getProducts = async (): Promise<Product[]> => {
  */
 export const getManagerProducts = async (
   page: number = 1,
-  limit: number = 20
-): Promise<Product[]> => {
-  const response = await api.get<Product[] | { products: Product[] }>(
-    `/api/products/manager/all?page=${page}&limit=${limit}`
-  );
-  // Backend might return { products: [...] } or just the array
-  return Array.isArray(response.data) ? response.data : response.data.products;
+  limit: number = 20,
+  search?: string,
+  isActive?: boolean
+): Promise<any> => {
+  let url = `/api/products/manager/all?page=${page}&limit=${limit}`;
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`;
+  }
+  if (isActive !== undefined) {
+    url += `&isActive=${isActive}`;
+  }
+
+  const response = await api.get<any>(url);
+  return response.data;
 };
 
 /**

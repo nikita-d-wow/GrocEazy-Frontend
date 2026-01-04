@@ -121,9 +121,9 @@ export default function Footer() {
             <span className="cursor-default hover:text-green-600">
               Privacy Policy
             </span>
-            <span className="cursor-default hover:text-green-600">
+            <Link to="/terms" className="hover:text-green-600">
               Terms of Service
-            </span>
+            </Link>
           </div>
         </div>
       </div>

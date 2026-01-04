@@ -13,23 +13,32 @@ import {
 } from '../reducers/productReducer';
 
 /**
- * Fetch all products
+ * Fetch products for customer (public endpoint)
  */
 export const fetchProducts =
-  (force = false) =>
-  async (dispatch: AppDispatch, getState: () => any) => {
-    const { products, loading } = getState().product;
-
-    // Cache check: skip if loading or if we already have products and not forcing
-    if (loading || (products.length > 0 && !force)) {
-      return;
-    }
-
+  (
+    page?: number,
+    limit?: number,
+    search?: string,
+    categoryId?: string,
+    minPrice?: number,
+    maxPrice?: number,
+    sortBy?: string
+  ) =>
+  async (dispatch: AppDispatch) => {
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
-      const products = await productApi.getProducts();
-      dispatch(setProducts(products));
+      const data = await productApi.getProducts(
+        page,
+        limit,
+        search,
+        categoryId,
+        minPrice,
+        maxPrice,
+        sortBy
+      );
+      dispatch(setProducts(data));
     } catch (error: any) {
       dispatch(
         setError(error.response?.data?.message || 'Failed to fetch products')
@@ -43,40 +52,23 @@ export const fetchProducts =
  * Fetch all products for manager (includes inactive)
  */
 export const fetchManagerProducts =
-  (page = 1, limit = 20, force = false) =>
+  (page = 1, limit = 20, search?: string, isActive?: boolean) =>
   async (dispatch: AppDispatch, getState: () => any) => {
-    const { products, loading } = getState().product;
-
-    // Cache check: skip if loading or if we already have products and not forcing
-    // However, if we are specifically asking for a page, we should probably fetch.
-    if (loading || (products.length > 0 && !force && page === 1)) {
+    const { loading } = getState().product;
+    if (loading) {
       return;
     }
 
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
-      const products = await productApi.getManagerProducts(page, limit);
-      dispatch(setProducts(products));
-    } catch (error: any) {
-      dispatch(
-        setError(error.response?.data?.message || 'Failed to fetch products')
+      const data = await productApi.getManagerProducts(
+        page,
+        limit,
+        search,
+        isActive
       );
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-
-/**
- * Fetch products by category
- */
-export const fetchProductsByCategory =
-  (categoryId: string) => async (dispatch: AppDispatch) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
-    try {
-      const products = await productApi.getProductsByCategory(categoryId);
-      dispatch(setProducts(products));
+      dispatch(setProducts(data));
     } catch (error: any) {
       dispatch(
         setError(error.response?.data?.message || 'Failed to fetch products')

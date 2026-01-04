@@ -1,11 +1,4 @@
-import React, {
-  type FC,
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
+import React, { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Plus, Edit2, Trash2, Search, Layers } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,13 +6,14 @@ import { useDebounce } from '../../customhooks/useDebounce';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
-  fetchCategories,
+  fetchPagedCategories,
   deleteCategory,
 } from '../../redux/actions/categoryActions';
 
 import {
   selectCategories,
   selectCategoryLoading,
+  selectCategoryPagination,
 } from '../../redux/selectors/categorySelectors';
 
 import type { Category } from '../../types/Category';
@@ -29,6 +23,7 @@ import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import Pagination from '../../components/common/Pagination';
 
 const CategoryRow = React.memo(
   ({
@@ -100,60 +95,19 @@ CategoryRow.displayName = 'CategoryRow';
 
 const CategoryManagement: FC = () => {
   const dispatch = useAppDispatch();
-
   const categories = useSelector(selectCategories);
   const loading = useSelector(selectCategoryLoading);
+  const pagination = useSelector(selectCategoryPagination);
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
-
-  // Incremental Rendering State
-  const [visibleCount, setVisibleCount] = useState(20);
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
-
-  const filteredCategories = useMemo(() => {
-    return categories.filter(
-      (c) =>
-        !c.isDeleted &&
-        c &&
-        c.name &&
-        c.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-    );
-  }, [categories, debouncedSearchTerm]);
-
-  // Intersection Observer for Infinite Scroll effect
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          visibleCount < filteredCategories.length
-        ) {
-          setVisibleCount((prev) => prev + 20);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [filteredCategories.length, visibleCount]);
-
-  // Reset visible count when search term changes (Adjust state during render to avoid Effect)
-  const [lastSearch, setLastSearch] = useState(debouncedSearchTerm);
-  if (debouncedSearchTerm !== lastSearch) {
-    setLastSearch(debouncedSearchTerm);
-    setVisibleCount(20);
-  }
+    dispatch(fetchPagedCategories(page, 10, debouncedSearchTerm));
+  }, [dispatch, page, debouncedSearchTerm]);
 
   const handleDelete = useCallback(
     async (id: string) => {
@@ -204,7 +158,10 @@ const CategoryManagement: FC = () => {
             <Input
               placeholder="Search categories..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
               leftIcon={<Search className="w-5 h-5" />}
             />
           </div>
@@ -218,7 +175,7 @@ const CategoryManagement: FC = () => {
             Loading categories...
           </p>
         </div>
-      ) : filteredCategories.length === 0 ? (
+      ) : categories.length === 0 ? (
         <EmptyState
           title="No Categories Found"
           description={
@@ -234,7 +191,7 @@ const CategoryManagement: FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
@@ -250,8 +207,10 @@ const CategoryManagement: FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredCategories.slice(0, visibleCount).map((category) => (
+              <tbody
+                className={`divide-y divide-gray-100 transition-opacity duration-200 ${loading ? 'opacity-50' : 'opacity-100'}`}
+              >
+                {categories.map((category) => (
                   <CategoryRow
                     key={category._id}
                     category={category}
@@ -263,19 +222,13 @@ const CategoryManagement: FC = () => {
             </table>
           </div>
 
-          {/* Intersection trigger at the bottom */}
-          {visibleCount < filteredCategories.length && (
-            <div
-              ref={loaderRef}
-              className="p-4 flex justify-center border-t border-gray-50"
-            >
-              <Loader size="sm" />
-            </div>
-          )}
-
-          {loading && categories.length > 0 && (
-            <div className="p-4 flex justify-center border-t border-gray-50">
-              <Loader size="sm" />
+          {pagination && pagination.pages > 1 && (
+            <div className="p-4 border-t border-gray-50">
+              <Pagination
+                currentPage={page}
+                totalPages={pagination.pages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </div>

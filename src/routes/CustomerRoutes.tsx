@@ -19,11 +19,13 @@ import ProtectedRoute from './ProtectedRoute';
 import SetPassword from '../views/auth/SetPassword';
 import ForgotPassword from '../views/auth/ForgotPassword';
 import ResetPassword from '../views/auth/ResetPassword';
+import TermsPage from '../views/customer/TermsPage';
 
 export const CustomerRoutes = (
   <>
     <Route element={<CustomerLayout />}>
       <Route index element={<Dashboard />} />
+      <Route path="/terms" element={<TermsPage />} />
       <Route path="/contact" element={<ContactSupport />} />
       <Route path="/orders" element={<OrdersPage />} />
       <Route path="/orders/:id" element={<OrderDetails />} />

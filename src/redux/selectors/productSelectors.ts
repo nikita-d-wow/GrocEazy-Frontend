@@ -20,3 +20,6 @@ export const selectTopProducts = createSelector(
 export const selectProductLoading = (state: RootState) => state.product.loading;
 
 export const selectProductError = (state: RootState) => state.product.error;
+
+export const selectProductPagination = (state: RootState) =>
+  state.product.pagination;

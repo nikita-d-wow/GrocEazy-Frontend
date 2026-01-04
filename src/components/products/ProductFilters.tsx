@@ -37,9 +37,9 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
     });
   };
 
-  const visibleCategories = (categories || []).filter(
-    (cat: Category) => !cat.isDeleted
-  );
+  const visibleCategories = [...(categories || [])]
+    .filter((cat: Category) => !cat.isDeleted)
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit sticky top-20">
@@ -98,7 +98,7 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
         </h4>
         <PriceRangeSlider
           min={0}
-          max={1000}
+          max={5000}
           value={filters.priceRange}
           onChange={(newRange) =>
             setFilters({ ...filters, priceRange: newRange })

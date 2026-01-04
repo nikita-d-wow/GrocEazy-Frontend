@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+// Force re-index of image utility
 import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 //import { motion } from 'framer-motion';

@@ -2,13 +2,36 @@ import api from './api';
 import type { Category, CategoryFormData } from '../types/Category';
 
 /**
- * Get all categories (public endpoint)
+ * Get categories with pagination (public or manager)
+ */
+export const getPagedCategories = async (
+  page = 1,
+  limit = 20,
+  search?: string
+): Promise<{
+  categories: Category[];
+  total: number;
+  page: number;
+  pages: number;
+}> => {
+  const response = await api.get<{
+    categories: Category[];
+    total: number;
+    page: number;
+    pages: number;
+  }>('/api/categories', {
+    params: { page, limit, search },
+  });
+  return response.data;
+};
+
+/**
+ * Get all categories (public endpoint - legacy support)
  */
 export const getCategories = async (): Promise<Category[]> => {
   const response = await api.get<Category[] | { categories: Category[] }>(
-    '/api/categories'
+    '/api/categories?limit=100' // High limit for legacy one-time fetch
   );
-  // Backend might return { categories: [...] } or just the array
   return Array.isArray(response.data)
     ? response.data
     : response.data.categories;
