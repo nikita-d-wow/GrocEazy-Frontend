@@ -26,7 +26,9 @@ export default function MobileCategorySidebar({
 
         const categoriesData = (
           Array.isArray(res.data) ? res.data : res.data.categories || []
-        ).filter((cat: Category) => cat.isActive !== false);
+        )
+          .filter((cat: Category) => cat.isActive !== false)
+          .sort((a: Category, b: Category) => a.name.localeCompare(b.name));
 
         setCategories(categoriesData);
       })

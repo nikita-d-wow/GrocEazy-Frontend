@@ -26,7 +26,7 @@ export default function CategoryCard({
     >
       <div className="w-16 h-16 flex items-center justify-center mb-3">
         <img
-          src={getOptimizedImage(image, 128)} // Request 128px for 2x retina
+          src={getOptimizedImage(image, { width: 128, height: 128 })} // Request 128px for 2x retina
           alt={text}
           loading="lazy"
           className="w-full h-full object-contain mix-blend-multiply transition-transform hover:rotate-6"

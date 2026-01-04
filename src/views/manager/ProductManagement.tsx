@@ -1,11 +1,4 @@
-import React, {
-  type FC,
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
+import React, { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Plus, Edit2, Trash2, Search, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -19,7 +12,10 @@ import {
 import {
   selectProducts,
   selectProductLoading,
+  selectProductPagination,
 } from '../../redux/selectors/productSelectors';
+import Pagination from '../../components/common/Pagination';
+import { optimizeCloudinaryUrl } from '../../utils/imageUtils';
 
 import type { Product } from '../../types/Product';
 
@@ -57,7 +53,7 @@ const ProductRow = React.memo(
               <img
                 className="h-full w-full rounded-lg object-cover"
                 src={
-                  product.images?.[0] ||
+                  optimizeCloudinaryUrl(product.images?.[0]) ||
                   `https://ui-avatars.com/api/?name=${product.name}`
                 }
                 alt={product.name}
@@ -147,69 +143,27 @@ const ProductManagement: FC = () => {
   const dispatch = useAppDispatch();
   const products = useSelector(selectProducts);
   const loading = useSelector(selectProductLoading);
+  const pagination = useSelector(selectProductPagination);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [statusFilter, setStatusFilter] = useState('all');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
-  // Incremental Rendering State
-  const [visibleCount, setVisibleCount] = useState(20);
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchManagerProducts(1, 20, true));
-  }, [dispatch]);
+    const isActive =
+      statusFilter === 'all'
+        ? undefined
+        : statusFilter === 'active'
+          ? true
+          : false;
 
-  const filteredProducts = useMemo(
-    () =>
-      products.filter((p) => {
-        if (!p || !p.name) {
-          return false;
-        }
+    dispatch(fetchManagerProducts(page, 10, debouncedSearchTerm, isActive));
+  }, [dispatch, page, debouncedSearchTerm, statusFilter]);
 
-        const matchesSearch = p.name
-          .toLowerCase()
-          .includes(debouncedSearchTerm.toLowerCase());
-
-        const matchesStatus =
-          statusFilter === 'all' ||
-          (statusFilter === 'active' && p.isActive) ||
-          (statusFilter === 'inactive' && !p.isActive);
-
-        return matchesSearch && matchesStatus;
-      }),
-    [products, debouncedSearchTerm, statusFilter]
-  );
-
-  // Intersection Observer for Infinite Scroll effect
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          visibleCount < filteredProducts.length
-        ) {
-          setVisibleCount((prev) => prev + 20);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [filteredProducts.length, visibleCount]);
-
-  // Reset visible count when search term changes (Adjust state during render to avoid Effect)
-  const [lastSearch, setLastSearch] = useState(debouncedSearchTerm);
-  if (debouncedSearchTerm !== lastSearch) {
-    setLastSearch(debouncedSearchTerm);
-    setVisibleCount(20);
-  }
+  const displayProducts = products;
 
   const handleEdit = useCallback((product: Product) => {
     setEditingProduct(product);
@@ -255,7 +209,10 @@ const ProductManagement: FC = () => {
               <Input
                 placeholder="Search products..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
                 leftIcon={<Search className="w-5 h-5" />}
               />
             </div>
@@ -263,7 +220,10 @@ const ProductManagement: FC = () => {
               label="Filter by Status"
               options={STATUS_OPTIONS}
               value={statusFilter}
-              onChange={setStatusFilter}
+              onChange={(value) => {
+                setStatusFilter(value);
+                setPage(1);
+              }}
               className="w-full md:w-48"
             />
           </div>
@@ -277,7 +237,7 @@ const ProductManagement: FC = () => {
             Loading products...
           </p>
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : displayProducts.length === 0 ? (
         <EmptyState
           title="No Products Found"
           description={
@@ -296,7 +256,9 @@ const ProductManagement: FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div
+          className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
+        >
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
@@ -319,7 +281,7 @@ const ProductManagement: FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredProducts.slice(0, visibleCount).map((product) => (
+                {displayProducts.map((product) => (
                   <ProductRow
                     key={product._id}
                     product={product}
@@ -331,19 +293,15 @@ const ProductManagement: FC = () => {
             </table>
           </div>
 
-          {/* Intersection trigger at the bottom */}
-          {visibleCount < filteredProducts.length && (
-            <div
-              ref={loaderRef}
-              className="p-4 flex justify-center border-t border-gray-50"
-            >
-              <Loader size="sm" />
-            </div>
-          )}
-
-          {loading && products.length > 0 && (
-            <div className="p-4 flex justify-center border-t border-gray-50">
-              <Loader size="sm" />
+          {/* Pagination */}
+          {pagination && pagination.pages > 1 && (
+            <div className="border-t border-gray-100 px-6 py-4 flex justify-center">
+              <Pagination
+                currentPage={page}
+                totalPages={pagination.pages}
+                onPageChange={setPage}
+                isLoading={loading}
+              />
             </div>
           )}
         </div>

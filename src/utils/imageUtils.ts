@@ -1,36 +1,36 @@
-/**
- * Utility to inject Cloudinary optimization parameters into image URLs.
- * Example: w_400,c_limit,q_auto,f_auto
- */
-export const getOptimizedImage = (
+export function getOptimizedImage(
   url: string | undefined,
-  width: number = 400
-): string => {
+  optionsOrWidth:
+    | { width?: number; height?: number; quality?: string }
+    | number = {}
+): string {
   if (!url) {
-    return '/img/placeholder.png';
+    return '';
   }
-
-  // If it's already a local placeholder or not a Cloudinary URL, return as is
   if (!url.includes('cloudinary.com')) {
     return url;
   }
 
-  // Cloudinary URL format usually: .../upload/v1234567/filename.jpg
-  // We want to insert transformations after /upload/
-  const uploadIndex = url.indexOf('/upload/');
-  if (uploadIndex === -1) {
-    return url;
+  let width = 100;
+  let height = 100;
+  let quality = 'auto';
+
+  if (typeof optionsOrWidth === 'number') {
+    width = optionsOrWidth;
+    height = optionsOrWidth;
+  } else {
+    width = optionsOrWidth.width || 100;
+    height = optionsOrWidth.height || optionsOrWidth.width || 100;
+    quality = optionsOrWidth.quality || 'auto';
   }
 
-  const prefix = url.substring(0, uploadIndex + 8);
-  const rest = url.substring(uploadIndex + 8);
+  const transformation = `w_${width},h_${height},c_fill,f_auto,q_${quality}`;
 
-  // Transformations:
-  // w_[width] -> specific width
-  // c_limit   -> don't upscale
-  // q_auto    -> automatic quality
-  // f_auto    -> automatic format (WebP/AVIF)
-  const transformations = `w_${width},c_limit,q_auto,f_auto/`;
+  if (url.includes('/upload/')) {
+    return url.replace('/upload/', `/upload/${transformation}/`);
+  }
 
-  return `${prefix}${transformations}${rest}`;
-};
+  return url;
+}
+
+export const optimizeCloudinaryUrl = getOptimizedImage;

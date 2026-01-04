@@ -12,51 +12,62 @@ export default function FloatingCartBar() {
   }
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+
+  // Get unique product images (up to 2)
+  const productImages = items
+    .map((item) => item.product?.images?.[0])
+    .filter(Boolean)
+    .slice(0, 2);
 
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ y: 100, opacity: 0, scale: 0.8 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        exit={{ y: 100, opacity: 0, scale: 0.8 }}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden w-auto min-w-[280px] max-w-[340px]"
+        initial={{ y: 100, x: '-50%', opacity: 0 }}
+        animate={{ y: 0, x: '-50%', opacity: 1 }}
+        exit={{ y: 100, x: '-50%', opacity: 0 }}
+        className="fixed bottom-8 left-1/2 z-50 md:hidden w-auto min-w-[280px] max-w-[90%]"
       >
         <Link
           to="/cart"
-          className="flex items-center justify-between bg-green-600 text-white p-3.5 rounded-2xl shadow-2xl border border-green-500/30 backdrop-blur-sm"
+          className="flex items-center justify-between bg-green-600 text-white p-2.5 md:p-3 rounded-full shadow-[0_12px_40px_rgb(0,0,0,0.3)] border border-white/20 backdrop-blur-md transition-transform active:scale-95 mx-auto"
         >
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="bg-green-700/50 p-2 rounded-xl border border-white/10">
-                <ShoppingCart className="w-5 h-5 text-white" />
-              </div>
-              <motion.span
-                key={totalItems}
-                initial={{ scale: 1.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="absolute -top-2 -right-2 bg-yellow-400 text-green-900 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm border border-white"
-              >
-                {totalItems}
-              </motion.span>
+          <div className="flex items-center gap-3 pr-4">
+            {/* Overlapping Images */}
+            <div className="flex -space-x-4 pl-1">
+              {productImages.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="w-10 h-10 rounded-full border-2 border-white bg-white overflow-hidden shadow-md flex-shrink-0"
+                  style={{ zIndex: idx }}
+                >
+                  <img
+                    src={img}
+                    alt="Product"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+              {productImages.length === 0 && (
+                <div className="w-10 h-10 rounded-full border-2 border-white bg-white flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-green-600" />
+                </div>
+              )}
             </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-sm tracking-tight leading-tight">
-                {totalItems} Item{totalItems !== 1 ? 's' : ''}
+
+            {/* Labels */}
+            <div className="flex flex-col text-left">
+              <span className="font-bold text-[15px] leading-tight text-white tracking-tight">
+                View cart
               </span>
-              <span className="text-[11px] font-semibold text-green-100 flex items-center">
-                ₹{totalPrice.toLocaleString()}{' '}
-                <span className="mx-1 opacity-50">•</span>{' '}
-                <span className="text-yellow-300">View Cart</span>
+              <span className="text-[11px] font-semibold text-green-100/90">
+                {totalItems} item{totalItems !== 1 ? 's' : ''}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center justify-center bg-white/20 p-2 rounded-xl">
-            <ChevronRight className="w-5 h-5 text-white" />
+          {/* Right Icon */}
+          <div className="pr-3 flex items-center border-l border-white/20 pl-3">
+            <ChevronRight className="w-5 h-5 text-white stroke-[3px]" />
           </div>
         </Link>
       </motion.div>

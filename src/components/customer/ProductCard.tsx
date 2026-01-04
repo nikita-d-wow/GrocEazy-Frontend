@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+// Force re-index
 import { getOptimizedImage } from '../../utils/imageUtils';
 import type { RootState } from '../../redux/store';
 import React from 'react';
@@ -71,8 +72,18 @@ export default function ProductCard({
     }
   };
 
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.4, ease: 'easeOut' },
+    },
+  } as any;
+
   return (
     <motion.div
+      variants={itemVariants}
       whileHover={{ y: -5 }}
       onClick={() => navigate(`/products/${_id}`)}
       className="bg-white rounded-2xl p-4 shadow-md hover:shadow-xl transition-all cursor-pointer group h-full flex flex-col"
@@ -113,7 +124,7 @@ export default function ProductCard({
         <p className="text-gray-900 font-bold text-sm mb-1 line-clamp-2 leading-tight">
           {name}
         </p>
-        <div className="mt-auto pt-2 flex items-center justify-between">
+        <div className="mt-auto pt-2 flex items-center justify-between gap-2">
           <p className="text-green-600 font-bold text-base">₹{price}</p>
           {quantity === 0 ? (
             <button
@@ -132,10 +143,10 @@ export default function ProductCard({
                 }
               }}
               disabled={stock === 0}
-              className={`px-6 py-1.5 rounded-lg border font-bold text-sm uppercase transition-colors ${
+              className={`px-3 sm:px-4 py-1.5 rounded-lg border font-bold text-[10px] sm:text-xs uppercase transition-all whitespace-nowrap flex items-center justify-center ${
                 stock === 0
-                  ? 'border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50'
-                  : 'border-green-600 text-green-600 hover:bg-green-50 cursor-pointer'
+                  ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
+                  : 'border-green-600 text-green-600 hover:bg-green-50 cursor-pointer min-w-[80px]'
               }`}
             >
               {stock === 0 ? 'SOLD OUT' : 'ADD'}

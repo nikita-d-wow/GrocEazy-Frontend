@@ -1,26 +1,21 @@
 import type { FC } from 'react';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+
+import Pagination from '../../../components/common/Pagination';
 
 import ProductGrid from '../../../components/products/ProductGrid';
 import ProductFilters, {
   type FilterState,
 } from '../../../components/products/ProductFilters';
 import MobileCategorySidebar from '../../../components/products/MobileCategorySidebar';
-import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
 
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
 import { fetchProducts } from '../../../redux/actions/productActions';
 import { fetchWishlist } from '../../../redux/actions/wishlistActions';
 
-import type { Product } from '../../../types/Product';
 import type { RootState } from '../../../redux/store';
-
-interface CategoryData {
-  _id: string;
-  name: string;
-}
 
 const ProductsPage: FC = () => {
   const dispatch = useAppDispatch();
@@ -42,9 +37,10 @@ const ProductsPage: FC = () => {
 
   /* ---------------- LOCAL FILTERS ---------------- */
   const [localFilters, setLocalFilters] = useState({
-    priceRange: [0, 1000] as [number, number],
-    sortBy: 'featured',
+    priceRange: [0, 5000] as [number, number],
+    sortBy: 'newest',
   });
+  const [page, setPage] = useState(1);
 
   const allFilters = useMemo(
     () => ({
@@ -55,16 +51,27 @@ const ProductsPage: FC = () => {
     [selectedCategory, searchQuery, localFilters]
   );
 
-  /* ---------------- PAGINATION ---------------- */
-  const [displayCount, setDisplayCount] = useState(20);
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  /* ---------------- DERIVED STATE RESET ---------------- */
+  const [prevSearch, setPrevSearch] = useState(searchQuery);
+  const [prevCategory, setPrevCategory] = useState(selectedCategory);
+  const [prevLocalFilters, setPrevLocalFilters] = useState(localFilters);
 
-  /* ---------------- SAFE DATA FETCH ---------------- */
+  if (
+    searchQuery !== prevSearch ||
+    selectedCategory !== prevCategory ||
+    localFilters !== prevLocalFilters
+  ) {
+    setPage(1);
+    setPrevSearch(searchQuery);
+    setPrevCategory(selectedCategory);
+    setPrevLocalFilters(localFilters);
+  }
+
+  /* ---------------- DATA FETCH ---------------- */
   useEffect(() => {
-    if (products.length === 0) {
-      dispatch(fetchProducts());
-    }
-  }, [dispatch, products.length]);
+    // Fetch all products once to allow fast client-side filtering
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   useEffect(() => {
     if (user) {
@@ -72,73 +79,55 @@ const ProductsPage: FC = () => {
     }
   }, [dispatch, user]);
 
-  /* ---------------- INFINITE SCROLL ---------------- */
-  useEffect(() => {
-    if (!loadMoreRef.current || loading) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setDisplayCount((prev) => prev + 20);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(loadMoreRef.current);
-    return () => observer.disconnect();
-  }, [loading]);
-
-  /* ---------------- FILTER LOGIC (UNCHANGED) ---------------- */
+  /* ---------------- CLIENT-SIDE FILTER LOGIC ---------------- */
   const filteredProducts = useMemo(() => {
-    let result = products.filter((p: Product) => p.isActive !== false);
+    let result = products.filter((p) => p.isActive !== false);
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase().trim();
       const words = query.split(/\s+/);
 
-      const nameMatches = result.filter((p) =>
-        words.every((w) => p.name.toLowerCase().includes(w))
-      );
+      // Multi-word matching logic (Matches either name OR description)
+      result = result.filter((p) => {
+        const target = `${p.name} ${p.description || ''}`.toLowerCase();
+        return words.every((word) => target.includes(word));
+      });
+    }
 
-      result =
-        nameMatches.length > 0
-          ? nameMatches
-          : result.filter((p) =>
-              words.every(
-                (w) =>
-                  p.name.toLowerCase().includes(w) ||
-                  p.description?.toLowerCase().includes(w)
-              )
-            );
-    } else if (selectedCategory) {
+    if (selectedCategory) {
       result = result.filter((p) => {
         const catId =
-          typeof p.categoryId === 'object'
-            ? (p.categoryId as CategoryData)._id
-            : p.categoryId;
+          typeof p.categoryId === 'object' ? p.categoryId._id : p.categoryId;
         return String(catId) === selectedCategory;
       });
     }
 
+    // Price Filter
     result = result.filter(
       (p) =>
         p.price >= localFilters.priceRange[0] &&
         p.price <= localFilters.priceRange[1]
     );
 
+    // Sorting
     if (localFilters.sortBy === 'price_asc') {
       result.sort((a, b) => a.price - b.price);
     } else if (localFilters.sortBy === 'price_desc') {
       result.sort((a, b) => b.price - a.price);
     } else if (localFilters.sortBy === 'newest') {
-      result.reverse();
+      result = [...result].reverse(); // Assuming original is chronologically sorted
     }
 
     return result;
   }, [products, searchQuery, selectedCategory, localFilters]);
+
+  const ITEMS_PER_PAGE = 16;
+  const paginatedProducts = useMemo(() => {
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, page]);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
 
   /* ---------------- FILTER HANDLER ---------------- */
   const handleUpdateFilters = (updates: Partial<FilterState>) => {
@@ -158,7 +147,6 @@ const ProductsPage: FC = () => {
       setLocalFilters((prev) => ({ ...prev, ...updates }));
     }
 
-    setDisplayCount(20);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -223,11 +211,18 @@ const ProductsPage: FC = () => {
                 </div>
               ) : (
                 <>
-                  <ProductGrid
-                    products={filteredProducts.slice(0, displayCount)}
-                  />
-                  {displayCount < filteredProducts.length && (
-                    <div ref={loadMoreRef} className="py-12 text-center" />
+                  <ProductGrid products={paginatedProducts} />
+                  {totalPages > 1 && (
+                    <div className="mt-12">
+                      <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={(p) => {
+                          setPage(p);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                      />
+                    </div>
                   )}
                 </>
               )}
@@ -235,7 +230,6 @@ const ProductsPage: FC = () => {
           </div>
         </div>
       </div>
-      <FloatingCartBar />
     </div>
   );
 };

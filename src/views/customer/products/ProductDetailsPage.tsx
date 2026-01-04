@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+// Force re-index
 import { useEffect, useState } from 'react';
 import type { CartItem } from '../../../redux/types/cartTypes';
 import { useParams, Link } from 'react-router-dom';
@@ -31,7 +32,6 @@ import {
 import { selectCartItems } from '../../../redux/selectors/cartSelectors';
 
 import ProductCard from '../../../components/customer/ProductCard';
-import FloatingCartBar from '../../../components/customer/cart/FloatingCartBar';
 import { getOptimizedImage } from '../../../utils/imageUtils';
 import type { RootState } from '../../../redux/store';
 
@@ -53,7 +53,9 @@ const ProductDetailsPage: FC = () => {
   useEffect(() => {
     // If we have very few products (e.g. from a filtered search), refresh the full list
     // to ensure fallback sections like "Top 10" have data.
-    dispatch(fetchProducts(products.length < 5));
+    if (products.length < 5) {
+      dispatch(fetchProducts());
+    }
 
     if (id) {
       dispatch(fetchSimilarProducts(id));
@@ -199,22 +201,24 @@ const ProductDetailsPage: FC = () => {
             </div>
 
             {product.images.length > 1 && (
-              <div className="flex gap-3 justify-center overflow-x-auto pb-2 no-scrollbar">
+              <div className="flex gap-4 justify-center overflow-x-auto py-3 no-scrollbar relative">
                 {product.images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`w-16 h-16 rounded-xl border-2 p-1 transition-all flex-shrink-0 ${
+                    className={`w-16 h-16 rounded-xl transition-all duration-300 flex-shrink-0 relative p-1 ${
                       idx === selectedImage
-                        ? 'border-green-600 scale-110 shadow-md'
-                        : 'border-gray-100 hover:border-green-300'
+                        ? 'ring-4 ring-green-600 ring-offset-2 scale-110 shadow-xl z-20'
+                        : 'bg-white hover:ring-2 hover:ring-green-300 z-0'
                     }`}
                   >
-                    <img
-                      src={getOptimizedImage(img, 200)}
-                      className="w-full h-full object-contain rounded-lg"
-                      alt="thumbnail"
-                    />
+                    <div className="w-full h-full rounded-lg overflow-hidden bg-white">
+                      <img
+                        src={getOptimizedImage(img, 200)}
+                        className="w-full h-full object-contain"
+                        alt="thumbnail"
+                      />
+                    </div>
                   </button>
                 ))}
               </div>
@@ -430,8 +434,6 @@ const ProductDetailsPage: FC = () => {
           );
         })()}
       </div>
-
-      <FloatingCartBar />
     </div>
   );
 };

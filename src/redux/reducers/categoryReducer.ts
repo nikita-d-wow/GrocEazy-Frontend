@@ -3,12 +3,18 @@ import type { Category } from '../../types/Category';
 
 interface CategoryState {
   categories: Category[];
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+  } | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: CategoryState = {
   categories: [],
+  pagination: null,
   loading: false,
   error: null,
 };
@@ -17,8 +23,24 @@ const categorySlice = createSlice({
   name: 'category',
   initialState,
   reducers: {
-    setCategories(state, action: PayloadAction<Category[]>) {
-      state.categories = action.payload;
+    setCategories(
+      state,
+      action: PayloadAction<
+        | Category[]
+        | { categories: Category[]; total: number; page: number; pages: number }
+      >
+    ) {
+      if (Array.isArray(action.payload)) {
+        state.categories = action.payload;
+        state.pagination = null;
+      } else {
+        state.categories = action.payload.categories;
+        state.pagination = {
+          total: action.payload.total,
+          page: action.payload.page,
+          pages: action.payload.pages,
+        };
+      }
     },
     addCategory(state, action: PayloadAction<Category>) {
       if (!state.categories) {

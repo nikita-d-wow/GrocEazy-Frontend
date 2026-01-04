@@ -11,13 +11,37 @@ import {
 } from '../reducers/categoryReducer';
 
 /**
- * Fetch all categories
+ * Fetch categories with pagination
+ */
+export const fetchPagedCategories =
+  (page = 1, limit = 20, search?: string) =>
+  async (dispatch: AppDispatch, getState: () => any) => {
+    const { loading } = getState().category;
+    if (loading) {
+      return;
+    }
+
+    dispatch(setLoading(true));
+    dispatch(setError(null));
+    try {
+      const data = await categoryApi.getPagedCategories(page, limit, search);
+      dispatch(setCategories(data));
+    } catch (error: any) {
+      dispatch(
+        setError(error.response?.data?.message || 'Failed to fetch categories')
+      );
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+/**
+ * Fetch all categories (standard list for sidebar/dropdowns)
  */
 export const fetchCategories =
   () => async (dispatch: AppDispatch, getState: () => any) => {
     const { categories, loading } = getState().category;
 
-    // Cache check: skip if loading or we already have categories
     if (loading || categories.length > 0) {
       return;
     }

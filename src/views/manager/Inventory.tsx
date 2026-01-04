@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useState, useMemo, useRef } from 'react';
+import React, { type FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Search, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { useDebounce } from '../../customhooks/useDebounce';
@@ -9,8 +9,10 @@ import { fetchCategories } from '../../redux/actions/categoryActions';
 import {
   selectProducts,
   selectProductLoading,
+  selectProductPagination,
 } from '../../redux/selectors/productSelectors';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
+import Pagination from '../../components/common/Pagination';
 
 import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
@@ -94,60 +96,19 @@ InventoryRow.displayName = 'InventoryRow';
 const Inventory: FC = () => {
   const dispatch = useAppDispatch();
   const products = useSelector(selectProducts);
-  const categories = useSelector(selectCategories);
   const loading = useSelector(selectProductLoading);
+  const categories = useSelector(selectCategories);
+  const pagination = useSelector(selectProductPagination);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
-
-  // Incremental Rendering State
-  const [visibleCount, setVisibleCount] = useState(20);
-  const loaderRef = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchManagerProducts());
+    dispatch(fetchManagerProducts(page, 10, debouncedSearchTerm));
     dispatch(fetchCategories());
-  }, [dispatch]);
-
-  const filteredProducts = useMemo(
-    () =>
-      products.filter(
-        (p) =>
-          p &&
-          p.name &&
-          p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
-      ),
-    [products, debouncedSearchTerm]
-  );
-
-  // Intersection Observer for Infinite Scroll effect
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          visibleCount < filteredProducts.length
-        ) {
-          setVisibleCount((prev) => prev + 20);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [filteredProducts.length, visibleCount]);
-
-  // Reset visible count when search term changes (Adjust state during render to avoid Effect)
-  const [lastSearch, setLastSearch] = useState(debouncedSearchTerm);
-  if (debouncedSearchTerm !== lastSearch) {
-    setLastSearch(debouncedSearchTerm);
-    setVisibleCount(20);
-  }
+  }, [dispatch, page, debouncedSearchTerm]);
 
   const getStockStatus = (stock: number, threshold: number = 5) => {
     if (Number(stock) === 0) {
@@ -215,7 +176,10 @@ const Inventory: FC = () => {
             <Input
               placeholder="Search inventory..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
               leftIcon={<Search className="w-5 h-5" />}
             />
           </div>
@@ -229,7 +193,7 @@ const Inventory: FC = () => {
             Loading inventory...
           </p>
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : products.length === 0 ? (
         <EmptyState
           title="No Products Found"
           description={
@@ -240,7 +204,7 @@ const Inventory: FC = () => {
           icon={<Package className="w-12 h-12" />}
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
@@ -262,8 +226,10 @@ const Inventory: FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filteredProducts.slice(0, visibleCount).map((product) => {
+              <tbody
+                className={`divide-y divide-gray-100 transition-opacity duration-200 ${loading ? 'opacity-50' : 'opacity-100'}`}
+              >
+                {products.map((product) => {
                   const status = getStockStatus(
                     product.stock,
                     product.lowStockThreshold
@@ -285,19 +251,13 @@ const Inventory: FC = () => {
             </table>
           </div>
 
-          {/* Intersection trigger at the bottom */}
-          {visibleCount < filteredProducts.length && (
-            <div
-              ref={loaderRef}
-              className="p-4 flex justify-center border-t border-gray-50"
-            >
-              <Loader size="sm" />
-            </div>
-          )}
-
-          {loading && products.length > 0 && (
-            <div className="p-4 flex justify-center border-t border-gray-50">
-              <Loader size="sm" />
+          {pagination && pagination.pages > 1 && (
+            <div className="p-4 border-t border-gray-50">
+              <Pagination
+                currentPage={page}
+                totalPages={pagination.pages}
+                onPageChange={setPage}
+              />
             </div>
           )}
         </div>

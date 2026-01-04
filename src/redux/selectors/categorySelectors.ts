@@ -9,3 +9,6 @@ export const selectCategories = createSelector(
 
 export const selectCategoryLoading = (state: RootState) =>
   state.category.loading;
+
+export const selectCategoryPagination = (state: RootState) =>
+  state.category.pagination;

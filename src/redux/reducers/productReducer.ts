@@ -7,6 +7,12 @@ interface ProductState {
   topProducts: Product[];
   loading: boolean;
   error: string | null;
+  pagination: {
+    total: number;
+    pages: number;
+    page: number;
+    limit: number;
+  } | null;
 }
 
 const initialState: ProductState = {
@@ -15,14 +21,38 @@ const initialState: ProductState = {
   topProducts: [],
   loading: false,
   error: null,
+  pagination: null,
 };
 
 const productSlice = createSlice({
   name: 'product',
   initialState,
   reducers: {
-    setProducts(state, action: PayloadAction<Product[]>) {
-      state.products = action.payload;
+    setProducts(
+      state,
+      action: PayloadAction<
+        | Product[]
+        | {
+            products: Product[];
+            total: number;
+            page: number;
+            pages: number;
+            limit: number;
+          }
+      >
+    ) {
+      if (Array.isArray(action.payload)) {
+        state.products = action.payload;
+        state.pagination = null;
+      } else {
+        state.products = action.payload.products;
+        state.pagination = {
+          total: action.payload.total,
+          page: action.payload.page,
+          pages: action.payload.pages,
+          limit: action.payload.limit,
+        };
+      }
     },
     addProduct(state, action: PayloadAction<Product>) {
       if (!state.products) {
