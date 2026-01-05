@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -25,6 +25,7 @@ const ProductsPage: FC = () => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     products,
@@ -46,7 +47,7 @@ const ProductsPage: FC = () => {
 
   /* ---------------- LOCAL FILTERS ---------------- */
   const [localFilters, setLocalFilters] = useState({
-    priceRange: [0, 5000] as [number, number],
+    priceRange: [0, 1000] as [number, number],
     sortBy: 'newest',
   });
 
@@ -138,7 +139,16 @@ const ProductsPage: FC = () => {
       setLocalFilters((prev) => ({ ...prev, ...updates }));
     }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    const delay = updates.priceRange ? 1000 : 0;
+
+    scrollTimeoutRef.current = setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      scrollTimeoutRef.current = null;
+    }, delay);
   };
 
   if (error) {

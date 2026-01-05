@@ -18,11 +18,12 @@ import {
 
 import type { Category } from '../../types/Category';
 
+import Pagination from '../../components/common/Pagination';
+import FilterSelect from '../../components/common/FilterSelect';
 import CategoryForm from '../../components/categories/CategoryForm';
 import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
-import Pagination from '../../components/common/Pagination';
 
 const CategoryRow = React.memo(
   ({
@@ -57,6 +58,12 @@ const CategoryRow = React.memo(
               </div>
             </div>
           </div>
+        </td>
+
+        <td className="px-6 py-4">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            {category.productCount || 0} Products
+          </span>
         </td>
 
         <td className="px-6 py-4">
@@ -102,10 +109,11 @@ const CategoryManagement: FC = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState<string>('newest');
 
   useEffect(() => {
-    dispatch(fetchPagedCategories(page, 10, search));
-  }, [dispatch, page, search]);
+    dispatch(fetchPagedCategories(page, 10, search, sortOrder));
+  }, [dispatch, page, search, sortOrder]);
 
   const handleDelete = useCallback(
     async (id: string) => {
@@ -149,18 +157,40 @@ const CategoryManagement: FC = () => {
         </Button>
       </div>
 
-      {/* Search Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+      {/* Search & Sort Bar */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
         <div className="p-4 border-b border-gray-100">
-          <div className="max-w-md">
-            <DebouncedSearch
-              placeholder="Search categories..."
-              initialValue={search}
-              onSearch={(val) => {
-                setSearch(val);
-                setPage(1);
-              }}
-            />
+          <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
+            <div className="flex-1 max-w-md w-full">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
+                Search
+              </span>
+              <DebouncedSearch
+                placeholder="Search categories..."
+                initialValue={search}
+                onSearch={(val) => {
+                  setSearch(val);
+                  setPage(1);
+                }}
+              />
+            </div>
+            <div className="flex flex-wrap md:flex-nowrap gap-4 justify-end">
+              <FilterSelect
+                label="Sort By"
+                value={sortOrder}
+                onChange={(val: string) => {
+                  setSortOrder(val);
+                  setPage(1);
+                }}
+                options={[
+                  { value: 'newest', label: 'Newest First' },
+                  { value: 'oldest', label: 'Oldest First' },
+                  { value: 'name_asc', label: 'Name (A-Z)' },
+                  { value: 'name_desc', label: 'Name (Z-A)' },
+                ]}
+                className="w-full md:w-56"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -195,6 +225,9 @@ const CategoryManagement: FC = () => {
                 <tr>
                   <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Category
+                  </th>
+                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Products
                   </th>
                   <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                     Created Date

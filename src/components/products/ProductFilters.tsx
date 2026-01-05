@@ -5,6 +5,7 @@ import { fetchCategories } from '../../redux/actions/categoryActions';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import type { Category } from '../../types/Category';
 import PriceRangeSlider from '../common/PriceRangeSlider';
+import FilterSelect from '../common/FilterSelect';
 import type { RootState } from '../../redux/store';
 
 export interface FilterState {
@@ -12,6 +13,7 @@ export interface FilterState {
   searchQuery: string;
   priceRange: [number, number];
   sortBy: string;
+  stockStatus?: string;
 }
 
 interface Props {
@@ -43,9 +45,7 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
 
   return (
     <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit sticky top-20">
-      <h3 className="font-bold text-gray-800 mb-6 text-lg border-b pb-3">
-        Filters
-      </h3>
+      <h3 className="font-bold text-gray-800 mb-6 text-lg">Filters</h3>
 
       <div className="mb-8">
         <h4 className="font-semibold text-gray-700 mb-4 text-sm uppercase tracking-wide">
@@ -98,7 +98,7 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
         </h4>
         <PriceRangeSlider
           min={0}
-          max={5000}
+          max={1000}
           value={filters.priceRange}
           onChange={(newRange) =>
             setFilters({ ...filters, priceRange: newRange })
@@ -107,19 +107,17 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
       </div>
 
       <div>
-        <h4 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">
-          Sort By
-        </h4>
-        <select
+        <FilterSelect
+          label="Sort By"
           value={filters.sortBy}
-          onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-          className="w-full border-2 border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-50 bg-white transition-all cursor-pointer"
-        >
-          <option value="featured"> Featured</option>
-          <option value="price_asc"> Price: Low to High</option>
-          <option value="price_desc"> Price: High to Low</option>
-          <option value="newest"> Newest Arrivals</option>
-        </select>
+          onChange={(val: string) => setFilters({ ...filters, sortBy: val })}
+          options={[
+            { value: 'featured', label: 'Featured' },
+            { value: 'price_asc', label: 'Price: Low to High' },
+            { value: 'price_desc', label: 'Price: High to Low' },
+            { value: 'newest', label: 'Newest Arrivals' },
+          ]}
+        />
       </div>
     </div>
   );

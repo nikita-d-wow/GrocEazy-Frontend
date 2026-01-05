@@ -14,7 +14,7 @@ import {
  * Fetch categories with pagination
  */
 export const fetchPagedCategories =
-  (page = 1, limit = 20, search?: string) =>
+  (page = 1, limit = 20, search?: string, sortBy?: string) =>
   async (dispatch: AppDispatch, getState: () => any) => {
     const { loading } = getState().category;
     if (loading) {
@@ -24,7 +24,12 @@ export const fetchPagedCategories =
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
-      const data = await categoryApi.getPagedCategories(page, limit, search);
+      const data = await categoryApi.getPagedCategories(
+        page,
+        limit,
+        search,
+        sortBy
+      );
       dispatch(setCategories(data));
     } catch (error: any) {
       dispatch(

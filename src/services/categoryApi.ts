@@ -7,7 +7,8 @@ import type { Category, CategoryFormData } from '../types/Category';
 export const getPagedCategories = async (
   page = 1,
   limit = 20,
-  search?: string
+  search?: string,
+  sortBy?: string
 ): Promise<{
   categories: Category[];
   total: number;
@@ -20,7 +21,7 @@ export const getPagedCategories = async (
     page: number;
     pages: number;
   }>('/api/categories', {
-    params: { page, limit, search },
+    params: { page, limit, search, sortBy },
   });
   return response.data;
 };

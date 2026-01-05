@@ -49,7 +49,9 @@ export const getManagerProducts = async (
   page: number = 1,
   limit: number = 20,
   search?: string,
-  isActive?: boolean
+  isActive?: boolean,
+  stockStatus?: string,
+  categoryId?: string
 ): Promise<any> => {
   let url = `/api/products/manager/all?page=${page}&limit=${limit}`;
   if (search) {
@@ -57,6 +59,12 @@ export const getManagerProducts = async (
   }
   if (isActive !== undefined) {
     url += `&isActive=${isActive}`;
+  }
+  if (stockStatus) {
+    url += `&stockStatus=${stockStatus}`;
+  }
+  if (categoryId) {
+    url += `&categoryId=${categoryId}`;
   }
 
   const response = await api.get<any>(url);

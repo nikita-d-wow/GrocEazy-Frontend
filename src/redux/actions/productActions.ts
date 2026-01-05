@@ -53,7 +53,14 @@ export const fetchProducts =
   };
 
 export const fetchManagerProducts =
-  (page = 1, limit = 20, search?: string, isActive?: boolean) =>
+  (
+    page = 1,
+    limit = 20,
+    search?: string,
+    isActive?: boolean,
+    stockStatus?: string,
+    categoryId?: string
+  ) =>
   async (dispatch: AppDispatch, getState: () => RootState) => {
     const { loading } = getState().product;
     if (loading) {
@@ -67,7 +74,9 @@ export const fetchManagerProducts =
         page,
         limit,
         search,
-        isActive
+        isActive,
+        stockStatus,
+        categoryId
       );
       dispatch(setProducts(data));
     } catch (error) {
