@@ -13,6 +13,9 @@ interface ProductState {
     page: number;
     limit: number;
   } | null;
+  searchQuery: string;
+  searchResults: Product[];
+  searchLoading: boolean;
 }
 
 const initialState: ProductState = {
@@ -22,6 +25,9 @@ const initialState: ProductState = {
   loading: false,
   error: null,
   pagination: null,
+  searchQuery: '',
+  searchResults: [],
+  searchLoading: false,
 };
 
 const productSlice = createSlice({
@@ -83,6 +89,15 @@ const productSlice = createSlice({
     setTopProducts(state, action: PayloadAction<Product[]>) {
       state.topProducts = action.payload;
     },
+    setSearchQuery(state, action: PayloadAction<string>) {
+      state.searchQuery = action.payload;
+    },
+    setSearchResults(state, action: PayloadAction<Product[]>) {
+      state.searchResults = action.payload;
+    },
+    setSearchLoading(state, action: PayloadAction<boolean>) {
+      state.searchLoading = action.payload;
+    },
   },
 });
 
@@ -95,6 +110,9 @@ export const {
   setError,
   setSimilarProducts,
   setTopProducts,
+  setSearchQuery,
+  setSearchResults,
+  setSearchLoading,
 } = productSlice.actions;
 
 export default productSlice.reducer;

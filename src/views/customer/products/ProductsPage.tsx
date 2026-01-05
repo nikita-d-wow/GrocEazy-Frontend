@@ -12,8 +12,12 @@ import ProductFilters, {
 import MobileCategorySidebar from '../../../components/products/MobileCategorySidebar';
 
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
-import { fetchProducts } from '../../../redux/actions/productActions';
+import {
+  fetchProducts,
+  searchProductsGlobally,
+} from '../../../redux/actions/productActions';
 import { fetchWishlist } from '../../../redux/actions/wishlistActions';
+import { setSearchQuery } from '../../../redux/reducers/productReducer';
 
 import type { RootState } from '../../../redux/store';
 
@@ -22,9 +26,15 @@ const ProductsPage: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { products, loading, error, pagination } = useSelector(
-    (state: RootState) => state.product
-  );
+  const {
+    products,
+    loading,
+    error,
+    pagination,
+    searchQuery,
+    searchResults,
+    searchLoading,
+  } = useSelector((state: RootState) => state.product);
   const { user } = useSelector((state: RootState) => state.auth);
 
   /* ---------------- URL STATE ---------------- */
@@ -33,7 +43,6 @@ const ProductsPage: FC = () => {
     [location.search]
   );
   const selectedCategory = queryParams.get('category');
-  const searchQuery = queryParams.get('search') || '';
 
   /* ---------------- LOCAL FILTERS ---------------- */
   const [localFilters, setLocalFilters] = useState({
@@ -59,7 +68,7 @@ const ProductsPage: FC = () => {
       fetchProducts(
         page,
         ITEMS_PER_PAGE,
-        searchQuery,
+        undefined, // search no longer passed to backend
         selectedCategory || undefined,
         localFilters.priceRange[0],
         localFilters.priceRange[1],
@@ -69,11 +78,17 @@ const ProductsPage: FC = () => {
   }, [
     dispatch,
     page,
-    searchQuery,
     selectedCategory,
     localFilters.priceRange,
     localFilters.sortBy,
   ]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch(searchProductsGlobally(searchQuery));
+    }, 300); // Small debounce for global search
+    return () => clearTimeout(timer);
+  }, [dispatch, searchQuery]);
 
   useEffect(() => {
     if (user) {
@@ -85,6 +100,12 @@ const ProductsPage: FC = () => {
 
   const totalPages = pagination?.pages || 1;
   const totalResults = pagination?.total || products.length;
+
+  const isSearching = searchQuery.trim().length > 0;
+  const displayedProducts = isSearching ? searchResults : products;
+  const isDataLoading = isSearching
+    ? searchLoading
+    : loading && products.length === 0;
 
   const allFilters = useMemo(
     () => ({
@@ -101,6 +122,9 @@ const ProductsPage: FC = () => {
     params.set('page', '1'); // Reset to first page on filter change
 
     if (updates.selectedCategory !== undefined) {
+      // Clear global search when category is changed to avoid conflict
+      dispatch(setSearchQuery(''));
+
       if (updates.selectedCategory) {
         params.set('category', updates.selectedCategory);
       } else {
@@ -141,7 +165,9 @@ const ProductsPage: FC = () => {
             </div>
             <div className="mt-4 md:mt-0">
               <span className="text-gray-600 font-medium">
-                {totalResults} results found
+                {isSearching
+                  ? `${searchResults.length} matches found globally`
+                  : `${totalResults} results found`}
               </span>
             </div>
           </div>
@@ -167,7 +193,7 @@ const ProductsPage: FC = () => {
 
             {/* ---------------- PRODUCT GRID ---------------- */}
             <main className="flex-1 w-full">
-              {loading && products.length === 0 ? (
+              {isDataLoading ? (
                 <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {[1, 2, 3, 4].map((i) => (
                     <div
@@ -178,8 +204,8 @@ const ProductsPage: FC = () => {
                 </div>
               ) : (
                 <>
-                  <ProductGrid products={products} />
-                  {totalPages > 1 && (
+                  <ProductGrid products={displayedProducts} />
+                  {!isSearching && totalPages > 1 && (
                     <div className="mt-12">
                       <Pagination
                         currentPage={page}
