@@ -20,12 +20,21 @@ import SetPassword from '../views/auth/SetPassword';
 import ForgotPassword from '../views/auth/ForgotPassword';
 import ResetPassword from '../views/auth/ResetPassword';
 import TermsPage from '../views/customer/TermsPage';
+import PrivacyPolicy from '../views/customer/PrivacyPolicy';
 
 export const CustomerRoutes = (
   <>
     <Route element={<CustomerLayout />}>
       <Route index element={<Dashboard />} />
       <Route path="/terms" element={<TermsPage />} />
+      <Route
+        path="/privacy-policy"
+        element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <PrivacyPolicy />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/contact" element={<ContactSupport />} />
       <Route path="/orders" element={<OrdersPage />} />
       <Route path="/orders/:id" element={<OrderDetails />} />
