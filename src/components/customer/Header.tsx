@@ -9,7 +9,10 @@ import { logout } from '../../redux/actions/authActions';
 import UserProfileDropdown from './UserProfileDropdown';
 import { adminNav, managerNav, customerNav } from '../../utils/navitems';
 import { selectCartItems } from '../../redux/selectors/cartSelectors';
-import { selectWishlistItems } from '../../redux/selectors/wishlistSelectors';
+import {
+  selectWishlistItems,
+  selectWishlistPagination,
+} from '../../redux/selectors/wishlistSelectors';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -21,9 +24,10 @@ export default function Header() {
   const { user } = useSelector((state: RootState) => state.auth);
   const cartItems = useSelector(selectCartItems);
   const wishlistItems = useSelector(selectWishlistItems);
+  const wishlistPagination = useSelector(selectWishlistPagination);
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const wishlistCount = wishlistItems.length;
+  const wishlistCount = wishlistPagination?.total || wishlistItems.length;
 
   // 1. Sync state FROM URL (Handles browser back/forward and external navigations)
   React.useEffect(() => {

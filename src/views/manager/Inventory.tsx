@@ -105,10 +105,24 @@ const Inventory: FC = () => {
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [page, setPage] = useState(1);
 
+  // 1. Fetch Categories only once on mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  // 2. Fetch Products when page or search term changes
   useEffect(() => {
     dispatch(fetchManagerProducts(page, 10, debouncedSearchTerm));
-    dispatch(fetchCategories());
   }, [dispatch, page, debouncedSearchTerm]);
+
+  // 3. Memoized Category Lookup Map for performance
+  const categoryMap = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    categories.forEach((cat) => {
+      map[cat._id] = cat.name;
+    });
+    return map;
+  }, [categories]);
 
   const getStockStatus = (stock: number, threshold: number = 5) => {
     if (Number(stock) === 0) {
@@ -235,8 +249,7 @@ const Inventory: FC = () => {
                     product.lowStockThreshold
                   );
                   const catId = getCategoryId(product);
-                  const categoryName =
-                    categories.find((c) => c._id === catId)?.name || 'N/A';
+                  const categoryName = categoryMap[catId] || 'N/A';
 
                   return (
                     <InventoryRow

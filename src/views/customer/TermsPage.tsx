@@ -89,21 +89,6 @@ const TermsPage: FC = () => {
               <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center text-primary text-sm font-bold">
                 4
               </div>
-              Pricing and Payments
-            </h2>
-            <p className="text-gray-600 leading-relaxed text-sm md:text-base pl-11">
-              Prices for products are subject to change without notice. We use
-              secure third-party payment processors to handle transactions. By
-              providing payment information, you represent that you have the
-              legal right to use the chosen payment method.
-            </p>
-          </section>
-
-          <section className="space-y-4">
-            <h2 className="flex items-center gap-3 text-xl md:text-2xl font-bold text-gray-900">
-              <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center text-primary text-sm font-bold">
-                5
-              </div>
               Intellectual Property
             </h2>
             <p className="text-gray-600 leading-relaxed text-sm md:text-base pl-11">
