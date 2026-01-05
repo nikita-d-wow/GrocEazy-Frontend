@@ -1,14 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import type { RootState } from '../../redux/store';
 
 import {
-  fetchProducts,
+  fetchAnalyticsProducts,
   deleteProduct as deleteProductAction,
 } from '../../redux/actions/productActions';
-import {
-  selectProducts,
-  selectProductLoading,
-} from '../../redux/selectors/productSelectors';
 
 import { buildAnalytics } from '../../utils/analyticsBuilder';
 
@@ -63,9 +60,8 @@ interface AnalyticsData {
 
 export default function Analytics() {
   const dispatch = useAppDispatch();
-  const productsResult = useSelector(selectProducts);
-  const products = (productsResult || []) as Product[];
-  const loading = useSelector(selectProductLoading);
+  const { analyticsProducts: products, analyticsLoading: loading } =
+    useSelector((state: RootState) => state.product);
 
   const [drilldown, setDrilldown] = useState<{
     isOpen: boolean;
@@ -83,10 +79,8 @@ export default function Analytics() {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
-    if (!products.length) {
-      dispatch(fetchProducts());
-    }
-  }, [dispatch, products.length]);
+    dispatch(fetchAnalyticsProducts());
+  }, [dispatch]);
 
   const analytics = useMemo(
     () => buildAnalytics(products) as unknown as AnalyticsData,
@@ -166,78 +160,84 @@ export default function Analytics() {
 
       {/* CHARTS */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        <ChartCard
-          title="Revenue Trend"
-          description="Click bars to see products added that month"
-        >
-          <RevenueBarChart
-            data={analytics.revenueBar}
-            onSegmentClick={(label) =>
-              openDrilldown(
-                `Products from ${label}`,
-                analytics.productsByMonth[label] || [],
-                'revenue'
-              )
-            }
-          />
-        </ChartCard>
+        <div className="cursor-pointer">
+          <ChartCard
+            title="Revenue Trend"
+            description="Click bars to see products added that month"
+          >
+            <RevenueBarChart
+              data={analytics.revenueBar}
+              onSegmentClick={(label) =>
+                openDrilldown(
+                  `Products from ${label}`,
+                  analytics.productsByMonth[label] || [],
+                  'revenue'
+                )
+              }
+            />
+          </ChartCard>
+        </div>
 
-        <ChartCard
-          title="Inventory Health"
-          description="Click segments to view product lists"
-        >
-          <InventoryPieChart
-            data={analytics.inventoryHealth}
-            onSegmentClick={(segment) => {
-              if (segment === 'Healthy') {
-                openDrilldown(
-                  'Healthy Products',
-                  analytics.healthyProducts,
-                  'healthy'
-                );
-              }
-              if (segment === 'Low Stock') {
-                openDrilldown(
-                  'Low Stock Products',
-                  analytics.lowStockProducts,
-                  'low'
-                );
-              }
-              if (segment === 'Out of Stock') {
-                openDrilldown(
-                  'Out of Stock Products',
-                  analytics.outOfStockProducts,
-                  'out'
-                );
-              }
-            }}
-          />
-        </ChartCard>
+        <div className="cursor-pointer">
+          <ChartCard
+            title="Inventory Health"
+            description="Click segments to view product lists"
+          >
+            <InventoryPieChart
+              data={analytics.inventoryHealth}
+              onSegmentClick={(segment) => {
+                if (segment === 'Healthy') {
+                  openDrilldown(
+                    'Healthy Products',
+                    analytics.healthyProducts,
+                    'healthy'
+                  );
+                }
+                if (segment === 'Low Stock') {
+                  openDrilldown(
+                    'Low Stock Products',
+                    analytics.lowStockProducts,
+                    'low'
+                  );
+                }
+                if (segment === 'Out of Stock') {
+                  openDrilldown(
+                    'Out of Stock Products',
+                    analytics.outOfStockProducts,
+                    'out'
+                  );
+                }
+              }}
+            />
+          </ChartCard>
+        </div>
 
-        <ChartCard
-          title="Product Status"
-          description="Click segments to view status details"
-        >
-          <ProductStatusPieChart
-            data={analytics.productStatus}
-            onSegmentClick={(segment) => {
-              if (segment === 'Active Products') {
-                openDrilldown(
-                  'Active Products',
-                  analytics.activeProductList,
-                  'active'
-                );
-              }
-              if (segment === 'Inactive Products') {
-                openDrilldown(
-                  'Inactive Products',
-                  analytics.inactiveProductList,
-                  'inactive'
-                );
-              }
-            }}
-          />
-        </ChartCard>
+        <div className="cursor-pointer">
+          <ChartCard
+            title="Product Status"
+            description="Click segments to view status details"
+          >
+            <ProductStatusPieChart
+              data={analytics.productStatus}
+              onSegmentClick={(segment) => {
+                if (segment === 'Active Products') {
+                  openDrilldown(
+                    'Active Products',
+                    analytics.activeProductList,
+                    'active'
+                  );
+                }
+                if (segment === 'Inactive Products') {
+                  openDrilldown(
+                    'Inactive Products',
+                    analytics.inactiveProductList,
+                    'inactive'
+                  );
+                }
+              }}
+            />
+          </ChartCard>
+        </div>
       </div>
 
       <AnalyticsDrilldownModal

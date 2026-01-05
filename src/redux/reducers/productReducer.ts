@@ -16,6 +16,8 @@ interface ProductState {
   searchQuery: string;
   searchResults: Product[];
   searchLoading: boolean;
+  analyticsProducts: Product[];
+  analyticsLoading: boolean;
 }
 
 const initialState: ProductState = {
@@ -28,6 +30,8 @@ const initialState: ProductState = {
   searchQuery: '',
   searchResults: [],
   searchLoading: false,
+  analyticsProducts: [],
+  analyticsLoading: false,
 };
 
 const productSlice = createSlice({
@@ -65,17 +69,35 @@ const productSlice = createSlice({
         state.products = [];
       }
       state.products.push(action.payload);
-    },
-    updateProduct(state, action: PayloadAction<Product>) {
-      const index = state.products.findIndex(
-        (p) => p._id === action.payload._id
-      );
-      if (index !== -1) {
-        state.products[index] = action.payload;
+
+      // Keep analytics products in sync if they exist
+      if (state.analyticsProducts && state.analyticsProducts.length > 0) {
+        state.analyticsProducts.push(action.payload);
       }
     },
+    updateProduct(state, action: PayloadAction<Product>) {
+      const updateArray = (arr: Product[]) => {
+        const index = arr.findIndex((p) => p._id === action.payload._id);
+        if (index !== -1) {
+          arr[index] = action.payload;
+        }
+      };
+
+      updateArray(state.products);
+      updateArray(state.analyticsProducts);
+      updateArray(state.searchResults);
+      updateArray(state.topProducts);
+      updateArray(state.similarProducts);
+    },
     deleteProduct(state, action: PayloadAction<string>) {
-      state.products = state.products.filter((p) => p._id !== action.payload);
+      const filterArray = (arr: Product[]) =>
+        arr.filter((p) => p._id !== action.payload);
+
+      state.products = filterArray(state.products);
+      state.analyticsProducts = filterArray(state.analyticsProducts);
+      state.searchResults = filterArray(state.searchResults);
+      state.topProducts = filterArray(state.topProducts);
+      state.similarProducts = filterArray(state.similarProducts);
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
@@ -98,6 +120,12 @@ const productSlice = createSlice({
     setSearchLoading(state, action: PayloadAction<boolean>) {
       state.searchLoading = action.payload;
     },
+    setAnalyticsProducts(state, action: PayloadAction<Product[]>) {
+      state.analyticsProducts = action.payload;
+    },
+    setAnalyticsLoading(state, action: PayloadAction<boolean>) {
+      state.analyticsLoading = action.payload;
+    },
   },
 });
 
@@ -113,6 +141,8 @@ export const {
   setSearchQuery,
   setSearchResults,
   setSearchLoading,
+  setAnalyticsProducts,
+  setAnalyticsLoading,
 } = productSlice.actions;
 
 export default productSlice.reducer;

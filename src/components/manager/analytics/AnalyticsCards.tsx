@@ -31,7 +31,9 @@ export default function AnalyticsCards({
         value={`₹${analytics.revenue.toLocaleString()}`}
         icon={<IndianRupee />}
         bg="from-violet-500 to-purple-600"
-        onClick={() => {}} // Revenue card could show all products or something else
+        onClick={() =>
+          onDrilldown('Total Inventory', analytics.activeProductList, 'active')
+        }
       />
       <MetricCard
         title="Active Products"

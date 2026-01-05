@@ -13,6 +13,8 @@ import {
   setTopProducts,
   setSearchResults,
   setSearchLoading,
+  setAnalyticsProducts,
+  setAnalyticsLoading,
 } from '../reducers/productReducer';
 
 /**
@@ -215,3 +217,23 @@ export const searchProductsGlobally =
       dispatch(setSearchLoading(false));
     }
   };
+
+/**
+ * Fetch all products for analytics (unpaginated, includes inactive)
+ */
+export const fetchAnalyticsProducts = () => async (dispatch: AppDispatch) => {
+  dispatch(setAnalyticsLoading(true));
+  try {
+    const products = await productApi.getAnalyticsProducts();
+    dispatch(setAnalyticsProducts(products));
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    dispatch(
+      setError(
+        err.response?.data?.message || 'Failed to fetch analytics products'
+      )
+    );
+  } finally {
+    dispatch(setAnalyticsLoading(false));
+  }
+};
