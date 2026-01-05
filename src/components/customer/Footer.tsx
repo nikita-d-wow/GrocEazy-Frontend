@@ -121,9 +121,15 @@ export default function Footer() {
             <span className="cursor-default hover:text-green-600">
               Privacy Policy
             </span>
-            <Link to="/terms" className="hover:text-green-600">
-              Terms of Service
-            </Link>
+            {['admin', 'manager'].includes(role) ? (
+              <span className="cursor-default hover:text-green-600">
+                Terms of Service
+              </span>
+            ) : (
+              <Link to="/terms" className="hover:text-green-600">
+                Terms of Service
+              </Link>
+            )}
           </div>
         </div>
       </div>
