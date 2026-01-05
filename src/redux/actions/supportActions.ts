@@ -60,14 +60,16 @@ export const createSupportTicket =
   };
 
 export const fetchMySupportTickets =
-  (page = 1, limit = DEFAULT_LIMIT) =>
+  (page = 1, limit = DEFAULT_LIMIT, status?: string) =>
   async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_FETCH_MY_REQUEST });
 
     try {
-      const { data } = await api.get(
-        `/api/support/my?page=${page}&limit=${limit}`
-      );
+      let url = `/api/support/my?page=${page}&limit=${limit}`;
+      if (status && status !== 'all') {
+        url += `&status=${status}`;
+      }
+      const { data } = await api.get(url);
 
       dispatch({
         type: SUPPORT_FETCH_MY_SUCCESS,
@@ -88,13 +90,16 @@ export const fetchMySupportTickets =
 /* ================= ADMIN / MANAGER ================= */
 
 export const fetchAllSupportTickets =
-  (page = 1, limit = DEFAULT_LIMIT, managerId?: string) =>
+  (page = 1, limit = DEFAULT_LIMIT, status?: string, managerId?: string) =>
   async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_FETCH_ALL_REQUEST });
 
     try {
       let url = `/api/support?page=${page}&limit=${limit}`;
-      if (managerId) {
+      if (status && status !== 'all') {
+        url += `&status=${status}`;
+      }
+      if (managerId && managerId !== 'all') {
         url += `&assignedManager=${managerId}`;
       }
       const { data } = await api.get(url);
