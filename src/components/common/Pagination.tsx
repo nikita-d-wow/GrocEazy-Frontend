@@ -1,4 +1,4 @@
-import { type FC, useEffect } from 'react';
+import { type FC } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
@@ -23,14 +23,11 @@ const Pagination: FC<PaginationProps> = ({
     }, 50);
   };
 
-  useEffect(() => {
-    scrollToTop();
-  }, [currentPage]);
-
   const handlePageChange = (page: number) => {
     if (isLoading || page < 1 || page > totalPages) {
       return;
     }
+    scrollToTop();
     onPageChange(page);
   };
 

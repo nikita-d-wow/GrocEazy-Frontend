@@ -118,13 +118,8 @@ const Inventory: FC = () => {
   }, [dispatch]);
 
   // 2. Fetch Products when page or search term changes
-  // If stock filter is active, fetch more items for client-side filtering
   useEffect(() => {
-    const limit = stockFilter ? 1000 : 10;
-    const fetchPage = stockFilter ? 1 : page;
-    dispatch(
-      fetchManagerProducts(fetchPage, limit, search, undefined, stockFilter)
-    );
+    dispatch(fetchManagerProducts(page, 10, search, undefined, stockFilter));
   }, [dispatch, page, search, stockFilter]);
 
   // 3. Memoized Category Lookup Map for performance
@@ -272,25 +267,7 @@ const Inventory: FC = () => {
               <tbody
                 className={`divide-y divide-gray-100 transition-opacity duration-200 ${loading ? 'opacity-50' : 'opacity-100'}`}
               >
-                {(stockFilter
-                  ? products.filter((p) => {
-                      const status = getStockStatus(
-                        p.stock,
-                        p.lowStockThreshold
-                      );
-                      if (stockFilter === 'low') {
-                        return status.label === 'Low Stock';
-                      }
-                      if (stockFilter === 'out') {
-                        return status.label === 'Out of Stock';
-                      }
-                      if (stockFilter === 'in') {
-                        return status.label === 'In Stock';
-                      }
-                      return true;
-                    })
-                  : products
-                ).map((product) => {
+                {products.map((product) => {
                   const status = getStockStatus(
                     product.stock,
                     product.lowStockThreshold
@@ -311,7 +288,7 @@ const Inventory: FC = () => {
             </table>
           </div>
 
-          {!stockFilter && pagination && pagination.pages > 1 && (
+          {pagination && pagination.pages > 1 && (
             <div className="p-4 border-t border-gray-50">
               <Pagination
                 currentPage={page}
