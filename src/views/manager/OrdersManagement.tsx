@@ -25,16 +25,11 @@ const OrdersManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
-    dispatch(getAllOrders(page, PAGE_SIZE));
-  }, [dispatch, page]);
+    dispatch(getAllOrders(page, PAGE_SIZE, statusFilter));
+  }, [dispatch, page, statusFilter]);
 
   // Client-side filtering
-  const filteredOrders = useMemo(() => {
-    if (statusFilter === 'all') {
-      return orders;
-    }
-    return orders.filter((order) => order.status === statusFilter);
-  }, [orders, statusFilter]);
+  const filteredOrders = orders;
 
   const filterOptions = useMemo(() => {
     const options = Object.keys(ORDER_STATUS_META).map((status) => ({
@@ -98,7 +93,7 @@ const OrdersManagement = () => {
               </div>
 
               {/* Standard Pagination Component */}
-              {pagination && pagination.pages > 1 && statusFilter === 'all' && (
+              {pagination && pagination.pages > 1 && (
                 <div className="pt-10 flex justify-center">
                   <Pagination
                     currentPage={page}

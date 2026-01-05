@@ -31,12 +31,16 @@ interface CreateOrderPayload {
 /* ================= USER ORDERS ================= */
 
 export const getMyOrders =
-  (page = 1, limit = 5) =>
+  (page = 1, limit = 5, status?: string) =>
   async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
 
     try {
-      const { data } = await api.get(`/api/orders?page=${page}&limit=${limit}`);
+      let url = `/api/orders?page=${page}&limit=${limit}`;
+      if (status && status !== 'all') {
+        url += `&status=${status}`;
+      }
+      const { data } = await api.get(url);
 
       dispatch({
         type: FETCH_ORDERS_SUCCESS,
@@ -122,14 +126,16 @@ export const cancelOrder =
 /* ================= MANAGER ORDERS ================= */
 
 export const getAllOrders =
-  (page = 1, limit = 5) =>
+  (page = 1, limit = 5, status?: string) =>
   async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
 
     try {
-      const { data } = await api.get(
-        `/api/orders/all?page=${page}&limit=${limit}`
-      );
+      let url = `/api/orders/all?page=${page}&limit=${limit}`;
+      if (status && status !== 'all') {
+        url += `&status=${status}`;
+      }
+      const { data } = await api.get(url);
 
       dispatch({
         type: FETCH_ORDERS_SUCCESS,

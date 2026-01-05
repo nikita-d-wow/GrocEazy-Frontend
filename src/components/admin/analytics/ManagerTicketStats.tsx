@@ -14,25 +14,39 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
   totalCount,
 }) => {
   const stats = useMemo(() => {
-    const counts: Record<string, number> = {};
+    const counts: Record<
+      string,
+      { total: number; active: number; resolved: number }
+    > = {};
 
     // Initialize counts for all managers
-    managers.forEach((m) => (counts[m._id] = 0));
+    managers.forEach(
+      (m) => (counts[m._id] = { total: 0, active: 0, resolved: 0 })
+    );
 
     // Count tickets for each assigned manager
     tickets.forEach((ticket) => {
       if (ticket.assignedManager?._id) {
-        counts[ticket.assignedManager._id] =
-          (counts[ticket.assignedManager._id] || 0) + 1;
+        const mgrId = ticket.assignedManager._id;
+        if (!counts[mgrId]) {
+          counts[mgrId] = { total: 0, active: 0, resolved: 0 };
+        }
+
+        counts[mgrId].total += 1;
+        if (['open', 'in_progress'].includes(ticket.status)) {
+          counts[mgrId].active += 1;
+        } else {
+          counts[mgrId].resolved += 1;
+        }
       }
     });
 
     return managers
       .map((manager) => ({
         ...manager,
-        count: counts[manager._id] || 0,
+        ...(counts[manager._id] || { total: 0, active: 0, resolved: 0 }),
       }))
-      .sort((a, b) => b.count - a.count);
+      .sort((a, b) => b.active - a.active || b.total - a.total);
   }, [tickets, managers]);
 
   const unassignedCount = tickets.filter((t) => !t.assignedManager).length;
@@ -111,27 +125,43 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
             {stats.map((manager) => (
               <div
                 key={manager._id}
-                className="flex items-center justify-between p-3 rounded-xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm"
+                className="flex flex-col p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm group"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
-                    {(manager.name || manager.email || '?')
-                      .charAt(0)
-                      .toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-gray-800 truncate">
-                      {manager.name || 'Unnamed'}
-                    </p>
-                    <p className="text-[10px] text-gray-500 truncate">
-                      {manager.email}
-                    </p>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                      {(manager.name || manager.email || '?')
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-gray-800 truncate">
+                        {manager.name || 'Unnamed'}
+                      </p>
+                      <p className="text-[10px] text-gray-500 truncate">
+                        {manager.email}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-primary/5 rounded-lg shrink-0">
-                  <span className="text-xs font-bold text-primary">
-                    {manager.count}
-                  </span>
+
+                <div className="grid grid-cols-2 gap-2 mt-auto">
+                  <div className="flex flex-col p-2 bg-white rounded-xl border border-gray-100 items-center justify-center">
+                    <span className="text-[10px] uppercase text-amber-600 font-bold mb-0.5">
+                      Active
+                    </span>
+                    <span className="text-sm font-black text-gray-900">
+                      {manager.active}
+                    </span>
+                  </div>
+                  <div className="flex flex-col p-2 bg-white rounded-xl border border-gray-100 items-center justify-center">
+                    <span className="text-[10px] uppercase text-gray-400 font-bold mb-0.5">
+                      Total
+                    </span>
+                    <span className="text-sm font-bold text-gray-500">
+                      {manager.total}
+                    </span>
+                  </div>
                 </div>
               </div>
             ))}

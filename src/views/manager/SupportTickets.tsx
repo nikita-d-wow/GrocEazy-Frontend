@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { Ticket, SearchX } from 'lucide-react';
@@ -33,8 +33,8 @@ export default function ManagerSupportTickets() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
-    dispatch(fetchAllSupportTickets(page));
-  }, [dispatch, page]);
+    dispatch(fetchAllSupportTickets(page, undefined, statusFilter));
+  }, [dispatch, page, statusFilter]);
 
   const updateStatus = async (id: string, status: TicketStatus) => {
     setUpdatingId(id);
@@ -48,12 +48,7 @@ export default function ManagerSupportTickets() {
     }
   };
 
-  const filteredTickets = useMemo(() => {
-    if (statusFilter === 'all') {
-      return tickets;
-    }
-    return tickets.filter((ticket) => ticket.status === statusFilter);
-  }, [tickets, statusFilter]);
+  const filteredTickets = tickets;
 
   const filterOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -125,12 +120,14 @@ export default function ManagerSupportTickets() {
               ))}
             </div>
 
-            {totalPages > 1 && statusFilter === 'all' && (
+            {totalPages > 1 && (
               <div className="mt-12 flex justify-center">
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
-                  onPageChange={(p) => dispatch(fetchAllSupportTickets(p))}
+                  onPageChange={(p) =>
+                    dispatch(fetchAllSupportTickets(p, undefined, statusFilter))
+                  }
                   isLoading={loading}
                 />
               </div>

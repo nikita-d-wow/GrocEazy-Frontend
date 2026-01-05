@@ -44,32 +44,38 @@ export default function AdminSupportTickets() {
   const { page, totalPages, total } = useSelector(selectSupportPagination);
 
   const [statusFilter, setStatusFilter] = useState('all');
+  const [managerFilter, setManagerFilter] = useState('all');
 
   useEffect(() => {
-    dispatch(fetchAllSupportTickets(page, PAGE_LIMIT));
+    dispatch(
+      fetchAllSupportTickets(page, PAGE_LIMIT, statusFilter, managerFilter)
+    );
 
     if (managers.length === 0) {
       dispatch(fetchManagersForSupport());
     }
 
     dispatch(fetchSupportStats());
-  }, [dispatch, page, managers.length]);
+  }, [dispatch, page, managers.length, statusFilter, managerFilter]);
 
   const filterOptions = useMemo(() => {
-    const options = Object.keys(STATUS_MAP).map((status) => ({
+    const statusOptions = Object.keys(STATUS_MAP).map((status) => ({
       value: status,
       label: STATUS_MAP[status as keyof typeof STATUS_MAP].label,
       icon: STATUS_MAP[status as keyof typeof STATUS_MAP].icon,
     }));
-    return [{ value: 'all', label: 'All Statuses' }, ...options];
+    return [{ value: 'all', label: 'All Statuses' }, ...statusOptions];
   }, []);
 
-  const filteredTickets = useMemo(() => {
-    if (statusFilter === 'all') {
-      return tickets;
-    }
-    return tickets.filter((ticket) => ticket.status === statusFilter);
-  }, [tickets, statusFilter]);
+  const managerOptions = useMemo(() => {
+    const options = managers.map((m) => ({
+      value: m._id,
+      label: m.name || m.email,
+    }));
+    return [{ value: 'all', label: 'All Managers' }, ...options];
+  }, [managers]);
+
+  const filteredTickets = tickets;
 
   return (
     <div className="min-h-screen relative">
@@ -90,14 +96,41 @@ export default function AdminSupportTickets() {
             </h1>
           </div>
 
-          <FilterSelect
-            label="Filter by Status"
-            value={statusFilter}
-            options={filterOptions}
-            onChange={setStatusFilter}
-            className="md:w-64"
-          />
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <FilterSelect
+              label="Filter by Status"
+              value={statusFilter}
+              options={filterOptions}
+              onChange={(val) => {
+                setStatusFilter(val);
+                dispatch(
+                  fetchAllSupportTickets(1, PAGE_LIMIT, val, managerFilter)
+                );
+              }}
+              className="w-full sm:w-64"
+            />
+
+            <FilterSelect
+              label="Filter by Manager"
+              value={managerFilter}
+              options={managerOptions}
+              onChange={(val) => {
+                setManagerFilter(val);
+                dispatch(
+                  fetchAllSupportTickets(1, PAGE_LIMIT, statusFilter, val)
+                );
+              }}
+              className="w-full sm:w-64"
+            />
+          </div>
         </div>
+
+        {/* STATS - ALWAYS VISIBLE IF MANAGERS LOADED */}
+        <ManagerTicketStats
+          tickets={statsTickets.length > 0 ? statsTickets : tickets}
+          managers={managers}
+          totalCount={total}
+        />
 
         {loading && tickets.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -116,13 +149,6 @@ export default function AdminSupportTickets() {
           </div>
         ) : (
           <>
-            {/* STATS */}
-            <ManagerTicketStats
-              tickets={statsTickets.length > 0 ? statsTickets : tickets}
-              managers={managers}
-              totalCount={total}
-            />
-
             {/* LIST */}
             {filteredTickets.length > 0 ? (
               <div className="space-y-8 mt-10">
@@ -245,28 +271,37 @@ export default function AdminSupportTickets() {
                     No matches found
                   </h3>
                   <p className="text-gray-500 max-w-xs mx-auto">
-                    No tickets currently match the "
-                    {filterOptions.find((o) => o.value === statusFilter)?.label}
-                    " status on this page.
+                    No tickets currently match the selected filters across all{' '}
+                    {total} tickets.
                   </p>
                   <button
-                    onClick={() => setStatusFilter('all')}
-                    className="mt-4 text-indigo-600 font-semibold hover:underline"
+                    onClick={() => {
+                      setStatusFilter('all');
+                      setManagerFilter('all');
+                    }}
+                    className="mt-4 text-indigo-600 font-semibold hover:underline cursor-pointer"
                   >
-                    Clear filter
+                    Clear all filters
                   </button>
                 </div>
               </div>
             )}
 
             {/* PAGINATION */}
-            {totalPages > 1 && statusFilter === 'all' && (
+            {totalPages > 1 && (
               <div className="mt-12 flex justify-center">
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
                   onPageChange={(p) =>
-                    dispatch(fetchAllSupportTickets(p, PAGE_LIMIT))
+                    dispatch(
+                      fetchAllSupportTickets(
+                        p,
+                        PAGE_LIMIT,
+                        statusFilter,
+                        managerFilter
+                      )
+                    )
                   }
                   isLoading={loading}
                 />

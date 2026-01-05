@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -33,9 +33,9 @@ export default function MyTickets() {
   const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
-    dispatch(fetchMySupportTickets(currentPage, PAGE_LIMIT));
+    dispatch(fetchMySupportTickets(currentPage, PAGE_LIMIT, statusFilter));
     window.scrollTo(0, 0);
-  }, [dispatch, currentPage]);
+  }, [dispatch, currentPage, statusFilter]);
 
   const filterOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -56,15 +56,7 @@ export default function MyTickets() {
     },
   ];
 
-  const filteredTickets = useMemo(() => {
-    if (!myTickets) {
-      return [];
-    }
-    if (statusFilter === 'all') {
-      return myTickets;
-    }
-    return myTickets.filter((ticket) => ticket.status === statusFilter);
-  }, [myTickets, statusFilter]);
+  const filteredTickets = myTickets || [];
 
   return (
     <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10">
@@ -136,13 +128,13 @@ export default function MyTickets() {
             </div>
           )}
 
-          {pagination.totalPages > 1 && statusFilter === 'all' && (
+          {pagination.totalPages > 1 && (
             <div className="mt-10 flex justify-center">
               <Pagination
                 currentPage={currentPage}
                 totalPages={pagination.totalPages}
                 onPageChange={(p) =>
-                  dispatch(fetchMySupportTickets(p, PAGE_LIMIT))
+                  dispatch(fetchMySupportTickets(p, PAGE_LIMIT, statusFilter))
                 }
                 isLoading={loading}
               />
