@@ -72,6 +72,14 @@ export const getManagerProducts = async (
 };
 
 /**
+ * Get all products for analytics (unpaginated, includes inactive)
+ */
+export const getAnalyticsProducts = async (): Promise<Product[]> => {
+  const response = await api.get<Product[]>('/api/products/analytics');
+  return response.data;
+};
+
+/**
  * Get products by category
  */
 export const getProductsByCategory = async (
