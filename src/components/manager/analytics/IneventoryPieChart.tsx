@@ -10,11 +10,21 @@ interface InventoryHealthData {
 
 export default function InventoryPieChart({
   data,
+  onSegmentClick,
 }: {
   data: InventoryHealthData;
+  onSegmentClick?: (_segment: string) => void;
 }) {
+  const handleClick = (_event: unknown, elements: { index: number }[]) => {
+    if (elements.length > 0 && onSegmentClick) {
+      const index = elements[0].index;
+      const label = ['Healthy', 'Low Stock', 'Out of Stock'][index];
+      onSegmentClick(label);
+    }
+  };
+
   return (
-    <div className="h-[320px] flex items-center justify-center">
+    <div className="h-[320px] flex items-center justify-center cursor-pointer">
       <Pie
         data={{
           labels: ['Healthy', 'Low Stock', 'Out of Stock'],
@@ -26,7 +36,10 @@ export default function InventoryPieChart({
             },
           ],
         }}
-        options={pieOptions}
+        options={{
+          ...pieOptions,
+          onClick: handleClick,
+        }}
       />
     </div>
   );

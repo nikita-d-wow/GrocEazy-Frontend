@@ -1,7 +1,6 @@
 import React, { type FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Search, Package, AlertTriangle, CheckCircle } from 'lucide-react';
-import { useDebounce } from '../../customhooks/useDebounce';
+import { Package, AlertTriangle, CheckCircle } from 'lucide-react';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import { fetchManagerProducts } from '../../redux/actions/productActions';
@@ -13,13 +12,20 @@ import {
 } from '../../redux/selectors/productSelectors';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 import Pagination from '../../components/common/Pagination';
+import DebouncedSearch from '../../components/common/DebouncedSearch';
 
-import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 
 import { InventoryCharts } from './InventoryCharts';
 import { InventoryAlertsModal } from './InventoryAlertsModal';
+import type { Product } from '../../types/Product';
+
+interface StockStatus {
+  label: string;
+  color: string;
+  icon: any;
+}
 
 const InventoryRow = React.memo(
   ({
@@ -27,9 +33,9 @@ const InventoryRow = React.memo(
     categoryName,
     status,
   }: {
-    product: any;
+    product: Product;
     categoryName: string;
-    status: any;
+    status: StockStatus;
   }) => {
     const StatusIcon = status.icon;
     return (
@@ -100,8 +106,7 @@ const Inventory: FC = () => {
   const categories = useSelector(selectCategories);
   const pagination = useSelector(selectProductPagination);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [search, setSearch] = useState('');
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -112,8 +117,8 @@ const Inventory: FC = () => {
 
   // 2. Fetch Products when page or search term changes
   useEffect(() => {
-    dispatch(fetchManagerProducts(page, 10, debouncedSearchTerm));
-  }, [dispatch, page, debouncedSearchTerm]);
+    dispatch(fetchManagerProducts(page, 10, search));
+  }, [dispatch, page, search]);
 
   // 3. Memoized Category Lookup Map for performance
   const categoryMap = React.useMemo(() => {
@@ -146,17 +151,19 @@ const Inventory: FC = () => {
     };
   };
 
-  const getCategoryId = (p: any) => {
+  const getCategoryId = (p: Product) => {
     if (typeof p.categoryId === 'object' && p.categoryId !== null) {
       return (p.categoryId as { _id: string })._id;
     }
     if (typeof p.categoryId === 'string' && p.categoryId) {
       return p.categoryId;
     }
-    if (typeof p.category === 'object' && p.category !== null) {
-      return (p.category as { _id: string })._id;
+    // Fallback for different data structures if they exist
+    const prodAsAny = p as any;
+    if (typeof prodAsAny.category === 'object' && prodAsAny.category !== null) {
+      return (prodAsAny.category as { _id: string })._id;
     }
-    return p.category;
+    return prodAsAny.category;
   };
 
   return (
@@ -187,14 +194,13 @@ const Inventory: FC = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
         <div className="p-4 border-b border-gray-100">
           <div className="max-w-md">
-            <Input
+            <DebouncedSearch
               placeholder="Search inventory..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
+              initialValue={search}
+              onSearch={(val) => {
+                setSearch(val);
                 setPage(1);
               }}
-              leftIcon={<Search className="w-5 h-5" />}
             />
           </div>
         </div>
@@ -211,8 +217,8 @@ const Inventory: FC = () => {
         <EmptyState
           title="No Products Found"
           description={
-            searchTerm
-              ? `No products match "${searchTerm}"`
+            search
+              ? `No products match "${search}"`
               : 'Your inventory is currently empty.'
           }
           icon={<Package className="w-12 h-12" />}

@@ -36,14 +36,20 @@ const Input: FC<InputProps> = ({
         )}
         <input
           id={inputId}
+          onWheel={(e) => {
+            if (props.type === 'number') {
+              (e.target as HTMLInputElement).blur();
+            }
+          }}
           className={`
             w-full bg-white text-gray-900 border-2 rounded-xl 
             ${leftIcon ? 'pl-10' : 'pl-4'} 
             ${rightIcon ? 'pr-10' : 'pr-4'} 
             py-2.5 outline-none transition-all duration-200
-            ${error
-              ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-50'
-              : 'border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-4 focus:ring-green-50'
+            ${
+              error
+                ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-50'
+                : 'border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-4 focus:ring-green-50'
             }
             placeholder:text-gray-400
             ${className}

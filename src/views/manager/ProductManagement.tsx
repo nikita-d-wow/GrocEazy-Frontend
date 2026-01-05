@@ -1,8 +1,8 @@
 import React, { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { Plus, Edit2, Trash2, Search, Package } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useDebounce } from '../../customhooks/useDebounce';
+import DebouncedSearch from '../../components/common/DebouncedSearch';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
@@ -21,7 +21,6 @@ import type { Product } from '../../types/Product';
 
 import ProductForm from '../../components/products/ProductForm';
 import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import FilterSelect from '../../components/common/FilterSelect';
@@ -40,8 +39,8 @@ const ProductRow = React.memo(
     onDelete,
   }: {
     product: Product;
-    onEdit: (product: Product) => void;
-    onDelete: (id: string) => void;
+    onEdit: (_product: Product) => void;
+    onDelete: (_id: string) => void;
   }) => {
     return (
       <tr
@@ -145,8 +144,7 @@ const ProductManagement: FC = () => {
   const loading = useSelector(selectProductLoading);
   const pagination = useSelector(selectProductPagination);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -160,8 +158,8 @@ const ProductManagement: FC = () => {
           ? true
           : false;
 
-    dispatch(fetchManagerProducts(page, 10, debouncedSearchTerm, isActive));
-  }, [dispatch, page, debouncedSearchTerm, statusFilter]);
+    dispatch(fetchManagerProducts(page, 10, search, isActive));
+  }, [dispatch, page, search, statusFilter]);
 
   const displayProducts = products;
 
@@ -206,14 +204,13 @@ const ProductManagement: FC = () => {
         <div className="p-4 border-b border-gray-100">
           <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
             <div className="flex-1 max-w-md w-full">
-              <Input
+              <DebouncedSearch
                 placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                initialValue={search}
+                onSearch={(val) => {
+                  setSearch(val);
                   setPage(1);
                 }}
-                leftIcon={<Search className="w-5 h-5" />}
               />
             </div>
             <FilterSelect
@@ -241,13 +238,13 @@ const ProductManagement: FC = () => {
         <EmptyState
           title="No Products Found"
           description={
-            searchTerm
-              ? `No products match "${searchTerm}"`
+            search
+              ? `No products match "${search}"`
               : 'Start by adding products to your inventory.'
           }
           icon={<Package className="w-12 h-12" />}
           action={
-            !searchTerm
+            !search
               ? {
                   label: 'Add Product',
                   onClick: handleAddNew,

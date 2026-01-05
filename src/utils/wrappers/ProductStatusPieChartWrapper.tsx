@@ -9,11 +9,21 @@ interface ProductStatusData {
 
 export default function ProductStatusPieChartWrapper({
   data,
+  onSegmentClick,
 }: {
   data: ProductStatusData;
+  onSegmentClick?: (_segment: string) => void;
 }) {
+  const handleClick = (_event: unknown, elements: { index: number }[]) => {
+    if (elements.length > 0 && onSegmentClick) {
+      const index = elements[0].index;
+      const label = ['Active Products', 'Inactive Products'][index];
+      onSegmentClick(label);
+    }
+  };
+
   return (
-    <div className="h-[320px] flex items-center justify-center">
+    <div className="h-[320px] flex items-center justify-center cursor-pointer">
       <Pie
         data={{
           labels: ['Active Products', 'Inactive Products'],
@@ -29,6 +39,7 @@ export default function ProductStatusPieChartWrapper({
         }}
         options={{
           ...pieOptions,
+          onClick: handleClick,
           plugins: {
             ...pieOptions.plugins,
             legend: {
