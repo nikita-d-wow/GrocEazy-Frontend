@@ -9,11 +9,20 @@ interface RevenueBarData {
 
 export default function RevenueBarChartWrapper({
   data,
+  onSegmentClick,
 }: {
   data: RevenueBarData;
+  onSegmentClick?: (_label: string) => void;
 }) {
+  const handleClick = (_event: unknown, elements: { index: number }[]) => {
+    if (elements.length > 0 && onSegmentClick) {
+      const index = elements[0].index;
+      onSegmentClick(data.labels[index]);
+    }
+  };
+
   return (
-    <div className="h-[360px]">
+    <div className="h-[360px] cursor-pointer">
       <Bar
         data={{
           labels: data.labels,
@@ -27,7 +36,10 @@ export default function RevenueBarChartWrapper({
             },
           ],
         }}
-        options={barOptions}
+        options={{
+          ...barOptions,
+          onClick: handleClick,
+        }}
       />
     </div>
   );

@@ -12,8 +12,12 @@ import ProductFilters, {
 import MobileCategorySidebar from '../../../components/products/MobileCategorySidebar';
 
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
-import { fetchProducts } from '../../../redux/actions/productActions';
+import {
+  fetchProducts,
+  searchProductsGlobally,
+} from '../../../redux/actions/productActions';
 import { fetchWishlist } from '../../../redux/actions/wishlistActions';
+import { setSearchQuery } from '../../../redux/reducers/productReducer';
 
 import type { RootState } from '../../../redux/store';
 
@@ -22,9 +26,15 @@ const ProductsPage: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { products, loading, error } = useSelector(
-    (state: RootState) => state.product
-  );
+  const {
+    products,
+    loading,
+    error,
+    pagination,
+    searchQuery,
+    searchResults,
+    searchLoading,
+  } = useSelector((state: RootState) => state.product);
   const { user } = useSelector((state: RootState) => state.auth);
 
   /* ---------------- URL STATE ---------------- */
@@ -33,14 +43,69 @@ const ProductsPage: FC = () => {
     [location.search]
   );
   const selectedCategory = queryParams.get('category');
-  const searchQuery = queryParams.get('search') || '';
 
   /* ---------------- LOCAL FILTERS ---------------- */
   const [localFilters, setLocalFilters] = useState({
     priceRange: [0, 5000] as [number, number],
     sortBy: 'newest',
   });
-  const [page, setPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 16;
+  const page = useMemo(
+    () => parseInt(queryParams.get('page') || '1', 10),
+    [queryParams]
+  );
+
+  const setPage = (p: number) => {
+    const params = new URLSearchParams(location.search);
+    params.set('page', p.toString());
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+  };
+
+  /* ---------------- DATA FETCH ---------------- */
+  useEffect(() => {
+    dispatch(
+      fetchProducts(
+        page,
+        ITEMS_PER_PAGE,
+        undefined, // search no longer passed to backend
+        selectedCategory || undefined,
+        localFilters.priceRange[0],
+        localFilters.priceRange[1],
+        localFilters.sortBy
+      )
+    );
+  }, [
+    dispatch,
+    page,
+    selectedCategory,
+    localFilters.priceRange,
+    localFilters.sortBy,
+  ]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch(searchProductsGlobally(searchQuery));
+    }, 300); // Small debounce for global search
+    return () => clearTimeout(timer);
+  }, [dispatch, searchQuery]);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, user]);
+
+  /* ---------------- RESET PAGE ON FILTER CHANGE - Handled in handleUpdateFilters ---------------- */
+
+  const totalPages = pagination?.pages || 1;
+  const totalResults = pagination?.total || products.length;
+
+  const isSearching = searchQuery.trim().length > 0;
+  const displayedProducts = isSearching ? searchResults : products;
+  const isDataLoading = isSearching
+    ? searchLoading
+    : loading && products.length === 0;
 
   const allFilters = useMemo(
     () => ({
@@ -51,89 +116,15 @@ const ProductsPage: FC = () => {
     [selectedCategory, searchQuery, localFilters]
   );
 
-  /* ---------------- DERIVED STATE RESET ---------------- */
-  const [prevSearch, setPrevSearch] = useState(searchQuery);
-  const [prevCategory, setPrevCategory] = useState(selectedCategory);
-  const [prevLocalFilters, setPrevLocalFilters] = useState(localFilters);
-
-  if (
-    searchQuery !== prevSearch ||
-    selectedCategory !== prevCategory ||
-    localFilters !== prevLocalFilters
-  ) {
-    setPage(1);
-    setPrevSearch(searchQuery);
-    setPrevCategory(selectedCategory);
-    setPrevLocalFilters(localFilters);
-  }
-
-  /* ---------------- DATA FETCH ---------------- */
-  useEffect(() => {
-    // Fetch all products once to allow fast client-side filtering
-    dispatch(fetchProducts());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (user) {
-      dispatch(fetchWishlist());
-    }
-  }, [dispatch, user]);
-
-  /* ---------------- CLIENT-SIDE FILTER LOGIC ---------------- */
-  const filteredProducts = useMemo(() => {
-    let result = products.filter((p) => p.isActive !== false);
-
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase().trim();
-      const words = query.split(/\s+/);
-
-      // Multi-word matching logic (Matches either name OR description)
-      result = result.filter((p) => {
-        const target = `${p.name} ${p.description || ''}`.toLowerCase();
-        return words.every((word) => target.includes(word));
-      });
-    }
-
-    if (selectedCategory) {
-      result = result.filter((p) => {
-        const catId =
-          typeof p.categoryId === 'object' ? p.categoryId._id : p.categoryId;
-        return String(catId) === selectedCategory;
-      });
-    }
-
-    // Price Filter
-    result = result.filter(
-      (p) =>
-        p.price >= localFilters.priceRange[0] &&
-        p.price <= localFilters.priceRange[1]
-    );
-
-    // Sorting
-    if (localFilters.sortBy === 'price_asc') {
-      result.sort((a, b) => a.price - b.price);
-    } else if (localFilters.sortBy === 'price_desc') {
-      result.sort((a, b) => b.price - a.price);
-    } else if (localFilters.sortBy === 'newest') {
-      result = [...result].reverse(); // Assuming original is chronologically sorted
-    }
-
-    return result;
-  }, [products, searchQuery, selectedCategory, localFilters]);
-
-  const ITEMS_PER_PAGE = 16;
-  const paginatedProducts = useMemo(() => {
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredProducts, page]);
-
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-
-  /* ---------------- FILTER HANDLER ---------------- */
+  /* ---------------- HANDLERS ---------------- */
   const handleUpdateFilters = (updates: Partial<FilterState>) => {
     const params = new URLSearchParams(location.search);
+    params.set('page', '1'); // Reset to first page on filter change
 
     if (updates.selectedCategory !== undefined) {
+      // Clear global search when category is changed to avoid conflict
+      dispatch(setSearchQuery(''));
+
       if (updates.selectedCategory) {
         params.set('category', updates.selectedCategory);
       } else {
@@ -174,7 +165,9 @@ const ProductsPage: FC = () => {
             </div>
             <div className="mt-4 md:mt-0">
               <span className="text-gray-600 font-medium">
-                {filteredProducts.length} results found
+                {isSearching
+                  ? `${searchResults.length} matches found globally`
+                  : `${totalResults} results found`}
               </span>
             </div>
           </div>
@@ -200,7 +193,7 @@ const ProductsPage: FC = () => {
 
             {/* ---------------- PRODUCT GRID ---------------- */}
             <main className="flex-1 w-full">
-              {loading && products.length === 0 ? (
+              {isDataLoading ? (
                 <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {[1, 2, 3, 4].map((i) => (
                     <div
@@ -211,8 +204,8 @@ const ProductsPage: FC = () => {
                 </div>
               ) : (
                 <>
-                  <ProductGrid products={paginatedProducts} />
-                  {totalPages > 1 && (
+                  <ProductGrid products={displayedProducts} />
+                  {!isSearching && totalPages > 1 && (
                     <div className="mt-12">
                       <Pagination
                         currentPage={page}

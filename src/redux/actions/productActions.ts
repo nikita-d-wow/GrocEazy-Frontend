@@ -1,4 +1,5 @@
-import type { AppDispatch } from '../store';
+import type { AxiosError } from 'axios';
+import type { AppDispatch, RootState } from '../store';
 import type { ProductFormData } from '../../types/Product';
 import * as productApi from '../../services/productApi';
 import {
@@ -10,6 +11,8 @@ import {
   deleteProduct as deleteProductAction,
   setSimilarProducts,
   setTopProducts,
+  setSearchResults,
+  setSearchLoading,
 } from '../reducers/productReducer';
 
 /**
@@ -39,21 +42,19 @@ export const fetchProducts =
         sortBy
       );
       dispatch(setProducts(data));
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
       dispatch(
-        setError(error.response?.data?.message || 'Failed to fetch products')
+        setError(err.response?.data?.message || 'Failed to fetch products')
       );
     } finally {
       dispatch(setLoading(false));
     }
   };
 
-/**
- * Fetch all products for manager (includes inactive)
- */
 export const fetchManagerProducts =
   (page = 1, limit = 20, search?: string, isActive?: boolean) =>
-  async (dispatch: AppDispatch, getState: () => any) => {
+  async (dispatch: AppDispatch, getState: () => RootState) => {
     const { loading } = getState().product;
     if (loading) {
       return;
@@ -69,9 +70,10 @@ export const fetchManagerProducts =
         isActive
       );
       dispatch(setProducts(data));
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
       dispatch(
-        setError(error.response?.data?.message || 'Failed to fetch products')
+        setError(err.response?.data?.message || 'Failed to fetch products')
       );
     } finally {
       dispatch(setLoading(false));
@@ -88,9 +90,10 @@ export const createProduct =
     try {
       const product = await productApi.createProduct(data);
       dispatch(addProductAction(product));
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
       dispatch(
-        setError(error.response?.data?.message || 'Failed to create product')
+        setError(err.response?.data?.message || 'Failed to create product')
       );
       throw error;
     } finally {
@@ -108,9 +111,10 @@ export const updateProduct =
     try {
       const product = await productApi.updateProduct(id, data);
       dispatch(updateProductAction(product));
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
       dispatch(
-        setError(error.response?.data?.message || 'Failed to update product')
+        setError(err.response?.data?.message || 'Failed to update product')
       );
       throw error;
     } finally {
@@ -127,9 +131,10 @@ export const deleteProduct = (id: string) => async (dispatch: AppDispatch) => {
   try {
     await productApi.deleteProduct(id);
     dispatch(deleteProductAction(id));
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
     dispatch(
-      setError(error.response?.data?.message || 'Failed to delete product')
+      setError(err.response?.data?.message || 'Failed to delete product')
     );
     throw error;
   } finally {
@@ -145,10 +150,11 @@ export const fetchSimilarProducts =
     try {
       const products = await productApi.getSimilarProducts(id);
       dispatch(setSimilarProducts(products));
-    } catch (error: any) {
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
       dispatch(
         setError(
-          error.response?.data?.message || 'Failed to fetch similar products'
+          err.response?.data?.message || 'Failed to fetch similar products'
         )
       );
     }
@@ -162,9 +168,10 @@ export const fetchTopProducts = () => async (dispatch: AppDispatch) => {
   try {
     const products = await productApi.getTopProducts();
     dispatch(setTopProducts(products));
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
     dispatch(
-      setError(error.response?.data?.message || 'Failed to fetch top products')
+      setError(err.response?.data?.message || 'Failed to fetch top products')
     );
     // Fallback: set empty if failed, UI will handle with products fallback
     dispatch(setTopProducts([]));
@@ -172,3 +179,30 @@ export const fetchTopProducts = () => async (dispatch: AppDispatch) => {
     dispatch(setLoading(false));
   }
 };
+
+/**
+ * Global search products (backend results, high limit)
+ */
+export const searchProductsGlobally =
+  (search: string) => async (dispatch: AppDispatch) => {
+    if (!search.trim()) {
+      dispatch(setSearchResults([]));
+      return;
+    }
+
+    dispatch(setSearchLoading(true));
+    try {
+      // Fetch matching items across all categories/pages
+      const data = await productApi.getProducts(
+        1,
+        50, // High limit for search results
+        search
+      );
+      dispatch(setSearchResults(data.products || data));
+    } catch (error) {
+      // Silently fail or log to a service (but not console in production-lite linting)
+      dispatch(setSearchResults([]));
+    } finally {
+      dispatch(setSearchLoading(false));
+    }
+  };

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '../../redux/store';
 
 import { logout } from '../../redux/actions/authActions';
+import { setSearchQuery } from '../../redux/reducers/productReducer';
 import UserProfileDropdown from './UserProfileDropdown';
 import { adminNav, managerNav, customerNav } from '../../utils/navitems';
 import { selectCartItems } from '../../redux/selectors/cartSelectors';
@@ -17,9 +18,8 @@ import {
 export default function Header() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-  const [searchQuery, setSearchQuery] = useState(() => {
-    return new URLSearchParams(window.location.search).get('search') || '';
-  });
+  const dispatch = useAppDispatch();
+  const { searchQuery } = useSelector((state: RootState) => state.product);
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const cartItems = useSelector(selectCartItems);
@@ -29,67 +29,16 @@ export default function Header() {
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const wishlistCount = wishlistPagination?.total || wishlistItems.length;
 
-  // 1. Sync state FROM URL (Handles browser back/forward and external navigations)
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const searchParam = urlParams.get('search') || '';
-    if (searchParam !== searchQuery) {
-      setSearchQuery(searchParam);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search]); // Only re-run when actual URL search changes
-
-  // 2. Sync URL FROM state (Handles typing with debounce)
-  React.useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const currentSearch = urlParams.get('search') || '';
-    const trimmedQuery = searchQuery.trim();
-
-    // Avoid redundant navigation if state matches URL
-    if (trimmedQuery === currentSearch) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      const newParams = new URLSearchParams(location.search);
-      if (trimmedQuery) {
-        newParams.set('search', trimmedQuery);
-        newParams.delete('category'); // Searching usually clears category
-      } else {
-        newParams.delete('search');
-      }
-
-      // Only navigate if we're not just clearing an empty search on a non-products page
-      const isStillDifferent =
-        newParams.get('search') !==
-        (new URLSearchParams(location.search).get('search') || '');
-
-      if (isStillDifferent) {
-        navigate(`/products?${newParams.toString()}`, { replace: true });
-        setOpen(false); // Close mobile menu
-      }
-    }, 700);
-
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, navigate]); // Notice location.search is NOT a dependency to prevent feedback loops
+  // No longer syncing search with URL query parameters
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      const trimmed = searchQuery.trim();
-      const params = new URLSearchParams(location.search);
-      if (trimmed) {
-        params.set('search', trimmed);
-        params.delete('category');
-      } else {
-        params.delete('search');
+      if (!location.pathname.startsWith('/products')) {
+        navigate('/products');
       }
-      navigate(`/products?${params.toString()}`, { replace: true });
       setOpen(false);
     }
   };
-
-  const dispatch = useAppDispatch();
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -160,7 +109,7 @@ export default function Header() {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                 onKeyDown={handleSearch}
                 placeholder="Search available products..."
                 className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
@@ -280,7 +229,7 @@ export default function Header() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => dispatch(setSearchQuery(e.target.value))}
               onKeyDown={handleSearch}
               placeholder="Search products..."
               className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-100"

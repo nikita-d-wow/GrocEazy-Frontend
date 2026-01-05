@@ -1,8 +1,8 @@
 import React, { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { Plus, Edit2, Trash2, Search, Layers } from 'lucide-react';
+import { Plus, Edit2, Trash2, Layers } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useDebounce } from '../../customhooks/useDebounce';
+import DebouncedSearch from '../../components/common/DebouncedSearch';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
@@ -20,7 +20,6 @@ import type { Category } from '../../types/Category';
 
 import CategoryForm from '../../components/categories/CategoryForm';
 import Button from '../../components/common/Button';
-import Input from '../../components/common/Input';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
@@ -32,8 +31,8 @@ const CategoryRow = React.memo(
     onDelete,
   }: {
     category: Category;
-    onEdit: (category: Category) => void;
-    onDelete: (id: string) => void;
+    onEdit: (_category: Category) => void;
+    onDelete: (_id: string) => void;
   }) => {
     return (
       <tr className="hover:bg-gray-50/50">
@@ -101,13 +100,12 @@ const CategoryManagement: FC = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(fetchPagedCategories(page, 10, debouncedSearchTerm));
-  }, [dispatch, page, debouncedSearchTerm]);
+    dispatch(fetchPagedCategories(page, 10, search));
+  }, [dispatch, page, search]);
 
   const handleDelete = useCallback(
     async (id: string) => {
@@ -155,14 +153,13 @@ const CategoryManagement: FC = () => {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
         <div className="p-4 border-b border-gray-100">
           <div className="max-w-md">
-            <Input
+            <DebouncedSearch
               placeholder="Search categories..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
+              initialValue={search}
+              onSearch={(val) => {
+                setSearch(val);
                 setPage(1);
               }}
-              leftIcon={<Search className="w-5 h-5" />}
             />
           </div>
         </div>
@@ -179,13 +176,13 @@ const CategoryManagement: FC = () => {
         <EmptyState
           title="No Categories Found"
           description={
-            searchTerm
-              ? `No categories match "${searchTerm}"`
+            search
+              ? `No categories match "${search}"`
               : 'Create categories to organize your products.'
           }
           icon={<Layers className="w-12 h-12" />}
           action={
-            !searchTerm
+            !search
               ? { label: 'Add Category', onClick: handleAddNew }
               : undefined
           }
