@@ -115,7 +115,7 @@ const Inventory: FC = () => {
     dispatch(fetchCategories());
   }, [dispatch]);
 
-  // 2. Fetch Products when page or search term changes
+  // 2. Fetch Products when search or page changes
   useEffect(() => {
     dispatch(fetchManagerProducts(page, 10, search));
   }, [dispatch, page, search]);

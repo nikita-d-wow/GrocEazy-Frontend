@@ -3,6 +3,7 @@ export interface Category {
   name: string;
   image?: string;
   isActive: boolean;
+  productCount?: number;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;

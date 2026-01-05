@@ -32,45 +32,73 @@ const PriceRangeSlider: FC<PriceRangeSliderProps> = ({
   const maxPercent = ((value[1] - min) / (max - min)) * 100;
 
   return (
-    <div className="relative pt-6 pb-2">
-      {/* Display Values */}
-      <div className="flex justify-between mb-4 text-sm font-medium text-gray-700">
-        <span>₹{value[0]}</span>
-        <span>₹{value[1]}</span>
+    <div className="relative pt-8 pb-4">
+      {/* Display Values with subtle badges */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex flex-col">
+          <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-0.5">
+            Min
+          </span>
+          <span className="text-sm font-bold text-gray-900 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
+            ₹{value[0]}
+          </span>
+        </div>
+        <div className="h-px w-4 bg-gray-200 mt-4" />
+        <div className="flex flex-col items-end">
+          <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-0.5">
+            Max
+          </span>
+          <span className="text-sm font-bold text-gray-900 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
+            ₹{value[1]}
+          </span>
+        </div>
       </div>
 
-      {/* Slider Track Background */}
-      <div className="relative h-1.5 bg-gray-200 rounded-full">
-        {/* Active Range */}
-        <div
-          className="absolute h-full bg-green-500 rounded-full"
-          style={{
-            left: `${minPercent}%`,
-            right: `${100 - maxPercent}%`,
-          }}
-        />
-      </div>
+      {/* Slider Track Container */}
+      <div className="relative px-1">
+        {/* Slider Track Background */}
+        <div className="relative h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          {/* Active Range Overlay */}
+          <div
+            className="absolute h-full bg-green-500 transition-all duration-150"
+            style={{
+              left: `${minPercent}%`,
+              width: `${maxPercent - minPercent}%`,
+            }}
+          />
+        </div>
 
-      {/* Range Inputs */}
-      <div className="relative">
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={value[0]}
-          onChange={handleMinChange}
-          className="absolute w-full -mt-1.5 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-green-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-green-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md"
-          style={{ zIndex: value[0] > max - 100 ? 5 : 3 }}
-        />
-        <input
-          type="range"
-          min={min}
-          max={max}
-          value={value[1]}
-          onChange={handleMaxChange}
-          className="absolute w-full -mt-1.5 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-green-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md [&::-moz-range-thumb]:pointer-events-auto [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-green-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:shadow-md"
-          style={{ zIndex: 4 }}
-        />
+        {/* Range Inputs - Overlaid on the track */}
+        <div className="relative h-1.5 -mt-1.5">
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={value[0]}
+            onChange={handleMinChange}
+            className="absolute w-full appearance-none bg-transparent pointer-events-none z-30
+              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
+              [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full 
+              [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-green-500 
+              [&::-webkit-slider-thumb]:cursor-grab active:[&::-webkit-slider-thumb]:cursor-grabbing
+              [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(34,197,94,0.3)] [&::-webkit-slider-thumb]:transition-transform
+              hover:[&::-webkit-slider-thumb]:scale-110 active:[&::-webkit-slider-thumb]:scale-95"
+          />
+          <input
+            type="range"
+            min={min}
+            max={max}
+            value={value[1]}
+            onChange={handleMaxChange}
+            className="absolute w-full appearance-none bg-transparent pointer-events-none z-40
+              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
+              [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full 
+              [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-green-500 
+              [&::-webkit-slider-thumb]:cursor-grab active:[&::-webkit-slider-thumb]:cursor-grabbing
+              [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(34,197,94,0.3)] [&::-webkit-slider-thumb]:transition-transform
+              hover:[&::-webkit-slider-thumb]:scale-110 active:[&::-webkit-slider-thumb]:scale-95"
+          />
+        </div>
       </div>
     </div>
   );

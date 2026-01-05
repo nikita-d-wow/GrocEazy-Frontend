@@ -146,6 +146,7 @@ const ProductManagement: FC = () => {
 
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [stockFilter, setStockFilter] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [page, setPage] = useState(1);
@@ -158,8 +159,8 @@ const ProductManagement: FC = () => {
           ? true
           : false;
 
-    dispatch(fetchManagerProducts(page, 10, search, isActive));
-  }, [dispatch, page, search, statusFilter]);
+    dispatch(fetchManagerProducts(page, 10, search, isActive, stockFilter));
+  }, [dispatch, page, search, statusFilter, stockFilter]);
 
   const displayProducts = products;
 
@@ -199,11 +200,13 @@ const ProductManagement: FC = () => {
         </Button>
       </div>
 
-      {/* Search Bar */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
         <div className="p-4 border-b border-gray-100">
           <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
             <div className="flex-1 max-w-md w-full">
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
+                Search
+              </span>
               <DebouncedSearch
                 placeholder="Search products..."
                 initialValue={search}
@@ -213,16 +216,33 @@ const ProductManagement: FC = () => {
                 }}
               />
             </div>
-            <FilterSelect
-              label="Filter by Status"
-              options={STATUS_OPTIONS}
-              value={statusFilter}
-              onChange={(value) => {
-                setStatusFilter(value);
-                setPage(1);
-              }}
-              className="w-full md:w-48"
-            />
+            <div className="flex flex-wrap md:flex-nowrap gap-4 justify-end">
+              <FilterSelect
+                label="Stock Status"
+                options={[
+                  { value: '', label: 'All Items' },
+                  { value: 'inStock', label: 'In Stock' },
+                  { value: 'lowStock', label: 'Low Stock' },
+                  { value: 'outOfStock', label: 'Out of Stock' },
+                ]}
+                value={stockFilter}
+                onChange={(value: string) => {
+                  setStockFilter(value);
+                  setPage(1);
+                }}
+                className="w-full md:w-48"
+              />
+              <FilterSelect
+                label="Status"
+                options={STATUS_OPTIONS}
+                value={statusFilter}
+                onChange={(value: string) => {
+                  setStatusFilter(value);
+                  setPage(1);
+                }}
+                className="w-full md:w-48"
+              />
+            </div>
           </div>
         </div>
       </div>

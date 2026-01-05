@@ -15,6 +15,7 @@ interface FilterSelectProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  align?: 'left' | 'right';
 }
 
 const FilterSelect = ({
@@ -23,6 +24,7 @@ const FilterSelect = ({
   value,
   onChange,
   className = '',
+  align = 'left',
 }: FilterSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -46,32 +48,32 @@ const FilterSelect = ({
   return (
     <div className={`relative ${className}`} ref={containerRef}>
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">
+        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 drop-shadow-sm">
           {label}
         </span>
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`
             flex items-center justify-between gap-3 px-4 py-2.5
-            bg-white/80 backdrop-blur-md border border-gray-200
-            rounded-2xl shadow-sm hover:shadow-md hover:border-primary/30
+            bg-white border-2 border-gray-100
+            rounded-2xl shadow-sm hover:shadow-md hover:border-green-500/30
             transition-all duration-300 group min-w-[160px] cursor-pointer
-            ${isOpen ? 'ring-2 ring-primary/20 border-primary/50' : ''}
+            ${isOpen ? 'ring-4 ring-green-500/10 border-green-500/50' : ''}
           `}
         >
           <div className="flex items-center gap-2.5">
             <Filter
               size={16}
-              className="text-gray-400 group-hover:text-primary transition-colors"
+              className={`transition-colors ${isOpen ? 'text-green-600' : 'text-gray-400 group-hover:text-green-500'}`}
             />
-            <span className="text-sm font-semibold text-gray-700">
-              {selectedOption.label}
+            <span className="text-sm font-bold text-gray-700">
+              {selectedOption ? selectedOption.label : 'Select...'}
             </span>
           </div>
           <ChevronDown
             size={16}
             className={`text-gray-400 transition-transform duration-300 ${
-              isOpen ? 'rotate-180' : ''
+              isOpen ? 'rotate-180 text-green-600' : ''
             }`}
           />
         </button>
@@ -84,62 +86,67 @@ const FilterSelect = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="
-              absolute left-0 top-full mt-3 z-50
-              w-full min-w-[200px] p-2
-              bg-white/90 backdrop-blur-xl
-              border border-white/50
-              rounded-2xl shadow-2xl shadow-primary/10
+            className={`
+              absolute ${align === 'right' ? 'right-0' : 'left-0'} top-full mt-3 z-[999]
+              w-full min-w-[220px] p-2
+              bg-white border-2 border-gray-100
+              rounded-2xl shadow-2xl shadow-gray-200/50
               flex flex-col gap-1
-            "
+            `}
           >
-            {options.map((option) => {
-              const isSelected = option.value === value;
-              return (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    onChange(option.value);
-                    setIsOpen(false);
-                  }}
-                  className={`
+            {options.length > 0 ? (
+              options.map((option) => {
+                const isSelected = option.value === value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => {
+                      onChange(option.value);
+                      setIsOpen(false);
+                    }}
+                    className={`
                     w-full flex items-center justify-between
-                    px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200
+                    px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
                     ${
                       isSelected
-                        ? 'bg-primary/10 text-primary'
+                        ? 'bg-green-50 text-green-700'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 cursor-pointer'
                     }
                   `}
-                >
-                  <div className="flex items-center gap-2.5">
-                    {option.icon && (
-                      <span
-                        className={
-                          isSelected ? 'text-primary' : 'text-gray-400'
-                        }
+                  >
+                    <div className="flex items-center gap-2.5">
+                      {option.icon && (
+                        <span
+                          className={
+                            isSelected ? 'text-green-600' : 'text-gray-400'
+                          }
+                        >
+                          {option.icon}
+                        </span>
+                      )}
+                      {option.label}
+                    </div>
+                    {isSelected && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 300,
+                          damping: 20,
+                        }}
                       >
-                        {option.icon}
-                      </span>
+                        <Check size={16} className="text-green-600" />
+                      </motion.div>
                     )}
-                    {option.label}
-                  </div>
-                  {isSelected && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 300,
-                        damping: 20,
-                      }}
-                    >
-                      <Check size={16} className="text-primary" />
-                    </motion.div>
-                  )}
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })
+            ) : (
+              <div className="px-4 py-3 text-sm text-gray-400 text-center">
+                No options available
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
