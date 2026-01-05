@@ -13,6 +13,7 @@ import {
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 import Pagination from '../../components/common/Pagination';
 import DebouncedSearch from '../../components/common/DebouncedSearch';
+import FilterSelect from '../../components/common/FilterSelect';
 
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
@@ -107,6 +108,7 @@ const Inventory: FC = () => {
   const pagination = useSelector(selectProductPagination);
 
   const [search, setSearch] = useState('');
+  const [stockFilter, setStockFilter] = useState('');
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -115,10 +117,15 @@ const Inventory: FC = () => {
     dispatch(fetchCategories());
   }, [dispatch]);
 
-  // 2. Fetch Products when search or page changes
+  // 2. Fetch Products when page or search term changes
+  // If stock filter is active, fetch more items for client-side filtering
   useEffect(() => {
-    dispatch(fetchManagerProducts(page, 10, search));
-  }, [dispatch, page, search]);
+    const limit = stockFilter ? 1000 : 10;
+    const fetchPage = stockFilter ? 1 : page;
+    dispatch(
+      fetchManagerProducts(fetchPage, limit, search, undefined, stockFilter)
+    );
+  }, [dispatch, page, search, stockFilter]);
 
   // 3. Memoized Category Lookup Map for performance
   const categoryMap = React.useMemo(() => {
@@ -191,14 +198,30 @@ const Inventory: FC = () => {
 
       <InventoryCharts products={products} categories={categories} />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-        <div className="p-4 border-b border-gray-100">
-          <div className="max-w-md">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+        <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-4 items-center justify-between">
+          <div className="max-w-md w-full">
             <DebouncedSearch
               placeholder="Search inventory..."
               initialValue={search}
               onSearch={(val) => {
                 setSearch(val);
+                setPage(1);
+              }}
+            />
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <FilterSelect
+              label="Stock Level"
+              value={stockFilter}
+              options={[
+                { value: '', label: 'All Stock Levels' },
+                { value: 'low', label: 'Low Stock' },
+                { value: 'out', label: 'Out of Stock' },
+                { value: 'in', label: 'In Stock' },
+              ]}
+              onChange={(val) => {
+                setStockFilter(val);
                 setPage(1);
               }}
             />
@@ -249,7 +272,25 @@ const Inventory: FC = () => {
               <tbody
                 className={`divide-y divide-gray-100 transition-opacity duration-200 ${loading ? 'opacity-50' : 'opacity-100'}`}
               >
-                {products.map((product) => {
+                {(stockFilter
+                  ? products.filter((p) => {
+                      const status = getStockStatus(
+                        p.stock,
+                        p.lowStockThreshold
+                      );
+                      if (stockFilter === 'low') {
+                        return status.label === 'Low Stock';
+                      }
+                      if (stockFilter === 'out') {
+                        return status.label === 'Out of Stock';
+                      }
+                      if (stockFilter === 'in') {
+                        return status.label === 'In Stock';
+                      }
+                      return true;
+                    })
+                  : products
+                ).map((product) => {
                   const status = getStockStatus(
                     product.stock,
                     product.lowStockThreshold
@@ -270,7 +311,7 @@ const Inventory: FC = () => {
             </table>
           </div>
 
-          {pagination && pagination.pages > 1 && (
+          {!stockFilter && pagination && pagination.pages > 1 && (
             <div className="p-4 border-t border-gray-50">
               <Pagination
                 currentPage={page}
