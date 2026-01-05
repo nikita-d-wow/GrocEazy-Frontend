@@ -113,22 +113,26 @@ export default function Footer() {
         </div>
 
         {/* BOTTOM BAR */}
-        <div className="mt-12 pt-8 border-t border-green-200/50 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-500 text-sm">
+        <div
+          className={`mt-12 pt-8 border-t border-green-200/50 flex flex-col md:flex-row ${
+            role === 'customer' ? 'justify-between' : 'justify-center'
+          } items-center gap-4`}
+        >
+          <p
+            className={`text-gray-500 text-sm ${role !== 'customer' ? 'text-center' : ''}`}
+          >
             © {new Date().getFullYear()} GrocEazy. All rights reserved.
           </p>
           <div className="flex gap-6 text-sm text-gray-500">
-            <span className="cursor-default hover:text-green-600">
-              Privacy Policy
-            </span>
-            {['admin', 'manager'].includes(role) ? (
-              <span className="cursor-default hover:text-green-600">
-                Terms of Service
-              </span>
-            ) : (
-              <Link to="/terms" className="hover:text-green-600">
-                Terms of Service
-              </Link>
+            {role === 'customer' && (
+              <>
+                <Link to="/privacy-policy" className="hover:text-green-600">
+                  Privacy Policy
+                </Link>
+                <Link to="/terms" className="hover:text-green-600">
+                  Terms of Service
+                </Link>
+              </>
             )}
           </div>
         </div>
