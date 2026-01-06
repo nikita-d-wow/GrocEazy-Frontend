@@ -1,4 +1,4 @@
-import React, { type FC, useEffect, useState } from 'react';
+import React, { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Package, AlertTriangle, CheckCircle } from 'lucide-react';
 
@@ -14,9 +14,11 @@ import { selectCategories } from '../../redux/selectors/categorySelectors';
 import Pagination from '../../components/common/Pagination';
 import DebouncedSearch from '../../components/common/DebouncedSearch';
 import FilterSelect from '../../components/common/FilterSelect';
+import { optimizeCloudinaryUrl } from '../../utils/imageUtils';
 
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import { InventorySkeleton } from '../../components/common/Skeleton';
 
 import { InventoryCharts } from './InventoryCharts';
 import { InventoryAlertsModal } from './InventoryAlertsModal';
@@ -49,7 +51,7 @@ const InventoryRow = React.memo(
               <img
                 className="h-full w-full rounded-md object-cover"
                 src={
-                  product.images?.[0] ||
+                  optimizeCloudinaryUrl(product.images?.[0], 40) ||
                   `https://ui-avatars.com/api/?name=${product.name}`
                 }
                 alt={product.name}
@@ -100,7 +102,7 @@ const InventoryRow = React.memo(
 
 InventoryRow.displayName = 'InventoryRow';
 
-const Inventory: FC = () => {
+export const Inventory: FC = () => {
   const dispatch = useAppDispatch();
   const products = useSelector(selectProducts);
   const loading = useSelector(selectProductLoading);
@@ -135,6 +137,11 @@ const Inventory: FC = () => {
     });
     return map;
   }, [categories]);
+
+  const handleSearch = useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, []);
 
   const getStockStatus = (stock: number, threshold: number = 5) => {
     if (Number(stock) === 0) {
@@ -198,16 +205,16 @@ const Inventory: FC = () => {
 
       <InventoryCharts products={products} categories={categories} />
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
+      <div
+        id="inventory-table"
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 scroll-mt-24"
+      >
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="max-w-md w-full">
             <DebouncedSearch
               placeholder="Search inventory..."
               initialValue={search}
-              onSearch={(val) => {
-                setSearch(val);
-                setPage(1);
-              }}
+              onSearch={handleSearch}
             />
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -216,13 +223,24 @@ const Inventory: FC = () => {
               value={stockFilter}
               options={[
                 { value: '', label: 'All Stock Levels' },
-                { value: 'low', label: 'Low Stock' },
-                { value: 'out', label: 'Out of Stock' },
-                { value: 'in', label: 'In Stock' },
+                { value: 'lowStock', label: 'Low Stock' },
+                { value: 'outOfStock', label: 'Out of Stock' },
+                { value: 'inStock', label: 'In Stock' },
               ]}
               onChange={(val) => {
                 setStockFilter(val);
                 setPage(1);
+                // Manually scroll to table when filter changes
+                // This ensures we see the filtered results immediately
+                setTimeout(() => {
+                  const element = document.getElementById('inventory-table');
+                  if (element) {
+                    element.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }
+                }, 100);
               }}
             />
           </div>
@@ -230,12 +248,7 @@ const Inventory: FC = () => {
       </div>
 
       {loading && products.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-20 flex flex-col items-center justify-center">
-          <Loader size="lg" />
-          <p className="text-gray-500 mt-4 animate-pulse font-medium">
-            Loading inventory...
-          </p>
-        </div>
+        <InventorySkeleton />
       ) : products.length === 0 ? (
         <EmptyState
           title="No Products Found"
@@ -247,7 +260,15 @@ const Inventory: FC = () => {
           icon={<Package className="w-12 h-12" />}
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
+          {/* Subtle loading overlay for stale-while-revalidate */}
+          {loading && (
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
+              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+                <Loader size="sm" />
+              </div>
+            </div>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
@@ -269,28 +290,8 @@ const Inventory: FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody
-                className={`divide-y divide-gray-100 transition-opacity duration-200 ${loading ? 'opacity-50' : 'opacity-100'}`}
-              >
-                {(stockFilter
-                  ? products.filter((p) => {
-                      const status = getStockStatus(
-                        p.stock,
-                        p.lowStockThreshold
-                      );
-                      if (stockFilter === 'low') {
-                        return status.label === 'Low Stock';
-                      }
-                      if (stockFilter === 'out') {
-                        return status.label === 'Out of Stock';
-                      }
-                      if (stockFilter === 'in') {
-                        return status.label === 'In Stock';
-                      }
-                      return true;
-                    })
-                  : products
-                ).map((product) => {
+              <tbody className="divide-y divide-gray-100">
+                {products.map((product) => {
                   const status = getStockStatus(
                     product.stock,
                     product.lowStockThreshold
@@ -317,6 +318,8 @@ const Inventory: FC = () => {
                 currentPage={page}
                 totalPages={pagination.pages}
                 onPageChange={setPage}
+                isLoading={loading}
+                scrollTargetId="inventory-table"
               />
             </div>
           )}

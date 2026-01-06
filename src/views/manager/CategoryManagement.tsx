@@ -15,6 +15,7 @@ import {
   selectCategoryLoading,
   selectCategoryPagination,
 } from '../../redux/selectors/categorySelectors';
+import { optimizeCloudinaryUrl } from '../../utils/imageUtils';
 
 import type { Category } from '../../types/Category';
 
@@ -24,6 +25,7 @@ import CategoryForm from '../../components/categories/CategoryForm';
 import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
+import { TableSkeleton } from '../../components/common/Skeleton';
 
 const CategoryRow = React.memo(
   ({
@@ -43,7 +45,7 @@ const CategoryRow = React.memo(
               <img
                 className="h-full w-full rounded-lg object-cover"
                 src={
-                  category.image ||
+                  optimizeCloudinaryUrl(category.image, 48) ||
                   `https://ui-avatars.com/api/?name=${category.name}`
                 }
                 alt={category.name}
@@ -134,6 +136,11 @@ const CategoryManagement: FC = () => {
     setIsFormOpen(true);
   }, []);
 
+  const handleSearch = useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, []);
+
   const handleAddNew = useCallback(() => {
     setEditingCategory(null);
     setIsFormOpen(true);
@@ -168,10 +175,7 @@ const CategoryManagement: FC = () => {
               <DebouncedSearch
                 placeholder="Search categories..."
                 initialValue={search}
-                onSearch={(val) => {
-                  setSearch(val);
-                  setPage(1);
-                }}
+                onSearch={handleSearch}
               />
             </div>
             <div className="flex flex-wrap md:flex-nowrap gap-4 justify-end">
@@ -196,12 +200,7 @@ const CategoryManagement: FC = () => {
       </div>
 
       {loading && categories.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-20 flex flex-col items-center justify-center">
-          <Loader size="lg" />
-          <p className="text-gray-500 mt-4 animate-pulse font-medium">
-            Loading categories...
-          </p>
-        </div>
+        <TableSkeleton rows={5} cols={1} />
       ) : categories.length === 0 ? (
         <EmptyState
           title="No Categories Found"
@@ -218,7 +217,14 @@ const CategoryManagement: FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
+          {loading && (
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
+              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+                <Loader size="sm" />
+              </div>
+            </div>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
@@ -237,9 +243,7 @@ const CategoryManagement: FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody
-                className={`divide-y divide-gray-100 transition-opacity duration-200 ${loading ? 'opacity-50' : 'opacity-100'}`}
-              >
+              <tbody className="divide-y divide-gray-100">
                 {categories.map((category) => (
                   <CategoryRow
                     key={category._id}
@@ -258,6 +262,7 @@ const CategoryManagement: FC = () => {
                 currentPage={page}
                 totalPages={pagination.pages}
                 onPageChange={setPage}
+                isLoading={loading}
               />
             </div>
           )}

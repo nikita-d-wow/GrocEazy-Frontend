@@ -1,4 +1,4 @@
-import { type FC, useEffect } from 'react';
+import React, { type FC, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
@@ -7,6 +7,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void | Promise<void>;
   className?: string;
   isLoading?: boolean;
+  scrollTargetId?: string;
 }
 
 const Pagination: FC<PaginationProps> = ({
@@ -15,17 +16,31 @@ const Pagination: FC<PaginationProps> = ({
   onPageChange,
   className = '',
   isLoading = false,
+  scrollTargetId,
 }) => {
+  const isFirstRender = React.useRef(true);
+
   const scrollToTop = () => {
     // Immediate scroll (auto) feels faster for paginated data
     setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      if (scrollTargetId) {
+        const element = document.getElementById(scrollTargetId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, 50);
   };
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     scrollToTop();
-  }, [currentPage]);
+  }, [currentPage, scrollTargetId]);
 
   const handlePageChange = (page: number) => {
     if (isLoading || page < 1 || page > totalPages) {
