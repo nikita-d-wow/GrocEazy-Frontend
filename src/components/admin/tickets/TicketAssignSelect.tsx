@@ -3,18 +3,20 @@ import { useDispatch } from 'react-redux';
 import { UserCheck, ChevronDown, Check, Loader2 } from 'lucide-react';
 import type { AppDispatch } from '../../../redux/store';
 import { assignSupportTicket } from '../../../redux/actions/supportActions';
-import type { IUser } from '../../../redux/types/support.types';
+import type { IUser, TicketStatus } from '../../../redux/types/support.types';
 
 interface TicketAssignSelectProps {
   ticketId: string;
   currentManager?: IUser;
   managers: IUser[];
+  status: TicketStatus;
 }
 
 const TicketAssignSelect: React.FC<TicketAssignSelectProps> = ({
   ticketId,
   currentManager,
   managers,
+  status,
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +41,7 @@ const TicketAssignSelect: React.FC<TicketAssignSelectProps> = ({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        disabled={isAssigning}
+        disabled={isAssigning || ['resolved', 'closed'].includes(status)}
         className={`
           flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium
           transition-all duration-300
@@ -48,7 +50,7 @@ const TicketAssignSelect: React.FC<TicketAssignSelectProps> = ({
               ? 'bg-primary/10 text-primary shadow-sm'
               : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-100'
           }
-          ${isAssigning ? 'opacity-70 cursor-not-allowed' : ''}
+          ${isAssigning || ['resolved', 'closed'].includes(status) ? 'opacity-70 cursor-not-allowed' : ''}
         `}
       >
         {isAssigning ? (
