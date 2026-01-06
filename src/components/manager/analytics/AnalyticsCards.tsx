@@ -22,7 +22,7 @@ export default function AnalyticsCards({
   onDrilldown,
 }: {
   analytics: AnalyticsData;
-  onDrilldown: (_title: string, _products: Product[], _type: string) => void;
+  onDrilldown: (title: string, products: Product[], type: string) => void;
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -30,7 +30,7 @@ export default function AnalyticsCards({
         title="Inventory Value"
         value={`₹${analytics.revenue.toLocaleString()}`}
         icon={<IndianRupee />}
-        bg="from-violet-500 to-purple-600"
+        bg="from-indigo-500 to-blue-600"
         onClick={() =>
           onDrilldown('Total Inventory', analytics.activeProductList, 'active')
         }
@@ -39,7 +39,7 @@ export default function AnalyticsCards({
         title="Active Products"
         value={analytics.activeProducts}
         icon={<CheckCircle2 />}
-        bg="from-blue-500 to-cyan-400"
+        bg="from-emerald-400 to-teal-500"
         onClick={() =>
           onDrilldown('Active Products', analytics.activeProductList, 'active')
         }
@@ -58,7 +58,7 @@ export default function AnalyticsCards({
         title="Out of Stock"
         value={analytics.outOfStock}
         icon={<Package />}
-        bg="from-rose-500 to-red-600"
+        bg="from-rose-500 to-pink-600"
         productList={analytics.outOfStockProducts}
         onClick={() =>
           onDrilldown(

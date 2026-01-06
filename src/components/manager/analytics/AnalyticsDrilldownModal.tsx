@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   X,
   Search,
@@ -10,6 +10,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import DebouncedSearch from '../../common/DebouncedSearch';
+import FilterSelect from '../../common/FilterSelect';
 import type { Product } from '../../../types/Product';
 
 interface DrilldownProduct extends Product {
@@ -22,8 +23,8 @@ interface AnalyticsDrilldownModalProps {
   title: string;
   products: DrilldownProduct[];
   type?: 'healthy' | 'low' | 'out' | 'active' | 'inactive' | 'revenue';
-  onEdit?: (_product: DrilldownProduct) => void;
-  onDelete?: (_id: string) => void;
+  onEdit?: (product: DrilldownProduct) => void;
+  onDelete?: (id: string) => void;
 }
 
 const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
@@ -36,15 +37,64 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
   onDelete,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('default');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Reset search when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      // Use setTimeout to avoid synchronous setState during render cycle
+      const timer = setTimeout(() => {
+        setSearchTerm('');
+        setSortBy('default');
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  // Simulate loading state for better UX
+  useEffect(() => {
+    if (isOpen) {
+      // Avoid synchronous setState in effect
+      const timer = setTimeout(() => {
+        setIsLoading(true);
+        const secondTimer = setTimeout(() => setIsLoading(false), 300);
+        return () => clearTimeout(secondTimer);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   const filteredProducts = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return products;
+    let result = products;
+
+    // Search Filter
+    if (searchTerm.trim()) {
+      result = result.filter((p) =>
+        p.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
-    return products.filter((p) =>
-      p.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [products, searchTerm]);
+
+    // Sort Logic
+    switch (sortBy) {
+      case 'name-asc':
+        result = [...result].sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'price-asc':
+        result = [...result].sort((a, b) => a.price - b.price);
+        break;
+      case 'price-desc':
+        result = [...result].sort((a, b) => b.price - a.price);
+        break;
+      case 'stock-asc':
+        result = [...result].sort((a, b) => a.stock - b.stock);
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [products, searchTerm, sortBy]);
 
   if (!isOpen) {
     return null;
@@ -54,117 +104,200 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
     switch (type) {
       case 'healthy':
       case 'active':
-        return <CheckCircle className="text-emerald-500" />;
+        return <CheckCircle className="text-emerald-500" size={20} />;
       case 'low':
-        return <AlertTriangle className="text-amber-500" />;
+        return <AlertTriangle className="text-amber-500" size={20} />;
       case 'out':
       case 'inactive':
-        return <AlertTriangle className="text-rose-500" />;
+        return <AlertTriangle className="text-rose-500" size={20} />;
       default:
-        return <Package className="text-primary" />;
+        return <Package className="text-primary" size={20} />;
     }
   };
 
+  const ProductSkeleton = () => (
+    <div className="flex flex-col gap-2 p-2.5 rounded-[1.5rem] bg-gray-50/50 border border-gray-100 animate-pulse">
+      <div className="w-full aspect-[4/3] rounded-xl bg-gray-200" />
+      <div className="space-y-1.5 px-0.5 mt-1">
+        <div className="h-2.5 bg-gray-200 rounded-md w-3/4" />
+        <div className="flex justify-between items-center">
+          <div className="h-2 bg-gray-200 rounded-md w-1/4" />
+          <div className="h-3.5 bg-gray-200 rounded-full w-8" />
+        </div>
+      </div>
+      <div className="pt-2 border-t border-gray-100 flex gap-1.5">
+        <div className="h-6 bg-gray-200 rounded-lg flex-1" />
+        <div className="h-6 bg-gray-200 rounded-lg w-7" />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 pb-20 sm:pb-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm animate-fadeIn"
+        className="absolute inset-0 bg-gray-900/40 backdrop-blur-md animate-fadeIn transition-all duration-500"
         onClick={onClose}
       />
 
-      <div className="relative bg-white w-full max-w-4xl max-h-[85vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-scaleIn">
+      <div className="relative bg-white/95 backdrop-blur-2xl w-full max-w-4xl max-h-[85vh] rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] flex flex-col animate-scaleIn border border-white/50">
         {/* HEADER */}
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10">
+        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-xl sticky top-0 z-10 rounded-t-[2rem]">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gray-50 rounded-2xl">{getIcon()}</div>
+            <div className="p-2.5 bg-gray-50/80 rounded-t-[2rem] sm:rounded-xl shadow-inner shadow-gray-200/50">
+              {getIcon()}
+            </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
-              <p className="text-gray-500 text-sm">
-                Showing {filteredProducts.length} items
-              </p>
+              <h2 className="text-xl font-black text-gray-900 tracking-tight">
+                {title}
+              </h2>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-gray-400 text-[10px] font-bold flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary/30 animate-pulse" />
+                  {filteredProducts.length} items
+                </p>
+              </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+            className="p-2 hover:bg-rose-50 hover:text-rose-500 text-gray-300 rounded-xl transition-all duration-300 group cursor-pointer"
           >
-            <X size={24} className="text-gray-400" />
+            <X
+              size={18}
+              className="group-hover:rotate-90 transition-transform duration-300"
+            />
           </button>
         </div>
 
-        {/* SEARCH BAR */}
-        <div className="px-6 py-4 bg-gray-50/50 border-b border-gray-100">
-          <DebouncedSearch
-            placeholder="Search within these products..."
-            onSearch={setSearchTerm}
-            className="max-w-md"
-          />
+        {/* SEARCH & FILTERS */}
+        <div className="px-6 py-4 bg-gray-50/30 border-b border-gray-100/50 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between sm:gap-4 relative z-20">
+          <div className="w-full sm:w-auto flex-shrink-0">
+            <FilterSelect
+              label="Sort"
+              options={[
+                { value: 'default', label: 'Default' },
+                { value: 'name-asc', label: 'Name (A-Z)' },
+                { value: 'price-asc', label: 'Price (L-H)' },
+                { value: 'price-desc', label: 'Price (H-L)' },
+                { value: 'stock-asc', label: 'Stock (L-H)' },
+              ]}
+              value={sortBy}
+              onChange={setSortBy}
+              className="w-full sm:w-48"
+            />
+          </div>
+          <div className="w-full sm:flex-1 sm:max-w-xs relative group pb-1 sm:pb-0">
+            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
+              Search
+            </span>
+            <DebouncedSearch
+              placeholder="Search products..."
+              onSearch={setSearchTerm}
+              initialValue={searchTerm}
+              className="w-full"
+              showIcon={false}
+            />
+          </div>
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {filteredProducts.length === 0 ? (
+        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-white/50 scroll-smooth rounded-b-[2rem]">
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {[...Array(8)].map((_, i) => (
+                <ProductSkeleton key={i} />
+              ))}
+            </div>
+          ) : filteredProducts.length === 0 ? (
             <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-4">
-              <div className="p-4 bg-gray-50 rounded-full">
-                <Search size={40} className="text-gray-300" />
+              <div className="p-6 bg-gray-50/50 rounded-[2.5rem] animate-pulse">
+                <Search size={48} className="text-gray-200" />
               </div>
-              <p className="text-gray-500 font-medium">No matches found</p>
+              <div className="space-y-1">
+                <p className="text-lg font-bold text-gray-800">
+                  No results found
+                </p>
+                <p className="text-gray-400 text-xs font-medium">
+                  Try checking your keywords
+                </p>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {filteredProducts.map((p) => (
                 <div
                   key={p._id}
-                  className="group flex items-center gap-4 p-4 rounded-2xl bg-white border border-gray-100 hover:border-primary/20 hover:shadow-md transition-all duration-300"
+                  className="group relative flex flex-col gap-2 p-2.5 rounded-[1.5rem] bg-white border border-gray-100 hover:border-primary/30 hover:shadow-md transition-all duration-500 hover:-translate-y-1 cursor-pointer"
                 >
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-50 shrink-0">
+                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-50 border border-gray-50">
                     <img
                       src={p.image || 'https://via.placeholder.com/150'}
                       alt={p.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-900 truncate">
-                      {p.name}
-                    </h4>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-sm font-medium text-primary">
-                        ₹{p.price.toFixed(2)}
-                      </span>
-                      <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                      <span
-                        className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                          p.stock === 0
-                            ? 'bg-rose-50 text-rose-600'
-                            : p.stock <= 5
-                              ? 'bg-amber-50 text-amber-600'
-                              : 'bg-emerald-50 text-emerald-600'
-                        }`}
-                      >
-                        {p.stock} in stock
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
+                      <span className="bg-white/95 backdrop-blur-md px-1 py-0.5 rounded-md text-[7px] font-black shadow-lg text-gray-800 border border-white">
+                        #{p._id.slice(-6).toUpperCase()}
                       </span>
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-2 scale-90 sm:scale-100">
+                  <div className="flex-1 space-y-1">
+                    <div>
+                      <h4 className="font-bold text-gray-900 tracking-tight text-[10px] leading-snug line-clamp-1 group-hover:text-primary transition-colors">
+                        {p.name}
+                      </h4>
+                      {p.category && (
+                        <p className="text-[7px] font-bold text-gray-400 uppercase tracking-wider mt-0.5">
+                          {typeof p.category === 'object'
+                            ? p.category.name
+                            : p.category}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-0.5">
+                      <span className="text-[11px] font-black text-gray-900">
+                        ₹{p.price.toLocaleString()}
+                      </span>
+                      <span
+                        className={`text-[7px] font-black px-1.5 py-0.5 rounded-full border ${
+                          p.stock === 0
+                            ? 'bg-rose-50 text-rose-600 border-rose-100'
+                            : p.stock <= 5
+                              ? 'bg-amber-50 text-amber-600 border-amber-100'
+                              : 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                        }`}
+                      >
+                        {p.stock === 0 ? 'Out' : p.stock}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons Overlay */}
+                  <div className="flex items-center gap-1 mt-1 pt-2 border-t border-gray-50/80">
                     {onEdit && (
                       <button
-                        onClick={() => onEdit(p)}
-                        className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
-                        title="Edit Product"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(p);
+                        }}
+                        className="flex-1 py-1.5 flex items-center justify-center gap-1 bg-gray-50 hover:bg-emerald-600 hover:text-white text-gray-500 rounded-lg transition-all duration-300 font-bold text-[8px] cursor-pointer"
                       >
-                        <Edit2 size={18} />
+                        <Edit2 size={9} />
+                        Edit
                       </button>
                     )}
                     {onDelete && (
                       <button
-                        onClick={() => onDelete(p._id)}
-                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                        title="Delete Product"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(p._id);
+                        }}
+                        className="p-1 text-gray-700 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all duration-300 cursor-pointer"
                       >
-                        <Trash2 size={18} />
+                        <Trash2 size={10} />
                       </button>
                     )}
                   </div>
