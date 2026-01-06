@@ -1,4 +1,4 @@
-import { type FC, useEffect } from 'react';
+import { type FC } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationProps {
@@ -17,20 +17,14 @@ const Pagination: FC<PaginationProps> = ({
   isLoading = false,
 }) => {
   const scrollToTop = () => {
-    // Immediate scroll (auto) feels faster for paginated data
-    setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-    }, 50);
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   };
-
-  useEffect(() => {
-    scrollToTop();
-  }, [currentPage]);
 
   const handlePageChange = (page: number) => {
     if (isLoading || page < 1 || page > totalPages) {
       return;
     }
+    scrollToTop();
     onPageChange(page);
   };
 
@@ -100,10 +94,9 @@ const Pagination: FC<PaginationProps> = ({
               disabled={isLoading}
               className={`
                 min-w-[42px] h-[42px] px-2 rounded-xl font-bold transition-all duration-300
-                ${
-                  currentPage === page
-                    ? 'bg-[#bbf7d0] text-green-900 shadow-sm scale-110 border border-green-200'
-                    : 'bg-white border border-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-600 hover:border-green-100'
+                ${currentPage === page
+                  ? 'bg-[#bbf7d0] text-green-900 shadow-sm scale-110 border border-green-200'
+                  : 'bg-white border border-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-600 hover:border-green-100'
                 }
                 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer
               `}

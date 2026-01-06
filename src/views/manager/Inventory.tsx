@@ -118,12 +118,9 @@ const Inventory: FC = () => {
   }, [dispatch]);
 
   // 2. Fetch Products when page or search term changes
-  // If stock filter is active, fetch more items for client-side filtering
   useEffect(() => {
-    const limit = stockFilter ? 1000 : 10;
-    const fetchPage = stockFilter ? 1 : page;
     dispatch(
-      fetchManagerProducts(fetchPage, limit, search, undefined, stockFilter)
+      fetchManagerProducts(page, 10, search, undefined, stockFilter)
     );
   }, [dispatch, page, search, stockFilter]);
 
@@ -173,6 +170,11 @@ const Inventory: FC = () => {
     return prodAsAny.category;
   };
 
+  const handleSearch = React.useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <InventoryAlertsModal
@@ -204,10 +206,7 @@ const Inventory: FC = () => {
             <DebouncedSearch
               placeholder="Search inventory..."
               initialValue={search}
-              onSearch={(val) => {
-                setSearch(val);
-                setPage(1);
-              }}
+              onSearch={handleSearch}
             />
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -272,25 +271,7 @@ const Inventory: FC = () => {
               <tbody
                 className={`divide-y divide-gray-100 transition-opacity duration-200 ${loading ? 'opacity-50' : 'opacity-100'}`}
               >
-                {(stockFilter
-                  ? products.filter((p) => {
-                      const status = getStockStatus(
-                        p.stock,
-                        p.lowStockThreshold
-                      );
-                      if (stockFilter === 'low') {
-                        return status.label === 'Low Stock';
-                      }
-                      if (stockFilter === 'out') {
-                        return status.label === 'Out of Stock';
-                      }
-                      if (stockFilter === 'in') {
-                        return status.label === 'In Stock';
-                      }
-                      return true;
-                    })
-                  : products
-                ).map((product) => {
+                {products.map((product) => {
                   const status = getStockStatus(
                     product.stock,
                     product.lowStockThreshold
@@ -311,7 +292,7 @@ const Inventory: FC = () => {
             </table>
           </div>
 
-          {!stockFilter && pagination && pagination.pages > 1 && (
+          {pagination && pagination.pages > 1 && (
             <div className="p-4 border-t border-gray-50">
               <Pagination
                 currentPage={page}

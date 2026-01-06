@@ -18,7 +18,7 @@ export interface FilterState {
 
 interface Props {
   filters: FilterState;
-  setFilters: (updates: FilterState) => void;
+  setFilters: (updates: Partial<FilterState>) => void;
 }
 
 const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
@@ -33,7 +33,6 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
 
   const handleCategoryChange = (categoryId: string) => {
     setFilters({
-      ...filters,
       selectedCategory:
         filters.selectedCategory === categoryId ? null : categoryId,
     });
@@ -60,14 +59,12 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
         ) : (
           <ul className="space-y-1">
             <li
-              className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${
-                !filters.selectedCategory
+              className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${!filters.selectedCategory
                   ? 'bg-green-50 text-green-700 font-semibold shadow-sm'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
+                }`}
               onClick={() =>
                 setFilters({
-                  ...filters,
                   selectedCategory: null,
                 })
               }
@@ -78,11 +75,10 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
             {visibleCategories.map((category: Category) => (
               <li
                 key={category._id}
-                className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${
-                  filters.selectedCategory === category._id
+                className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${filters.selectedCategory === category._id
                     ? 'bg-green-50 text-green-700 font-semibold shadow-sm'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
+                  }`}
                 onClick={() => handleCategoryChange(category._id)}
               >
                 {category.name}
@@ -101,7 +97,7 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
           max={1000}
           value={filters.priceRange}
           onChange={(newRange) =>
-            setFilters({ ...filters, priceRange: newRange })
+            setFilters({ priceRange: newRange })
           }
         />
       </div>
@@ -110,7 +106,7 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
         <FilterSelect
           label="Sort By"
           value={filters.sortBy}
-          onChange={(val: string) => setFilters({ ...filters, sortBy: val })}
+          onChange={(val: string) => setFilters({ sortBy: val })}
           options={[
             { value: 'featured', label: 'Featured' },
             { value: 'price_asc', label: 'Price: Low to High' },

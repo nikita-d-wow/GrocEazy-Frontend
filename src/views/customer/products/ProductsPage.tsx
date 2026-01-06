@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -83,7 +83,6 @@ const ProductsPage: FC = () => {
     localFilters.priceRange,
     localFilters.sortBy,
   ]);
-
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch(searchProductsGlobally(searchQuery));
@@ -118,9 +117,51 @@ const ProductsPage: FC = () => {
   );
 
   /* ---------------- HANDLERS ---------------- */
-  const handleUpdateFilters = (updates: Partial<FilterState>) => {
-    const params = new URLSearchParams(location.search);
-    params.set('page', '1'); // Reset to first page on filter change
+  const handleUpdateFilters = useCallback((updates: Partial<FilterState>) => {
+    // console.log('[DEBUG] handleUpdateFilters triggered with:', updates);
+
+    // GUARD CLAUSE: Check if meaningful changes exist
+    let hasChanges = false;
+
+    // 1. Check Category Change
+    if (updates.selectedCategory !== undefined) {
+      const currentCat = new URLSearchParams(window.location.search).get('category');
+      // If passing null, that means "remove category". If current is null, no change.
+      // If passing ID, compare with current ID.
+      if (updates.selectedCategory !== currentCat) {
+        hasChanges = true;
+      }
+    }
+
+    // 2. Check Price Range Change
+    if (updates.priceRange) {
+      const [newMin, newMax] = updates.priceRange;
+      const [currMin, currMax] = localFilters.priceRange;
+      if (newMin !== currMin || newMax !== currMax) {
+        hasChanges = true;
+      }
+    }
+
+    // 3. Check SortBy Change
+    if (updates.sortBy && updates.sortBy !== localFilters.sortBy) {
+      hasChanges = true;
+    }
+
+    // If update contained search query (not expected from ProductFilters but good to handle)
+    if (updates.searchQuery !== undefined && updates.searchQuery !== searchQuery) {
+      // usually handled globally
+    }
+
+    // If NO changes detected, do nothing (prevent page reset loop)
+    if (!hasChanges) {
+      // console.log('[DEBUG] No changes detected, ignoring update.');
+      return;
+    }
+
+    console.warn('DEBUG: Filter Update Passed Guard!', updates);
+
+    const params = new URLSearchParams(window.location.search);
+    // params.set('page', '1'); // TEMPORARILY DISABLED TO DEBUG RESET LOOP
 
     if (updates.selectedCategory !== undefined) {
       // Clear global search when category is changed to avoid conflict
@@ -149,7 +190,13 @@ const ProductsPage: FC = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       scrollTimeoutRef.current = null;
     }, delay);
-  };
+  }, [
+    localFilters,
+    searchQuery,
+    location.pathname,
+    navigate,
+    dispatch,
+  ]);
 
   if (error) {
     return (
@@ -197,7 +244,7 @@ const ProductsPage: FC = () => {
             <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-[69px]">
               <ProductFilters
                 filters={allFilters}
-                setFilters={(updates) => handleUpdateFilters(updates)}
+                setFilters={handleUpdateFilters}
               />
             </aside>
 
