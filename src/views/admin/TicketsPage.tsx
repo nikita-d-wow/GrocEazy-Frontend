@@ -129,7 +129,7 @@ export default function AdminSupportTickets() {
         <ManagerTicketStats
           tickets={statsTickets.length > 0 ? statsTickets : tickets}
           managers={managers}
-          totalCount={total}
+          totalCount={statsTickets.length > 0 ? statsTickets.length : total}
         />
 
         {loading && tickets.length === 0 ? (
@@ -242,6 +242,7 @@ export default function AdminSupportTickets() {
                               ticketId={ticket._id}
                               currentManager={ticket.assignedManager}
                               managers={managers}
+                              status={ticket.status}
                             />
                           </div>
 
@@ -272,7 +273,8 @@ export default function AdminSupportTickets() {
                   </h3>
                   <p className="text-gray-500 max-w-xs mx-auto">
                     No tickets currently match the selected filters across all{' '}
-                    {total} tickets.
+                    {statsTickets.length > 0 ? statsTickets.length : total}{' '}
+                    tickets.
                   </p>
                   <button
                     onClick={() => {
