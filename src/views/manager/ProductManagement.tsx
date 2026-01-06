@@ -24,6 +24,7 @@ import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import FilterSelect from '../../components/common/FilterSelect';
+import { TableSkeleton } from '../../components/common/Skeleton';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -183,6 +184,11 @@ const ProductManagement: FC = () => {
     [dispatch]
   );
 
+  const handleSearch = useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, []);
+
   const handleAddNew = useCallback(() => {
     setEditingProduct(null);
     setIsFormOpen(true);
@@ -210,10 +216,7 @@ const ProductManagement: FC = () => {
               <DebouncedSearch
                 placeholder="Search products..."
                 initialValue={search}
-                onSearch={(val) => {
-                  setSearch(val);
-                  setPage(1);
-                }}
+                onSearch={handleSearch}
               />
             </div>
             <div className="flex flex-wrap md:flex-nowrap gap-4 justify-end">
@@ -248,12 +251,7 @@ const ProductManagement: FC = () => {
       </div>
 
       {loading && products.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-20 flex flex-col items-center justify-center">
-          <Loader size="lg" />
-          <p className="text-gray-500 mt-4 animate-pulse font-medium">
-            Loading products...
-          </p>
-        </div>
+        <TableSkeleton rows={5} cols={2} />
       ) : displayProducts.length === 0 ? (
         <EmptyState
           title="No Products Found"
@@ -273,9 +271,14 @@ const ProductManagement: FC = () => {
           }
         />
       ) : (
-        <div
-          className={`bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
-        >
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+          {loading && (
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
+              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+                <Loader size="sm" />
+              </div>
+            </div>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-gray-50/50">
@@ -309,18 +312,18 @@ const ProductManagement: FC = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
 
-          {/* Pagination */}
-          {pagination && pagination.pages > 1 && (
-            <div className="border-t border-gray-100 px-6 py-4 flex justify-center">
-              <Pagination
-                currentPage={page}
-                totalPages={pagination.pages}
-                onPageChange={setPage}
-                isLoading={loading}
-              />
-            </div>
-          )}
+      {/* Pagination - Outside of potential pointer-events-none container */}
+      {pagination && pagination.pages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            currentPage={page}
+            totalPages={pagination.pages}
+            onPageChange={setPage}
+            isLoading={loading}
+          />
         </div>
       )}
 

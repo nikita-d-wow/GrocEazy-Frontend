@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import React, { type FC } from 'react';
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import Input from './Input';
@@ -18,6 +18,7 @@ const DebouncedSearch: FC<DebouncedSearchProps> = ({
   delay = 300,
   className = '',
 }) => {
+  const lastEmittedValue = React.useRef(initialValue);
   const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
@@ -26,7 +27,10 @@ const DebouncedSearch: FC<DebouncedSearchProps> = ({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      onSearch(value);
+      if (value !== lastEmittedValue.current) {
+        onSearch(value);
+        lastEmittedValue.current = value;
+      }
     }, delay);
 
     return () => clearTimeout(timer);

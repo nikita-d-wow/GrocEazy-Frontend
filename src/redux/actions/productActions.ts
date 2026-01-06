@@ -1,5 +1,5 @@
 import type { AxiosError } from 'axios';
-import type { AppDispatch, RootState } from '../store';
+import type { AppDispatch } from '../store';
 import type { ProductFormData } from '../../types/Product';
 import * as productApi from '../../services/productApi';
 import {
@@ -63,12 +63,7 @@ export const fetchManagerProducts =
     stockStatus?: string,
     categoryId?: string
   ) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
-    const { loading } = getState().product;
-    if (loading) {
-      return;
-    }
-
+  async (dispatch: AppDispatch) => {
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {

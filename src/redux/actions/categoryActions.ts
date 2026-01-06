@@ -15,12 +15,7 @@ import {
  */
 export const fetchPagedCategories =
   (page = 1, limit = 20, search?: string, sortBy?: string) =>
-  async (dispatch: AppDispatch, getState: () => any) => {
-    const { loading } = getState().category;
-    if (loading) {
-      return;
-    }
-
+  async (dispatch: AppDispatch) => {
     dispatch(setLoading(true));
     dispatch(setError(null));
     try {
