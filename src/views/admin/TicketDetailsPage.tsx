@@ -237,6 +237,7 @@ export default function AdminTicketDetailsPage() {
                     ticketId={ticket._id}
                     currentManager={ticket.assignedManager}
                     managers={managers}
+                    status={ticket.status}
                   />
                 </div>
               </div>
