@@ -1,72 +1,96 @@
 import type { Product } from '../types/Product';
 
+export type MappedProduct = Product & { image: string };
+
 export function buildAnalytics(products: Product[]) {
-  const active = products.filter((p) => p.isActive && !p.isDeleted);
-  const inactive = products.filter((p) => !p.isActive && !p.isDeleted);
+  const stats = {
+    revenue: 0,
+    activeProducts: 0,
+    lowStockCount: 0,
+    outOfStockCount: 0,
+    healthyProducts: [] as MappedProduct[],
+    lowStockProducts: [] as MappedProduct[],
+    outOfStockProducts: [] as MappedProduct[],
+    activeProductList: [] as MappedProduct[],
+    inactiveProductList: [] as MappedProduct[],
+    monthlyRevenue: {} as Record<string, number>,
+    productsByMonth: {} as Record<string, MappedProduct[]>,
+  };
 
-  const healthy = active.filter(
-    (p) => p.stock > p.lowStockThreshold && p.stock > 0
-  );
-  const lowStock = active.filter(
-    (p) => p.stock <= p.lowStockThreshold && p.stock > 0
-  );
-  const outOfStock = active.filter((p) => p.stock === 0);
+  products.forEach((p) => {
+    if (p.isDeleted) {
+      return;
+    }
 
-  const monthlyRevenue: Record<string, number> = {};
-  const productsByMonth: Record<string, Product[]> = {};
+    const mappedProduct: MappedProduct = {
+      ...p,
+      image: p.images?.[0] || '',
+    };
 
-  active.forEach((p) => {
+    if (!p.isActive) {
+      stats.inactiveProductList.push(mappedProduct);
+      return;
+    }
+
+    // Active products logic
+    stats.activeProducts++;
+    stats.activeProductList.push(mappedProduct);
+
+    // Grouping by month
     const key = new Date(p.createdAt).toLocaleString('default', {
       month: 'short',
       year: 'numeric',
     });
 
-    monthlyRevenue[key] = (monthlyRevenue[key] || 0) + p.price * p.stock;
-    if (!productsByMonth[key]) {
-      productsByMonth[key] = [];
-    }
-    productsByMonth[key].push(p);
-  });
+    const productValue = (p.price || 0) * (p.stock || 0);
+    stats.revenue += productValue;
+    stats.monthlyRevenue[key] = (stats.monthlyRevenue[key] || 0) + productValue;
 
-  const mapProduct = (p: Product) => ({
-    ...p,
-    image: p.images[0],
+    if (!stats.productsByMonth[key]) {
+      stats.productsByMonth[key] = [];
+    }
+    stats.productsByMonth[key].push(mappedProduct);
+
+    // Stock Status
+    if (p.stock === 0) {
+      stats.outOfStockCount++;
+      stats.outOfStockProducts.push(mappedProduct);
+    } else if (p.stock <= (p.lowStockThreshold || 5)) {
+      stats.lowStockCount++;
+      stats.lowStockProducts.push(mappedProduct);
+    } else {
+      stats.healthyProducts.push(mappedProduct);
+    }
   });
 
   return {
-    revenue: Object.values(monthlyRevenue).reduce((a, b) => a + b, 0),
-    activeProducts: active.length,
-    lowStock: lowStock.length,
-    outOfStock: outOfStock.length,
+    revenue: stats.revenue,
+    activeProducts: stats.activeProducts,
+    lowStock: stats.lowStockCount,
+    outOfStock: stats.outOfStockCount,
 
-    // Product Lists for Drill-down
-    healthyProducts: healthy.map(mapProduct),
-    lowStockProducts: lowStock.map(mapProduct),
-    outOfStockProducts: outOfStock.map(mapProduct),
-    activeProductList: active.map(mapProduct),
-    inactiveProductList: inactive.map(mapProduct),
-    productsByMonth: Object.keys(productsByMonth).reduce(
-      (acc, key) => ({
-        ...acc,
-        [key]: productsByMonth[key].map(mapProduct),
-      }),
-      {}
-    ),
+    // Product Lists
+    healthyProducts: stats.healthyProducts,
+    lowStockProducts: stats.lowStockProducts,
+    outOfStockProducts: stats.outOfStockProducts,
+    activeProductList: stats.activeProductList,
+    inactiveProductList: stats.inactiveProductList,
+    productsByMonth: stats.productsByMonth,
 
     revenueBar: {
-      labels: Object.keys(monthlyRevenue),
-      data: Object.values(monthlyRevenue),
+      labels: Object.keys(stats.monthlyRevenue),
+      data: Object.values(stats.monthlyRevenue),
     },
 
     productStatus: {
-      active: active.length,
-      inactive: inactive.length,
+      active: stats.activeProducts,
+      inactive: stats.inactiveProductList.length,
     },
 
     inventoryHealth: {
-      healthy: healthy.length,
-      low: lowStock.length,
-      out: outOfStock.length,
+      healthy: stats.healthyProducts.length,
+      low: stats.lowStockCount,
+      out: stats.outOfStockCount,
     },
   };
 }

@@ -15,7 +15,7 @@ import {
   selectProductPagination,
 } from '../../redux/selectors/productSelectors';
 import Pagination from '../../components/common/Pagination';
-import { optimizeCloudinaryUrl } from '../../utils/imageUtils';
+import OptimizedImage from '../../components/common/OptimizedImage';
 
 import type { Product } from '../../types/Product';
 
@@ -40,23 +40,20 @@ const ProductRow = React.memo(
   }: {
     product: Product;
     onEdit: (_product: Product) => void;
-    onDelete: (_id: string) => void;
+    onDelete: (_productId: string) => void;
   }) => {
     return (
       <tr
-        className={`hover:bg-gray-50/50 transition-opacity ${!product.isActive ? 'opacity-60' : ''}`}
+        className={`hover:bg-gray-50/50 transition-[background-color,opacity] duration-150 ${!product.isActive ? 'opacity-60' : ''}`}
       >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
             <div className="h-12 w-12 rounded-xl bg-gray-100 p-1 flex-shrink-0">
-              <img
+              <OptimizedImage
                 className="h-full w-full rounded-lg object-cover"
-                src={
-                  optimizeCloudinaryUrl(product.images?.[0]) ||
-                  `https://ui-avatars.com/api/?name=${product.name}`
-                }
+                src={product.images?.[0]}
                 alt={product.name}
-                loading="lazy"
+                size="thumbnail"
                 width={48}
                 height={48}
               />

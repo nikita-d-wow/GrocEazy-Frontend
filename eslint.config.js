@@ -22,14 +22,20 @@ export default defineConfig([
     rules: {
       'no-console': 'error',
       'no-debugger': 'error',
-      'no-unused-vars': 'warn',
+      'no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       'no-undef': 'error',
       eqeqeq: ['error', 'always'],
       curly: 'error',
       'no-var': 'error',
 
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/consistent-type-imports': 'error',
 
       'react-refresh/only-export-components': 'warn',

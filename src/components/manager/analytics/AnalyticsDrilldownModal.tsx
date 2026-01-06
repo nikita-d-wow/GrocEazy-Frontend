@@ -10,6 +10,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import DebouncedSearch from '../../common/DebouncedSearch';
+import OptimizedImage from '../../common/OptimizedImage';
 import type { Product } from '../../../types/Product';
 
 interface DrilldownProduct extends Product {
@@ -118,10 +119,12 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
                   className="group flex items-center gap-4 p-4 rounded-2xl bg-white border border-gray-100 hover:border-primary/20 hover:shadow-md transition-all duration-300"
                 >
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-50 shrink-0">
-                    <img
-                      src={p.image || 'https://via.placeholder.com/150'}
+                    <OptimizedImage
+                      src={p.image}
                       alt={p.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      size="thumbnail"
+                      containerClassName="w-full h-full"
+                      className="group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
                   <div className="flex-1 min-w-0">

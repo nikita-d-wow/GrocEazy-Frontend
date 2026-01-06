@@ -44,7 +44,8 @@ export const login = (payload: LoginPayload) => {
         type: AUTH_LOGIN_SUCCESS,
         payload: { accessToken: data.accessToken, user: data.user as IUser },
       });
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Login failed';
       dispatch({
@@ -64,7 +65,8 @@ export const register = (payload: RegisterPayload) => {
       dispatch({ type: AUTH_REGISTER_SUCCESS });
       // Note: Registration doesn't auto-login per spec, so no token setting here.
       // The UI should redirect to Login.
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Registration failed';
       dispatch({
@@ -95,10 +97,10 @@ export const logout = () => {
         await api.post('/api/auth/logout', { refreshToken });
       }
     } catch (error) {
-      console.error("Logout backend call failed", error);
+      // Silently fail logout backend call
     } finally {
       // Optional: Force reload to ensure clean state
-      // window.location.reload(); 
+      // window.location.reload();
     }
   };
 };
@@ -120,7 +122,8 @@ export const googleLogin = (token: string) => {
         type: AUTH_LOGIN_SUCCESS,
         payload: { accessToken: data.accessToken, user: data.user as IUser },
       });
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Google login failed';
       dispatch({
@@ -149,7 +152,8 @@ export const resetPassword = (token: string, password: string) => {
     try {
       await api.post('/api/auth/reset-password', { token, password });
       dispatch({ type: AUTH_RESET_PASSWORD_SUCCESS });
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Reset password failed';
       dispatch({

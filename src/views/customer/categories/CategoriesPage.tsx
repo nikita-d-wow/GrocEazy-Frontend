@@ -5,6 +5,8 @@ import { fetchPagedCategories } from '../../../redux/actions/categoryActions';
 import { useSelector } from 'react-redux';
 import Pagination from '../../../components/common/Pagination';
 import type { RootState } from '../../../redux/store';
+import { optimizeCloudinaryUrl } from '../../../utils/imageUtils';
+import type { Category } from '../../../types/Category';
 
 export default function CategoriesPage() {
   const dispatch = useAppDispatch();
@@ -17,6 +19,18 @@ export default function CategoriesPage() {
   useEffect(() => {
     dispatch(fetchPagedCategories(page, LIMIT));
   }, [dispatch, page]);
+
+  // Image preloading effect
+  useEffect(() => {
+    if (!loading && categories.length > 0) {
+      categories.forEach((cat: Category) => {
+        if (cat.image) {
+          const img = new Image();
+          img.src = optimizeCloudinaryUrl(cat.image, { size: 'small' });
+        }
+      });
+    }
+  }, [categories, loading]);
 
   const totalPages = pagination?.pages || 1;
 
@@ -41,7 +55,7 @@ export default function CategoriesPage() {
           <>
             <CategoryGrid
               categories={categories.filter(
-                (cat) => !cat.isDeleted && cat.isActive !== false
+                (cat: Category) => !cat.isDeleted && cat.isActive !== false
               )}
             />
 
@@ -50,7 +64,7 @@ export default function CategoriesPage() {
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
-                  onPageChange={(p) => {
+                  onPageChange={(p: number) => {
                     setPage(p);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
