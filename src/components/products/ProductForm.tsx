@@ -17,6 +17,7 @@ import type { Product, ProductFormData } from '../../types/Product';
 import Modal from '../common/Modal';
 import Input from '../common/Input';
 import Button from '../common/Button';
+import FilterSelect from '../common/FilterSelect';
 
 interface Props {
   product?: Product | null;
@@ -43,8 +44,8 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
     isActive: product?.isActive ?? true,
     categoryId:
       typeof product?.categoryId === 'object' && product?.categoryId !== null
-        ? (product.categoryId as any)._id
-        : product?.categoryId || '',
+        ? (product.categoryId as { _id: string })._id
+        : (product?.categoryId as string) || '',
     images: product?.images || [],
   });
 
@@ -179,25 +180,23 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
 
           {/* Category Dropdown */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Category
-            </label>
-            <select
-              name="categoryId"
+            <FilterSelect
+              label="Category"
+              options={[
+                { value: '', label: 'Select category' },
+                ...categories
+                  .filter((cat) => !cat.isDeleted)
+                  .map((cat) => ({
+                    value: cat._id,
+                    label: cat.name,
+                  })),
+              ]}
               value={formData.categoryId}
-              onChange={handleChange}
-              className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50 bg-white"
-              required
-            >
-              <option value="">Select category</option>
-              {categories
-                .filter((cat) => !cat.isDeleted)
-                .map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
-                ))}
-            </select>
+              onChange={(value: string) =>
+                setFormData((prev) => ({ ...prev, categoryId: value }))
+              }
+              className="w-full"
+            />
           </div>
         </div>
 
