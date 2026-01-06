@@ -319,6 +319,21 @@ export const Inventory: FC = () => {
                 }, 100);
               }}
             />
+            {/* Reset Filters Button */}
+            {(stockFilter || categoryId || isActive !== undefined || search) && (
+              <button
+                onClick={() => {
+                  setStockFilter('');
+                  setCategoryId('');
+                  setIsActive(undefined);
+                  setPage(1);
+                  setSearch('');
+                }}
+                className="text-sm text-red-600 hover:text-red-700 font-medium px-3 py-2 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Reset Filters
+              </button>
+            )}
           </div>
         </div>
       </div>
