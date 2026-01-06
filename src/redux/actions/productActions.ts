@@ -30,29 +30,29 @@ export const fetchProducts =
     maxPrice?: number,
     sortBy?: string
   ) =>
-  async (dispatch: AppDispatch) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
-    try {
-      const data = await productApi.getProducts(
-        page,
-        limit,
-        search,
-        categoryId,
-        minPrice,
-        maxPrice,
-        sortBy
-      );
-      dispatch(setProducts(data));
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      dispatch(
-        setError(err.response?.data?.message || 'Failed to fetch products')
-      );
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+    async (dispatch: AppDispatch) => {
+      dispatch(setLoading(true));
+      dispatch(setError(null));
+      try {
+        const data = await productApi.getProducts(
+          page,
+          limit,
+          search,
+          categoryId,
+          minPrice,
+          maxPrice,
+          sortBy
+        );
+        dispatch(setProducts(data));
+      } catch (error) {
+        const err = error as AxiosError<{ message: string }>;
+        dispatch(
+          setError(err.response?.data?.message || 'Failed to fetch products')
+        );
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
 
 export const fetchManagerProducts =
   (
@@ -63,28 +63,29 @@ export const fetchManagerProducts =
     stockStatus?: string,
     categoryId?: string
   ) =>
-  async (dispatch: AppDispatch) => {
-    dispatch(setLoading(true));
-    dispatch(setError(null));
-    try {
-      const data = await productApi.getManagerProducts(
-        page,
-        limit,
-        search,
-        isActive,
-        stockStatus,
-        categoryId
-      );
-      dispatch(setProducts(data));
-    } catch (error) {
-      const err = error as AxiosError<{ message: string }>;
-      dispatch(
-        setError(err.response?.data?.message || 'Failed to fetch products')
-      );
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
+    async (dispatch: AppDispatch) => {
+      dispatch(setLoading(true));
+      dispatch(setError(null));
+      try {
+        console.log('Redux fetchManagerProducts:', { page, limit, search, isActive, stockStatus, categoryId });
+        const data = await productApi.getManagerProducts(
+          page,
+          limit,
+          search,
+          isActive,
+          stockStatus,
+          categoryId
+        );
+        dispatch(setProducts(data));
+      } catch (error) {
+        const err = error as AxiosError<{ message: string }>;
+        dispatch(
+          setError(err.response?.data?.message || 'Failed to fetch products')
+        );
+      } finally {
+        dispatch(setLoading(false));
+      }
+    };
 
 /**
  * Create a new product

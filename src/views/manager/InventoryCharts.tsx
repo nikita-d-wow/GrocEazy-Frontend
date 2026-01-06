@@ -19,6 +19,8 @@ import type { Category } from '../../types/Category';
 interface InventoryChartsProps {
   products: Product[];
   categories: Category[];
+  onStockClick?: (status: string) => void;
+  onCategoryClick?: (categoryId: string) => void;
 }
 
 const STATUS_COLORS = {
@@ -53,6 +55,8 @@ const CustomXAxisTick = ({
 export const InventoryCharts: FC<InventoryChartsProps> = ({
   products,
   categories,
+  onStockClick,
+  onCategoryClick,
 }) => {
   // 1. Stock Status Distribution (Pie Chart)
   const stockData = useMemo(() => {
@@ -72,12 +76,23 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
     });
 
     return [
-      { name: 'In Stock', value: inStock, color: STATUS_COLORS.inStock },
-      { name: 'Low Stock', value: lowStock, color: STATUS_COLORS.lowStock },
+      {
+        name: 'In Stock',
+        value: inStock,
+        color: STATUS_COLORS.inStock,
+        key: 'inStock',
+      },
+      {
+        name: 'Low Stock',
+        value: lowStock,
+        color: STATUS_COLORS.lowStock,
+        key: 'lowStock',
+      },
       {
         name: 'Out of Stock',
         value: outOfStock,
         color: STATUS_COLORS.outOfStock,
+        key: 'outOfStock',
       },
     ].filter((d) => d.value > 0);
   }, [products]);
@@ -89,13 +104,13 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
         let pCatId;
         // Check categoryId object/string
         if (typeof p.categoryId === 'object' && p.categoryId) {
-          pCatId = (p.categoryId as any)._id;
+          pCatId = (p.categoryId as { _id: string })._id;
         } else if (p.categoryId) {
           pCatId = p.categoryId;
         }
         // fallback to category field
         else if (typeof p.category === 'object' && p.category) {
-          pCatId = (p.category as any)._id;
+          pCatId = (p.category as { _id: string })._id;
         } else {
           pCatId = p.category;
         }
@@ -107,6 +122,7 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
         name: cat.name,
         stock: totalStock,
         count: catProducts.length,
+        id: cat._id, // Pass ID for filtering
       };
     });
     // Sort by stock desc and take top 8
@@ -129,9 +145,19 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
                 outerRadius={100}
                 paddingAngle={5}
                 dataKey="value"
+                onClick={(data) => {
+                  if (onStockClick && data && data.key) {
+                    onStockClick(data.key);
+                  }
+                }}
+                className="cursor-pointer focus:outline-none"
               >
                 {stockData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={entry.color}
+                    className="hover:opacity-80 transition-opacity cursor-pointer"
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -174,6 +200,12 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
                 fill="#0ea5e9"
                 radius={[4, 4, 0, 0]}
                 name="Total Items"
+                onClick={(data) => {
+                  if (onCategoryClick && data && data.id) {
+                    onCategoryClick(data.id);
+                  }
+                }}
+                className="cursor-pointer hover:opacity-80 transition-opacity"
               />
             </BarChart>
           </ResponsiveContainer>
