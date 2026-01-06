@@ -119,7 +119,9 @@ const Inventory: FC = () => {
 
   // 2. Fetch Products when page or search term changes
   useEffect(() => {
-    dispatch(fetchManagerProducts(page, 10, search, undefined, stockFilter));
+    dispatch(
+      fetchManagerProducts(page, 10, search, undefined, stockFilter)
+    );
   }, [dispatch, page, search, stockFilter]);
 
   // 3. Memoized Category Lookup Map for performance
@@ -168,6 +170,11 @@ const Inventory: FC = () => {
     return prodAsAny.category;
   };
 
+  const handleSearch = React.useCallback((val: string) => {
+    setSearch(val);
+    setPage(1);
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <InventoryAlertsModal
@@ -199,10 +206,7 @@ const Inventory: FC = () => {
             <DebouncedSearch
               placeholder="Search inventory..."
               initialValue={search}
-              onSearch={(val) => {
-                setSearch(val);
-                setPage(1);
-              }}
+              onSearch={handleSearch}
             />
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
