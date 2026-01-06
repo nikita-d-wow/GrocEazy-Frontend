@@ -9,6 +9,7 @@ import {
   selectProducts,
   selectProductLoading,
   selectProductPagination,
+  selectProductError,
 } from '../../redux/selectors/productSelectors';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 import Pagination from '../../components/common/Pagination';
@@ -27,7 +28,7 @@ import type { Product } from '../../types/Product';
 interface StockStatus {
   label: string;
   color: string;
-  icon: any;
+  icon: React.ElementType;
 }
 
 const InventoryRow = React.memo(
@@ -111,6 +112,8 @@ export const Inventory: FC = () => {
 
   const [search, setSearch] = useState('');
   const [stockFilter, setStockFilter] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [isActive, setIsActive] = useState<boolean | undefined>(undefined);
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [page, setPage] = useState(1);
 
@@ -125,9 +128,16 @@ export const Inventory: FC = () => {
     const limit = stockFilter ? 1000 : 10;
     const fetchPage = stockFilter ? 1 : page;
     dispatch(
-      fetchManagerProducts(fetchPage, limit, search, undefined, stockFilter)
+      fetchManagerProducts(
+        fetchPage,
+        limit,
+        search,
+        isActive,
+        stockFilter,
+        categoryId // Pass categoryId
+      )
     );
-  }, [dispatch, page, search, stockFilter]);
+  }, [dispatch, page, search, stockFilter, isActive, categoryId]);
 
   // 3. Memoized Category Lookup Map for performance
   const categoryMap = React.useMemo(() => {
@@ -138,10 +148,18 @@ export const Inventory: FC = () => {
     return map;
   }, [categories]);
 
+  const error = useSelector(selectProductError);
+
   const handleSearch = useCallback((val: string) => {
+    console.log('Inventory handleSearch:', val);
     setSearch(val);
     setPage(1);
   }, []);
+
+  // Log whenever search term actually changes in component state
+  useEffect(() => {
+    console.log('Inventory search state changed:', search);
+  }, [search]);
 
   const getStockStatus = (stock: number, threshold: number = 5) => {
     if (Number(stock) === 0) {
@@ -173,11 +191,10 @@ export const Inventory: FC = () => {
       return p.categoryId;
     }
     // Fallback for different data structures if they exist
-    const prodAsAny = p as any;
-    if (typeof prodAsAny.category === 'object' && prodAsAny.category !== null) {
-      return (prodAsAny.category as { _id: string })._id;
+    if (typeof p.category === 'object' && p.category !== null) {
+      return (p.category as { _id: string })._id;
     }
-    return prodAsAny.category;
+    return p.category;
   };
 
   return (
@@ -203,7 +220,36 @@ export const Inventory: FC = () => {
         </button>
       </div>
 
-      <InventoryCharts products={products} categories={categories} />
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {error}
+        </div>
+      )}
+
+      <InventoryCharts
+        products={products}
+        categories={categories}
+        onStockClick={(status) => {
+          setStockFilter(status);
+          setPage(1);
+          setTimeout(() => {
+            document.getElementById('inventory-table')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }, 100);
+        }}
+        onCategoryClick={(catId) => {
+          setCategoryId(catId);
+          setPage(1);
+          setTimeout(() => {
+            document.getElementById('inventory-table')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          }, 100);
+        }}
+      />
 
       <div
         id="inventory-table"
@@ -215,9 +261,39 @@ export const Inventory: FC = () => {
               placeholder="Search inventory..."
               initialValue={search}
               onSearch={handleSearch}
+              delay={800}
             />
           </div>
           <div className="flex items-center gap-3 w-full sm:w-auto">
+            <FilterSelect
+              label="Category"
+              value={categoryId}
+              options={[
+                { value: '', label: 'All Categories' },
+                ...categories.map((c) => ({ value: c._id, label: c.name })),
+              ]}
+              onChange={(val) => {
+                setCategoryId(val);
+                setPage(1);
+              }}
+            />
+            <FilterSelect
+              label="Status"
+              value={
+                isActive === undefined ? '' : isActive ? 'active' : 'inactive'
+              }
+              options={[
+                { value: '', label: 'All Status' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+              onChange={(val) => {
+                if (val === 'active') setIsActive(true);
+                else if (val === 'inactive') setIsActive(false);
+                else setIsActive(undefined);
+                setPage(1);
+              }}
+            />
             <FilterSelect
               label="Stock Level"
               value={stockFilter}
@@ -296,8 +372,26 @@ export const Inventory: FC = () => {
                     product.stock,
                     product.lowStockThreshold
                   );
-                  const catId = getCategoryId(product);
-                  const categoryName = categoryMap[catId] || 'N/A';
+
+                  // Try to get category name from populated object first
+                  let categoryName = 'N/A';
+                  if (
+                    typeof product.categoryId === 'object' &&
+                    product.categoryId &&
+                    'name' in product.categoryId
+                  ) {
+                    categoryName = (product.categoryId as { name: string }).name;
+                  } else if (
+                    typeof product.category === 'object' &&
+                    product.category &&
+                    'name' in product.category
+                  ) {
+                    categoryName = (product.category as { name: string }).name;
+                  } else {
+                    // Fallback to ID map
+                    const catId = getCategoryId(product);
+                    categoryName = (catId && categoryMap[catId]) || 'N/A';
+                  }
 
                   return (
                     <InventoryRow

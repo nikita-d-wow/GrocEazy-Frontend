@@ -1,5 +1,4 @@
-import React, { type FC } from 'react';
-import { useState, useEffect } from 'react';
+import React, { type FC, useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import Input from './Input';
 
@@ -17,36 +16,49 @@ const DebouncedSearch: FC<DebouncedSearchProps> = ({
   initialValue = '',
   onSearch,
   delay = 300,
-  className = '',
-  showIcon = true,
-}) => {
-  const lastEmittedValue = React.useRef(initialValue);
+  className = '', }) => {
   const [value, setValue] = useState(initialValue);
+  const timeoutRef = useRef<number | null>(null);
+  const lastEmittedValue = useRef(initialValue);
 
+  // Sync with parent's initialValue ONLY if it's not what we just emitted
   useEffect(() => {
-    setValue(initialValue);
+    if (initialValue !== lastEmittedValue.current) {
+      setValue(initialValue);
+      lastEmittedValue.current = initialValue;
+    }
   }, [initialValue]);
 
+  // Cleanup timer on unmount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (value !== lastEmittedValue.current) {
-        onSearch(value);
-        lastEmittedValue.current = value;
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
-    }, delay);
+    };
+  }, []);
 
-    return () => clearTimeout(timer);
-  }, [value, delay, onSearch]);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setValue(newValue);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = window.setTimeout(() => {
+      onSearch(newValue);
+      lastEmittedValue.current = newValue;
+    }, delay);
+  };
 
   return (
     <div className={className}>
       <Input
         placeholder={placeholder}
         value={value}
-        onChange={(e) => setValue(e.target.value)}
-        leftIcon={
-          showIcon ? <Search className="w-4 h-4 text-gray-400" /> : undefined
-        }
+        onChange={handleInputChange}
+        leftIcon={<Search className="w-5 h-5 text-gray-400" />}
       />
     </div>
   );
