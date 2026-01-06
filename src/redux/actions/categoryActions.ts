@@ -40,9 +40,11 @@ export const fetchPagedCategories =
  */
 export const fetchCategories =
   () => async (dispatch: AppDispatch, getState: () => any) => {
-    const { categories, loading } = getState().category;
+    const { categories, loading, pagination } = getState().category;
 
-    if (loading || categories.length > 0) {
+    // If already loading, or if we have categories AND they are NOT paginated (meaning full list), return.
+    // If pagination is present, it means we have a subset, so we MUST fetch all.
+    if (loading || (categories.length > 0 && pagination === null)) {
       return;
     }
 

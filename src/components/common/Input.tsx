@@ -51,8 +51,8 @@ const Input: FC<InputProps> = ({
                 ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-50'
                 : 'border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-4 focus:ring-green-50'
             }
-            placeholder:text-gray-400
             ${className}
+            placeholder:text-gray-400
           `}
           {...props}
         />

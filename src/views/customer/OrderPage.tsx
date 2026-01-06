@@ -30,7 +30,7 @@ export default function OrdersPage() {
       value: status,
       label: status,
     }));
-    return [{ value: 'all', label: 'All Statuses' }, ...options];
+    return [{ value: 'all', label: 'All Status' }, ...options];
   }, []);
 
   if (loading) {

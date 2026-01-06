@@ -34,8 +34,8 @@ const CategoryRow = React.memo(
     onDelete,
   }: {
     category: Category;
-    onEdit: (_category: Category) => void;
-    onDelete: (_id: string) => void;
+    onEdit: (category: Category) => void;
+    onDelete: (id: string) => void;
   }) => {
     return (
       <tr className="hover:bg-gray-50/50">
@@ -64,7 +64,8 @@ const CategoryRow = React.memo(
 
         <td className="px-6 py-4">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            {category.productCount || 0} Products
+            {category.productCount || 0}{' '}
+            {category.productCount === 1 ? 'Product' : 'Products'}
           </span>
         </td>
 
@@ -146,6 +147,10 @@ const CategoryManagement: FC = () => {
     setIsFormOpen(true);
   }, []);
 
+  const handleSuccess = useCallback(() => {
+    dispatch(fetchPagedCategories(page, 10, search, sortOrder));
+  }, [dispatch, page, search, sortOrder]);
+
   return (
     <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
       {/* Header */}
@@ -158,7 +163,7 @@ const CategoryManagement: FC = () => {
           onClick={handleAddNew}
           leftIcon={<Plus className="w-5 h-5" />}
           variant="primary"
-          className="shadow-xl shadow-green-200"
+          className="shadow-xl shadow-green-200 w-full sm:w-auto justify-center"
         >
           Add Category
         </Button>
@@ -167,8 +172,8 @@ const CategoryManagement: FC = () => {
       {/* Search & Sort Bar */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
         <div className="p-4 border-b border-gray-100">
-          <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
-            <div className="flex-1 max-w-md w-full">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            <div className="w-full lg:max-w-md">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
                 Search
               </span>
@@ -178,7 +183,7 @@ const CategoryManagement: FC = () => {
                 onSearch={handleSearch}
               />
             </div>
-            <div className="flex flex-wrap md:flex-nowrap gap-4 justify-end">
+            <div className="w-full lg:w-auto">
               <FilterSelect
                 label="Sort By"
                 value={sortOrder}
@@ -273,6 +278,7 @@ const CategoryManagement: FC = () => {
         <CategoryForm
           category={editingCategory}
           onClose={() => setIsFormOpen(false)}
+          onSuccess={handleSuccess}
         />
       )}
     </div>

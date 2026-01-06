@@ -22,9 +22,10 @@ import FilterSelect from '../common/FilterSelect';
 interface Props {
   product?: Product | null;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-const ProductForm: FC<Props> = ({ product, onClose }) => {
+const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
   const dispatch = useAppDispatch();
   const categories = useSelector(selectCategories);
 
@@ -108,6 +109,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
         toast.success('Product created successfully');
       }
 
+      onSuccess?.();
       onClose();
     } catch {
       toast.error('Failed to save product');
@@ -128,6 +130,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             name="name"
             value={formData.name}
             onChange={handleChange}
+            className="border-green-100 hover:border-green-200"
             required
           />
 
@@ -140,6 +143,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             onChange={handleChange}
             min="0"
             step="0.01"
+            className="border-green-100 hover:border-green-200"
             required
           />
 
@@ -150,6 +154,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             value={formData.stock}
             onChange={handleChange}
             min="0"
+            className="border-green-100 hover:border-green-200"
             required
           />
 
@@ -160,6 +165,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             value={formData.lowStockThreshold}
             onChange={handleChange}
             min="0"
+            className="border-green-100 hover:border-green-200"
           />
 
           <Input
@@ -168,6 +174,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             value={formData.size || ''}
             onChange={handleChange}
             placeholder="e.g., 500g, 1kg, 1L"
+            className="border-green-100 hover:border-green-200"
           />
 
           <Input
@@ -176,12 +183,14 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             value={formData.dietary || ''}
             onChange={handleChange}
             placeholder="e.g., Vegan, Gluten-Free"
+            className="border-green-100 hover:border-green-200"
           />
 
           {/* Category Dropdown */}
           <div className="md:col-span-2">
             <FilterSelect
               label="Category"
+              searchable
               options={[
                 { value: '', label: 'Select category' },
                 ...categories
@@ -209,7 +218,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className="w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-50"
+            className="w-full px-4 py-2 border-2 border-green-100 rounded-xl hover:border-green-200 transition-all outline-none focus:border-green-500 focus:ring-4 focus:ring-green-50"
             required
           />
         </div>
@@ -278,7 +287,7 @@ const ProductForm: FC<Props> = ({ product, onClose }) => {
           </label>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t">
+        <div className="flex justify-end gap-3 pt-6 pb-2">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>

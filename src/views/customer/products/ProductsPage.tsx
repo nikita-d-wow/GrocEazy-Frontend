@@ -170,13 +170,13 @@ const ProductsPage: FC = () => {
                 Explore Products
               </h1>
               <p className="text-gray-500 mt-1">
-                Find the best fresh produce and groceries.
+                Find the best fresh products and groceries.
               </p>
             </div>
             <div className="mt-4 md:mt-0">
               <span className="text-gray-600 font-medium">
                 {isSearching
-                  ? `${searchResults.length} matches found globally`
+                  ? `${searchResults.length}  results found`
                   : `${totalResults} results found`}
               </span>
             </div>
