@@ -66,7 +66,7 @@ const FilterSelect = ({
               size={16}
               className={`transition-colors ${isOpen ? 'text-green-600' : 'text-gray-400 group-hover:text-green-500'}`}
             />
-            <span className="text-sm font-bold text-gray-700">
+            <span className="text-sm font-bold text-gray-700 whitespace-nowrap truncate max-w-[120px] sm:max-w-none">
               {selectedOption ? selectedOption.label : 'Select...'}
             </span>
           </div>

@@ -8,6 +8,7 @@ interface DebouncedSearchProps {
   onSearch: (value: string) => void;
   delay?: number;
   className?: string;
+  showIcon?: boolean;
 }
 
 const DebouncedSearch: FC<DebouncedSearchProps> = ({
