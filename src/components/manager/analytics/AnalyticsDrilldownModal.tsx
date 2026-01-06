@@ -11,7 +11,9 @@ import {
 } from 'lucide-react';
 import DebouncedSearch from '../../common/DebouncedSearch';
 import FilterSelect from '../../common/FilterSelect';
+import { optimizeCloudinaryUrl } from '../../../utils/imageUtils';
 import type { Product } from '../../../types/Product';
+import { ProductCardSkeleton } from '../../common/Skeleton';
 
 interface DrilldownProduct extends Product {
   image: string;
@@ -27,8 +29,7 @@ interface AnalyticsDrilldownModalProps {
   onDelete?: (id: string) => void;
 }
 
-const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
-  isOpen,
+const DrilldownContent: FC<AnalyticsDrilldownModalProps> = ({
   onClose,
   title,
   products,
@@ -40,30 +41,24 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
   const [sortBy, setSortBy] = useState('default');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Reset search when modal closes
+  // Artificial loading delay on mount
   useEffect(() => {
-    if (!isOpen) {
-      // Use setTimeout to avoid synchronous setState during render cycle
-      const timer = setTimeout(() => {
-        setSearchTerm('');
-        setSortBy('default');
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+    // Lock scroll on mount
+    document.body.style.overflow = 'hidden';
 
-  // Simulate loading state for better UX
-  useEffect(() => {
-    if (isOpen) {
-      // Avoid synchronous setState in effect
-      const timer = setTimeout(() => {
-        setIsLoading(true);
-        const secondTimer = setTimeout(() => setIsLoading(false), 300);
-        return () => clearTimeout(secondTimer);
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => {
+      // Unlock scroll on unmount
+      document.body.style.overflow = 'unset';
+      clearTimeout(timer);
+      // Reset search and sort when component unmounts (modal closes)
+      setSearchTerm('');
+      setSortBy('default');
+    };
+  }, []);
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -96,10 +91,6 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
     return result;
   }, [products, searchTerm, sortBy]);
 
-  if (!isOpen) {
-    return null;
-  }
-
   const getIcon = () => {
     switch (type) {
       case 'healthy':
@@ -115,23 +106,6 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
     }
   };
 
-  const ProductSkeleton = () => (
-    <div className="flex flex-col gap-2 p-2.5 rounded-[1.5rem] bg-gray-50/50 border border-gray-100 animate-pulse">
-      <div className="w-full aspect-[4/3] rounded-xl bg-gray-200" />
-      <div className="space-y-1.5 px-0.5 mt-1">
-        <div className="h-2.5 bg-gray-200 rounded-md w-3/4" />
-        <div className="flex justify-between items-center">
-          <div className="h-2 bg-gray-200 rounded-md w-1/4" />
-          <div className="h-3.5 bg-gray-200 rounded-full w-8" />
-        </div>
-      </div>
-      <div className="pt-2 border-t border-gray-100 flex gap-1.5">
-        <div className="h-6 bg-gray-200 rounded-lg flex-1" />
-        <div className="h-6 bg-gray-200 rounded-lg w-7" />
-      </div>
-    </div>
-  );
-
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div
@@ -139,9 +113,9 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
         onClick={onClose}
       />
 
-      <div className="relative bg-white/95 backdrop-blur-2xl w-full max-w-4xl max-h-[85vh] rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] flex flex-col animate-scaleIn border border-white/50">
+      <div className="relative bg-white/95 backdrop-blur-2xl w-full max-w-4xl max-h-[85vh] rounded-[2rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] flex flex-col animate-scaleIn border border-white/50 overflow-hidden">
         {/* HEADER */}
-        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white/50 backdrop-blur-xl sticky top-0 z-10 rounded-t-[2rem]">
+        <div className="px-6 py-5 flex items-center justify-between bg-white/50 backdrop-blur-xl sticky top-0 z-10 rounded-t-[2rem]">
           <div className="flex items-center gap-4">
             <div className="p-2.5 bg-gray-50/80 rounded-t-[2rem] sm:rounded-xl shadow-inner shadow-gray-200/50">
               {getIcon()}
@@ -201,11 +175,11 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
         </div>
 
         {/* CONTENT */}
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-white/50 scroll-smooth rounded-b-[2rem]">
+        <div className="flex-1 overflow-y-auto px-6 pb-8 pt-2 custom-scrollbar bg-white/50 scroll-smooth rounded-b-[2rem]">
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {[...Array(8)].map((_, i) => (
-                <ProductSkeleton key={i} />
+                <ProductCardSkeleton key={i} />
               ))}
             </div>
           ) : filteredProducts.length === 0 ? (
@@ -231,16 +205,14 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
                 >
                   <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-gray-50 border border-gray-50">
                     <img
-                      src={p.image || 'https://via.placeholder.com/150'}
+                      src={
+                        optimizeCloudinaryUrl(p.image, 400) ||
+                        'https://via.placeholder.com/150'
+                      }
                       alt={p.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-1 group-hover:translate-y-0">
-                      <span className="bg-white/95 backdrop-blur-md px-1 py-0.5 rounded-md text-[7px] font-black shadow-lg text-gray-800 border border-white">
-                        #{p._id.slice(-6).toUpperCase()}
-                      </span>
-                    </div>
                   </div>
 
                   <div className="flex-1 space-y-1">
@@ -309,6 +281,13 @@ const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = ({
       </div>
     </div>
   );
+};
+
+const AnalyticsDrilldownModal: FC<AnalyticsDrilldownModalProps> = (props) => {
+  if (!props.isOpen) {
+    return null;
+  }
+  return <DrilldownContent {...props} />;
 };
 
 export default AnalyticsDrilldownModal;

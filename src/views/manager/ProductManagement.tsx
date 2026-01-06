@@ -40,8 +40,8 @@ const ProductRow = React.memo(
     onDelete,
   }: {
     product: Product;
-    onEdit: (_product: Product) => void;
-    onDelete: (_id: string) => void;
+    onEdit: (product: Product) => void;
+    onDelete: (id: string) => void;
   }) => {
     return (
       <tr
@@ -194,22 +194,37 @@ const ProductManagement: FC = () => {
     setIsFormOpen(true);
   }, []);
 
+  const handleSuccess = useCallback(() => {
+    const isActive =
+      statusFilter === 'all'
+        ? undefined
+        : statusFilter === 'active'
+          ? true
+          : false;
+
+    dispatch(fetchManagerProducts(page, 10, search, isActive, stockFilter));
+  }, [dispatch, page, search, statusFilter, stockFilter]);
+
   return (
     <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-gray-500">Manage store inventory</p>
         </div>
-        <Button onClick={handleAddNew} leftIcon={<Plus className="w-5 h-5" />}>
+        <Button
+          onClick={handleAddNew}
+          leftIcon={<Plus className="w-5 h-5" />}
+          className="w-full sm:w-auto justify-center"
+        >
           Add Product
         </Button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
         <div className="p-4 border-b border-gray-100">
-          <div className="flex flex-col md:flex-row gap-4 items-end justify-between">
-            <div className="flex-1 max-w-md w-full">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+            <div className="w-full lg:max-w-md">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
                 Search
               </span>
@@ -219,7 +234,7 @@ const ProductManagement: FC = () => {
                 onSearch={handleSearch}
               />
             </div>
-            <div className="flex flex-wrap md:flex-nowrap gap-4 justify-end">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto">
               <FilterSelect
                 label="Stock Status"
                 options={[
@@ -332,6 +347,7 @@ const ProductManagement: FC = () => {
           key={editingProduct?._id ?? 'new'}
           product={editingProduct}
           onClose={() => setIsFormOpen(false)}
+          onSuccess={handleSuccess}
         />
       )}
     </div>

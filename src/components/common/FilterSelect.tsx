@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Check, Filter } from 'lucide-react';
+import { ChevronDown, Check, Filter, Search, X } from 'lucide-react';
 
 interface Option {
   value: string;
@@ -16,6 +16,7 @@ interface FilterSelectProps {
   onChange: (value: string) => void;
   className?: string;
   align?: 'left' | 'right';
+  searchable?: boolean;
 }
 
 const FilterSelect = ({
@@ -25,8 +26,10 @@ const FilterSelect = ({
   onChange,
   className = '',
   align = 'left',
+  searchable = false,
 }: FilterSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,6 +45,15 @@ const FilterSelect = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const filteredOptions = React.useMemo(() => {
+    if (!searchable || !searchTerm) {
+      return options;
+    }
+    return options.filter((opt) =>
+      opt.label.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [options, searchTerm, searchable]);
+
   const selectedOption =
     options.find((opt) => opt.value === value) || options[0];
 
@@ -52,6 +64,7 @@ const FilterSelect = ({
           {label}
         </span>
         <button
+          type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={`
             flex items-center justify-between gap-3 px-4 py-2.5
@@ -91,62 +104,89 @@ const FilterSelect = ({
               w-full min-w-[220px] p-2
               bg-white border-2 border-gray-100
               rounded-2xl shadow-2xl shadow-gray-200/50
-              flex flex-col gap-1
+              flex flex-col gap-1 max-h-[400px]
             `}
           >
-            {options.length > 0 ? (
-              options.map((option) => {
-                const isSelected = option.value === value;
-                return (
+            {searchable && (
+              <div className="relative mb-2 px-1 pt-1">
+                <Search className="absolute left-4 top-4 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-8 py-2.5 bg-gray-50 border-2 border-transparent focus:border-green-100 rounded-xl text-sm outline-none transition-all"
+                />
+                {searchTerm && (
                   <button
-                    key={option.value}
-                    onClick={() => {
-                      onChange(option.value);
-                      setIsOpen(false);
-                    }}
-                    className={`
-                    w-full flex items-center justify-between
-                    px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
-                    ${
-                      isSelected
-                        ? 'bg-green-50 text-green-700'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 cursor-pointer'
-                    }
-                  `}
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-4 p-1 hover:bg-gray-200 rounded-full transition-colors"
                   >
-                    <div className="flex items-center gap-2.5">
-                      {option.icon && (
-                        <span
-                          className={
-                            isSelected ? 'text-green-600' : 'text-gray-400'
-                          }
-                        >
-                          {option.icon}
-                        </span>
-                      )}
-                      {option.label}
-                    </div>
-                    {isSelected && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{
-                          type: 'spring',
-                          stiffness: 300,
-                          damping: 20,
-                        }}
-                      >
-                        <Check size={16} className="text-green-600" />
-                      </motion.div>
-                    )}
+                    <X className="w-3.5 h-3.5 text-gray-400" />
                   </button>
-                );
-              })
-            ) : (
-              <div className="px-4 py-3 text-sm text-gray-400 text-center">
-                No options available
+                )}
               </div>
             )}
+
+            <div className="overflow-y-auto custom-scrollbar flex flex-col gap-1">
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => {
+                  const isSelected = option.value === value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        onChange(option.value);
+                        setIsOpen(false);
+                        setSearchTerm('');
+                      }}
+                      className={`
+                        w-full flex items-center justify-between
+                        px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
+                        ${
+                          isSelected
+                            ? 'bg-green-50 text-green-700'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 cursor-pointer'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        {option.icon && (
+                          <span
+                            className={
+                              isSelected ? 'text-green-600' : 'text-gray-400'
+                            }
+                          >
+                            {option.icon}
+                          </span>
+                        )}
+                        {option.label}
+                      </div>
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 20,
+                          }}
+                        >
+                          <Check size={16} className="text-green-600" />
+                        </motion.div>
+                      )}
+                    </button>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-8 text-sm text-gray-400 text-center">
+                  No matches found
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

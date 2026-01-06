@@ -173,21 +173,34 @@ export default function Header() {
         </div>
 
         {/* Mobile Header Actions */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex md:hidden items-center gap-2 flex-1 justify-end">
           {isCustomer && (
             <>
+              {/* Mobile Search - Visible directly in header */}
+              <div className="relative flex-1 max-w-[160px] xs:max-w-xs">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+                  onKeyDown={handleSearch}
+                  placeholder="Search..."
+                  className="w-full pl-9 pr-3 py-2 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-xs transition-all outline-none"
+                />
+                <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-gray-400" />
+              </div>
+
               <Link
                 to="/wishlist"
-                className={`p-2.5 rounded-xl transition-all duration-200 ${
+                className={`p-1.5 rounded-lg transition-all duration-200 ${
                   isActive('/wishlist')
                     ? 'bg-pink-50 text-pink-500'
                     : 'text-gray-500 hover:bg-pink-50 hover:text-pink-500'
                 }`}
               >
                 <div className="relative">
-                  <Heart className="w-6 h-6" />
+                  <Heart className="w-5 h-5" />
                   {wishlistCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                    <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
                       {wishlistCount}
                     </span>
                   )}
@@ -195,16 +208,16 @@ export default function Header() {
               </Link>
               <Link
                 to="/cart"
-                className={`p-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 ${
+                className={`p-1.5 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                   isActive('/cart')
                     ? 'bg-green-50 text-green-600'
                     : 'text-gray-500 hover:bg-green-50 hover:text-green-600'
                 }`}
               >
                 <div className="relative">
-                  <ShoppingCart className="w-6 h-6" />
+                  <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] font-bold min-w-[18px] h-[18px] flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                    <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
                       {cartCount}
                     </span>
                   )}
@@ -225,18 +238,6 @@ export default function Header() {
       {/* Mobile Dropdown */}
       {open && (
         <div className="md:hidden px-4 pt-2 pb-6 bg-white border-t border-gray-100 shadow-xl space-y-4 animate-in slide-in-from-top duration-300">
-          <div className="relative mt-2">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-              onKeyDown={handleSearch}
-              placeholder="Search products..."
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-100"
-            />
-            <Search className="absolute left-3 top-3.5 w-4 h-4 text-gray-400" />
-          </div>
-
           <div className="flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
@@ -259,10 +260,12 @@ export default function Header() {
               {/* Mobile Profile Summary */}
               <div
                 onClick={() => {
-                  navigate('/profile');
-                  setOpen(false);
+                  if (isCustomer) {
+                    navigate('/profile');
+                    setOpen(false);
+                  }
                 }}
-                className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
+                className={`flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors ${isCustomer ? 'cursor-pointer' : ''}`}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
@@ -272,9 +275,11 @@ export default function Header() {
                     <div className="font-semibold text-gray-900">
                       {user.name || 'User'}
                     </div>
-                    <div className="text-xs text-green-600 font-medium tracking-tight">
-                      View Profile
-                    </div>
+                    {isCustomer && (
+                      <div className="text-xs text-green-600 font-medium tracking-tight">
+                        View Profile
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

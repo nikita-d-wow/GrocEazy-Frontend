@@ -16,7 +16,7 @@ import InventoryPieChart from '../../components/manager/analytics/IneventoryPieC
 import ProductStatusPieChart from '../../utils/wrappers/ProductStatusPieChartWrapper';
 import AnalyticsDrilldownModal from '../../components/manager/analytics/AnalyticsDrilldownModal';
 import ProductForm from '../../components/products/ProductForm';
-import Loader from '../../components/common/Loader';
+import { AnalyticsSkeleton } from '../../components/common/Skeleton';
 import toast from 'react-hot-toast';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import type { Product } from '../../types/Product';
@@ -127,14 +127,7 @@ export default function Analytics() {
   };
 
   if (loading && products.length === 0) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <Loader size="lg" />
-        <p className="mt-4 text-gray-500 font-medium animate-pulse">
-          Analyzing your inventory...
-        </p>
-      </div>
-    );
+    return <AnalyticsSkeleton />;
   }
 
   return (

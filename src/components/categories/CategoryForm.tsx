@@ -18,9 +18,10 @@ import Button from '../common/Button';
 interface Props {
   category?: Category | null;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-const CategoryForm: FC<Props> = ({ category, onClose }) => {
+const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
   const dispatch = useAppDispatch();
 
   const [formData, setFormData] = useState<CategoryFormData>({
@@ -32,6 +33,7 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
   const [imagePreview, setImagePreview] = useState<string | undefined>(
     category?.image
   );
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -57,6 +59,7 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const submitData: CategoryFormData = {
@@ -72,9 +75,12 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
         toast.success('Category created successfully');
       }
 
+      onSuccess?.();
       onClose();
     } catch {
       toast.error('Failed to save category');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,6 +97,7 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
           name="name"
           value={formData.name}
           onChange={handleChange}
+          className="border-green-100 hover:border-green-200"
           required
         />
 
@@ -108,7 +115,7 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
               />
             )}
             <label className="flex-1 cursor-pointer">
-              <div className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-gray-200 rounded-xl hover:border-green-500 transition-colors bg-white">
+              <div className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-green-100 rounded-xl hover:border-green-200 transition-colors bg-white">
                 <Upload className="w-5 h-5 text-gray-400" />
                 <span className="text-sm text-gray-600">
                   {imageFile ? imageFile.name : 'Choose image file'}
@@ -124,11 +131,11 @@ const CategoryForm: FC<Props> = ({ category, onClose }) => {
           </div>
         </div>
 
-        <div className="pt-6 flex justify-end space-x-3 border-t">
+        <div className="flex justify-end gap-3 pt-6">
           <Button type="button" variant="ghost" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit">
+          <Button type="submit" isLoading={loading}>
             {category ? 'Update Category' : 'Create Category'}
           </Button>
         </div>

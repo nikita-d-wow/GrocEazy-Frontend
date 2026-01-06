@@ -15,12 +15,6 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
   const { user, loading } = useSelector((state: RootState) => state.auth);
 
   const location = useLocation();
-  // eslint-disable-next-line no-console
-  console.log('ProtectedRoute Check:', {
-    hasPassword: user?.hasPassword,
-    path: location.pathname,
-    role: user?.role,
-  });
 
   if (loading) {
     return (

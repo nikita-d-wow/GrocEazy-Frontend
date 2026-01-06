@@ -112,3 +112,79 @@ export function InventorySkeleton() {
     </div>
   );
 }
+
+/**
+ * Specialized Analytics Dashboard Skeleton
+ */
+export function AnalyticsSkeleton() {
+  return (
+    <div className="space-y-12 animate-fadeIn max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-12">
+      {/* Header Skeleton */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-16 w-16 rounded-2xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-64 rounded-xl" />
+            <Skeleton className="h-4 w-48 rounded-lg" />
+          </div>
+        </div>
+      </div>
+
+      {/* Metric Cards Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-32 relative overflow-hidden"
+          >
+            <div className="flex items-center justify-between">
+              <div className="space-y-3">
+                <Skeleton className="h-3 w-20 rounded-full" />
+                <Skeleton className="h-8 w-16 rounded-xl" />
+              </div>
+              <Skeleton className="h-12 w-12 rounded-xl" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-[450px]"
+          >
+            <div className="space-y-2 mb-6">
+              <Skeleton className="h-6 w-38 rounded-xl" />
+              <Skeleton className="h-4 w-52 rounded-lg" />
+            </div>
+            <Skeleton className="h-[300px] w-full rounded-xl" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Product Card Skeleton for Analytics
+ */
+export function ProductCardSkeleton() {
+  return (
+    <div className="flex flex-col gap-2 p-2.5 rounded-[1.5rem] bg-gray-50/50 border border-gray-100 animate-pulse">
+      <div className="w-full aspect-[4/3] rounded-xl bg-gray-200" />
+      <div className="space-y-1.5 px-0.5 mt-1">
+        <div className="h-2.5 bg-gray-200 rounded-md w-3/4" />
+        <div className="flex justify-between items-center">
+          <div className="h-2 bg-gray-200 rounded-md w-1/4" />
+          <div className="h-3.5 bg-gray-200 rounded-full w-8" />
+        </div>
+      </div>
+      <div className="pt-2 border-t border-gray-100 flex gap-1.5">
+        <div className="h-6 bg-gray-200 rounded-lg flex-1" />
+        <div className="h-6 bg-gray-200 rounded-lg w-7" />
+      </div>
+    </div>
+  );
+}

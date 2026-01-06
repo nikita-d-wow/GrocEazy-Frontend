@@ -151,15 +151,9 @@ export const Inventory: FC = () => {
   const error = useSelector(selectProductError);
 
   const handleSearch = useCallback((val: string) => {
-    console.log('Inventory handleSearch:', val);
     setSearch(val);
     setPage(1);
   }, []);
-
-  // Log whenever search term actually changes in component state
-  useEffect(() => {
-    console.log('Inventory search state changed:', search);
-  }, [search]);
 
   const getStockStatus = (stock: number, threshold: number = 5) => {
     if (Number(stock) === 0) {
@@ -204,7 +198,7 @@ export const Inventory: FC = () => {
         onClose={() => setIsAlertsOpen(false)}
       />
 
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
           <p className="text-gray-500">
@@ -213,7 +207,7 @@ export const Inventory: FC = () => {
         </div>
         <button
           onClick={() => setIsAlertsOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
         >
           <AlertTriangle size={18} className="text-orange-500" />
           Stock Alerts
@@ -255,8 +249,8 @@ export const Inventory: FC = () => {
         id="inventory-table"
         className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 scroll-mt-24"
       >
-        <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="max-w-md w-full">
+        <div className="p-4 border-b border-gray-100 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+          <div className="w-full lg:max-w-md">
             <DebouncedSearch
               placeholder="Search inventory..."
               initialValue={search}
@@ -264,7 +258,7 @@ export const Inventory: FC = () => {
               delay={800}
             />
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex xl:items-center gap-3 w-full lg:w-auto">
             <FilterSelect
               label="Category"
               value={categoryId}
@@ -278,27 +272,10 @@ export const Inventory: FC = () => {
               }}
             />
             <FilterSelect
-              label="Status"
-              value={
-                isActive === undefined ? '' : isActive ? 'active' : 'inactive'
-              }
-              options={[
-                { value: '', label: 'All Status' },
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' },
-              ]}
-              onChange={(val) => {
-                if (val === 'active') setIsActive(true);
-                else if (val === 'inactive') setIsActive(false);
-                else setIsActive(undefined);
-                setPage(1);
-              }}
-            />
-            <FilterSelect
-              label="Stock Level"
+              label="Stock Status"
               value={stockFilter}
               options={[
-                { value: '', label: 'All Stock Levels' },
+                { value: '', label: 'All Items' },
                 { value: 'lowStock', label: 'Low Stock' },
                 { value: 'outOfStock', label: 'Out of Stock' },
                 { value: 'inStock', label: 'In Stock' },
@@ -319,8 +296,32 @@ export const Inventory: FC = () => {
                 }, 100);
               }}
             />
+            <FilterSelect
+              label="Status"
+              value={
+                isActive === undefined ? '' : isActive ? 'active' : 'inactive'
+              }
+              options={[
+                { value: '', label: 'All' },
+                { value: 'active', label: 'Active' },
+                { value: 'inactive', label: 'Inactive' },
+              ]}
+              onChange={(val) => {
+                if (val === 'active') {
+                  setIsActive(true);
+                } else if (val === 'inactive') {
+                  setIsActive(false);
+                } else {
+                  setIsActive(undefined);
+                }
+                setPage(1);
+              }}
+            />
             {/* Reset Filters Button */}
-            {(stockFilter || categoryId || isActive !== undefined || search) && (
+            {(stockFilter ||
+              categoryId ||
+              isActive !== undefined ||
+              search) && (
               <button
                 onClick={() => {
                   setStockFilter('');
@@ -395,7 +396,8 @@ export const Inventory: FC = () => {
                     product.categoryId &&
                     'name' in product.categoryId
                   ) {
-                    categoryName = (product.categoryId as { name: string }).name;
+                    categoryName = (product.categoryId as { name: string })
+                      .name;
                   } else if (
                     typeof product.category === 'object' &&
                     product.category &&
