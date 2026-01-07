@@ -81,7 +81,7 @@ export default function AdminSupportTickets() {
     <div className="min-h-screen relative">
       {/* SILENT REFRESH INDICATOR */}
       {refreshing && (
-        <div className="fixed top-0 left-0 right-0 h-1 bg-indigo-100 z-50 overflow-hidden">
+        <div className="fixed top-0 left-0 right-0 h-1 z-50 overflow-hidden">
           <div className="h-full bg-indigo-600 animate-progress origin-left" />
         </div>
       )}
@@ -90,7 +90,7 @@ export default function AdminSupportTickets() {
         {/* HEADER */}
         <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="flex items-center gap-3">
-            <ShieldCheck className="text-indigo-600" size={28} />
+            <ShieldCheck className="text-primary" size={28} />
             <h1 className="text-3xl font-semibold text-gray-800">
               Support Tickets
             </h1>
