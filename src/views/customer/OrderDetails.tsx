@@ -15,8 +15,8 @@ import {
   Clock,
   XCircle,
   Download,
-  CreditCard,
   Receipt,
+  Banknote,
 } from 'lucide-react';
 import { getOrderDetails, cancelOrder } from '../../redux/actions/orderActions';
 import type { RootState } from '../../redux/rootReducer';
@@ -271,7 +271,7 @@ export default function OrderDetails() {
                 >
                   <span style={{ color: '#4b5563' }}>Payment Method</span>
                   <span className="font-semibold" style={{ color: '#111827' }}>
-                    Online (Card)
+                    Cash on Delivery
                   </span>
                 </div>
                 <div
@@ -620,11 +620,13 @@ export default function OrderDetails() {
               <div className="mt-4 pt-4 border-t border-gray-50">
                 <div className="flex items-center gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100">
                   <div className="bg-white p-1.5 rounded-lg shadow-sm">
-                    <CreditCard size={16} className="text-blue-500" />
+                    <Banknote size={16} className="text-blue-500" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Paid Online</p>
-                    <p className="text-xs">Via Credit/Debit Card</p>
+                    <p className="font-semibold text-gray-900">
+                      Cash on Delivery
+                    </p>
+                    <p className="text-xs">COD</p>
                   </div>
                 </div>
               </div>
