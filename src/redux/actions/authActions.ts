@@ -21,6 +21,7 @@ import type {
 } from '../types/authTypes';
 import api from '../../services/api';
 import { AUTH_KEYS } from '../../constants/auth';
+import { verifyOtp } from '../../services/authService';
 
 type LoginPayload = { email: string; password: string };
 type RegisterPayload = { name: string; email: string; password: string };
@@ -44,7 +45,8 @@ export const login = (payload: LoginPayload) => {
         type: AUTH_LOGIN_SUCCESS,
         payload: { accessToken: data.accessToken, user: data.user as IUser },
       });
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Login failed';
       dispatch({
@@ -64,13 +66,15 @@ export const register = (payload: RegisterPayload) => {
       dispatch({ type: AUTH_REGISTER_SUCCESS });
       // Note: Registration doesn't auto-login per spec, so no token setting here.
       // The UI should redirect to Login.
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Registration failed';
       dispatch({
         type: AUTH_REGISTER_FAILURE,
         payload: { error: errorMessage },
       });
+      throw err;
     }
   };
 };
@@ -95,10 +99,10 @@ export const logout = () => {
         await api.post('/api/auth/logout', { refreshToken });
       }
     } catch (error) {
-      console.error("Logout backend call failed", error);
+      console.error('Logout backend call failed', error); // eslint-disable-line no-console
     } finally {
       // Optional: Force reload to ensure clean state
-      // window.location.reload(); 
+      // window.location.reload();
     }
   };
 };
@@ -120,7 +124,8 @@ export const googleLogin = (token: string) => {
         type: AUTH_LOGIN_SUCCESS,
         payload: { accessToken: data.accessToken, user: data.user as IUser },
       });
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Google login failed';
       dispatch({
@@ -149,11 +154,40 @@ export const resetPassword = (token: string, password: string) => {
     try {
       await api.post('/api/auth/reset-password', { token, password });
       dispatch({ type: AUTH_RESET_PASSWORD_SUCCESS });
-    } catch (err: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Reset password failed';
       dispatch({
         type: AUTH_RESET_PASSWORD_FAILURE,
+        payload: { error: errorMessage },
+      });
+      throw err;
+    }
+  };
+};
+
+export const verifyOtpAction = (email: string, otp: string) => {
+  return async (dispatch: Dispatch<AuthActionTypes>) => {
+    dispatch({ type: AUTH_LOGIN_REQUEST });
+    try {
+      const data = await verifyOtp({ email, otp });
+
+      localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, data.accessToken);
+      localStorage.setItem(AUTH_KEYS.REFRESH_TOKEN, data.refreshToken);
+      localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(data.user));
+
+      dispatch({
+        type: AUTH_LOGIN_SUCCESS,
+        payload: { accessToken: data.accessToken, user: data.user as IUser },
+      });
+      return data;
+    } catch (err: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
+      const errorMessage =
+        err.response?.data?.message || err.message || 'OTP Verification failed';
+      dispatch({
+        type: AUTH_LOGIN_FAILURE,
         payload: { error: errorMessage },
       });
       throw err;
