@@ -1,6 +1,6 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PackageX, SearchX } from 'lucide-react';
+import { PackageX, SearchX, Package } from 'lucide-react';
 import OrderCard from '../../components/customer/orders/OrderCard';
 import { getMyOrders } from '../../redux/actions/orderActions';
 import { fetchProducts } from '../../redux/actions/productActions';
@@ -18,13 +18,48 @@ export default function OrdersPage() {
   const { orders, pagination, loading, error } = useSelector(
     (state: RootState) => state.order
   );
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(() => {
+    const savedPage = sessionStorage.getItem('orderPageNum');
+    return savedPage ? parseInt(savedPage, 10) : 1;
+  });
   const [statusFilter, setStatusFilter] = useState('all');
+
+  // Keep ref synced with currentPage for unmount access
+  const currentPageRef = useRef(currentPage);
+  useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
 
   useEffect(() => {
     dispatch(getMyOrders(currentPage, 5, statusFilter));
     dispatch(fetchProducts());
+    // Scroll to top when page changes (except if we are about to restore scroll)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [dispatch, currentPage, statusFilter]);
+
+  // SCROLL RESTORATION (Only when data loads)
+  useEffect(() => {
+    if (!loading && orders.length > 0) {
+      const savedScroll = sessionStorage.getItem('orderPageScroll');
+      if (savedScroll) {
+        setTimeout(() => {
+          window.scrollTo({
+            top: parseInt(savedScroll, 10),
+            behavior: 'auto',
+          });
+          sessionStorage.removeItem('orderPageScroll');
+        }, 100);
+      }
+    }
+  }, [loading, orders.length]);
+
+  // STATE SAVING (Only on unmount)
+  useEffect(() => {
+    return () => {
+      sessionStorage.setItem('orderPageScroll', window.scrollY.toString());
+      sessionStorage.setItem('orderPageNum', currentPageRef.current.toString());
+    };
+  }, [currentPageRef]); // dependency on Ref is stable, effectively [] but satisfies linter if we used a ref object
 
   const filterOptions = useMemo(() => {
     const options = Object.keys(ORDER_STATUS_META).map((status) => ({
@@ -59,11 +94,21 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-10 animate-fadeIn">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-          <p className="text-gray-600">Track all your orders with ease.</p>
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-8 animate-fadeIn">
+      {/* Header Section */}
+      <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-white rounded-3xl shadow-sm text-primary border border-gray-100 hidden sm:block">
+            <Package size={32} />
+          </div>
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+              My Orders
+            </h1>
+            <p className="text-gray-500 font-medium text-lg">
+              Track your past purchases and deliveries
+            </p>
+          </div>
         </div>
 
         <FilterSelect
