@@ -1,5 +1,5 @@
 // src/routes/AdminRoutes.tsx
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 
 import ProtectedRoute from './ProtectedRoute';
 import AdminLayout from '../layouts/AdminLayout';
@@ -17,8 +17,8 @@ export const AdminRoutes = (
         </ProtectedRoute>
       }
     >
-      <Route index element={<UsersPage />} />
-      <Route path="/admin" element={<UsersPage />} />
+      <Route index element={<Navigate to="/admin/users" replace />} />
+      <Route path="/admin" element={<Navigate to="/admin/users" replace />} />
       <Route path="/admin/users" element={<UsersPage />} />
       <Route path="/admin/inventory" element={<Inventory />} />
       <Route path="/admin/tickets" element={<AdminSupportTickets />} />

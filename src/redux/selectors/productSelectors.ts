@@ -17,6 +17,12 @@ export const selectTopProducts = createSelector(
   (products) => products ?? []
 );
 
+// Selector for analytics products (all products for stats)
+export const selectAnalyticsProducts = createSelector(
+  [(state: RootState) => state.product.analyticsProducts],
+  (products) => products ?? []
+);
+
 export const selectProductLoading = (state: RootState) => state.product.loading;
 
 export const selectProductError = (state: RootState) => state.product.error;

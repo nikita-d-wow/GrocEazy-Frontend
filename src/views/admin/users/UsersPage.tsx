@@ -61,10 +61,6 @@ export default function UsersPage() {
     setIsModalOpen(true);
   };
 
-  // if (error) {
-  //     console.error(error);
-  // }
-
   return (
     <>
       <UserDetailsModal
@@ -294,7 +290,7 @@ export default function UsersPage() {
 
           {/* Pagination */}
           {pagination && pagination.pages > 1 && (
-            <div className="border-t border-gray-200 px-6 py-4 flex justify-center">
+            <div className="border-t border-gray-200 px-4 py-4 flex justify-center">
               <Pagination
                 currentPage={page}
                 totalPages={pagination.pages}
