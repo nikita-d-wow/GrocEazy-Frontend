@@ -5,7 +5,8 @@ interface PriceRangeSliderProps {
   max: number;
   value: [number, number];
 
-  onChange: (_value: [number, number]) => void;
+  // eslint-disable-next-line no-unused-vars
+  onChange: (value: [number, number]) => void;
 }
 
 const PriceRangeSlider: FC<PriceRangeSliderProps> = ({
@@ -36,19 +37,19 @@ const PriceRangeSlider: FC<PriceRangeSliderProps> = ({
       {/* Display Values with subtle badges */}
       <div className="flex justify-between items-center mb-6">
         <div className="flex flex-col">
-          <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-0.5">
+          <span className="text-[10px] text-muted-text opacity-50 uppercase tracking-widest font-bold mb-0.5">
             Min
           </span>
-          <span className="text-sm font-bold text-gray-900 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
+          <span className="text-sm font-bold text-text bg-muted px-2.5 py-1 rounded-md border border-border">
             ₹{value[0]}
           </span>
         </div>
-        <div className="h-px w-4 bg-gray-200 mt-4" />
+        <div className="h-px w-4 bg-border mt-4" />
         <div className="flex flex-col items-end">
-          <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-0.5">
+          <span className="text-[10px] text-muted-text opacity-50 uppercase tracking-widest font-bold mb-0.5">
             Max
           </span>
-          <span className="text-sm font-bold text-gray-900 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
+          <span className="text-sm font-bold text-text bg-muted px-2.5 py-1 rounded-md border border-border">
             ₹{value[1]}
           </span>
         </div>
@@ -57,10 +58,10 @@ const PriceRangeSlider: FC<PriceRangeSliderProps> = ({
       {/* Slider Track Container */}
       <div className="relative px-1">
         {/* Slider Track Background */}
-        <div className="relative h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="relative h-1.5 bg-muted rounded-full overflow-hidden">
           {/* Active Range Overlay */}
           <div
-            className="absolute h-full bg-green-500 transition-all duration-150"
+            className="absolute h-full bg-primary transition-all duration-150"
             style={{
               left: `${minPercent}%`,
               width: `${maxPercent - minPercent}%`,
@@ -79,9 +80,9 @@ const PriceRangeSlider: FC<PriceRangeSliderProps> = ({
             className="absolute w-full appearance-none bg-transparent pointer-events-none z-30
               [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
               [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full 
-              [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-green-500 
+              [&::-webkit-slider-thumb]:bg-card [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary 
               [&::-webkit-slider-thumb]:cursor-grab active:[&::-webkit-slider-thumb]:cursor-grabbing
-              [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(34,197,94,0.3)] [&::-webkit-slider-thumb]:transition-transform
+              [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(var(--primary-rgb),0.3)] [&::-webkit-slider-thumb]:transition-transform
               hover:[&::-webkit-slider-thumb]:scale-110 active:[&::-webkit-slider-thumb]:scale-95"
           />
           <input
@@ -93,9 +94,9 @@ const PriceRangeSlider: FC<PriceRangeSliderProps> = ({
             className="absolute w-full appearance-none bg-transparent pointer-events-none z-40
               [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none 
               [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full 
-              [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-green-500 
+              [&::-webkit-slider-thumb]:bg-card [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary 
               [&::-webkit-slider-thumb]:cursor-grab active:[&::-webkit-slider-thumb]:cursor-grabbing
-              [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(34,197,94,0.3)] [&::-webkit-slider-thumb]:transition-transform
+              [&::-webkit-slider-thumb]:shadow-[0_2px_6px_rgba(var(--primary-rgb),0.3)] [&::-webkit-slider-thumb]:transition-transform
               hover:[&::-webkit-slider-thumb]:scale-110 active:[&::-webkit-slider-thumb]:scale-95"
           />
         </div>

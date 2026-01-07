@@ -17,7 +17,7 @@ export default function Skeleton({
   width,
   height,
 }: SkeletonProps) {
-  const baseStyles = 'animate-pulse bg-gray-200 relative overflow-hidden';
+  const baseStyles = 'animate-pulse bg-muted relative overflow-hidden';
 
   const variantStyles = {
     rect: 'rounded-lg',
@@ -53,7 +53,7 @@ export function TableRowSkeleton({
   hasImage?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-gray-50 last:border-0">
+    <div className="flex items-center gap-4 py-3 border-b border-border last:border-0">
       {hasImage && <Skeleton className="h-12 w-12 rounded-xl shrink-0" />}
       <div className="flex-1 space-y-2">
         <Skeleton className="h-4 w-1/3" />
@@ -79,7 +79,7 @@ export function TableSkeleton({
   hasImage?: boolean;
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden animate-fadeIn">
+    <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden animate-fadeIn">
       <div className="p-6 space-y-2">
         {Array.from({ length: rows }).map((_, i) => (
           <TableRowSkeleton key={i} cols={cols} hasImage={hasImage} />
@@ -100,7 +100,7 @@ export function InventorySkeleton() {
         {[1, 2].map((i) => (
           <div
             key={i}
-            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-[460px]"
+            className="bg-card p-6 rounded-2xl shadow-sm border border-border h-[460px]"
           >
             <Skeleton className="h-6 w-32 mb-4" />
             <Skeleton className="h-[380px] w-full rounded-xl" />
@@ -135,7 +135,7 @@ export function AnalyticsSkeleton() {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-32 relative overflow-hidden"
+            className="bg-card p-6 rounded-2xl shadow-sm border border-border h-32 relative overflow-hidden"
           >
             <div className="flex items-center justify-between">
               <div className="space-y-3">
@@ -153,7 +153,7 @@ export function AnalyticsSkeleton() {
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-[450px]"
+            className="bg-card p-6 rounded-2xl shadow-sm border border-border h-[450px]"
           >
             <div className="space-y-2 mb-6">
               <Skeleton className="h-6 w-38 rounded-xl" />

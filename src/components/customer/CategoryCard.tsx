@@ -32,7 +32,7 @@ export default function CategoryCard({
           className="w-full h-full object-contain mix-blend-multiply transition-transform hover:rotate-6"
         />
       </div>
-      <p className="text-gray-900 font-bold text-center text-sm line-clamp-1">
+      <p className="text-text font-bold text-center text-sm line-clamp-1">
         {text}
       </p>
     </motion.div>

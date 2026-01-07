@@ -79,6 +79,7 @@ export default function ProductCard({
       opacity: 1,
       transition: { duration: 0.4, ease: 'easeOut' },
     },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 
   return (
@@ -86,19 +87,19 @@ export default function ProductCard({
       variants={itemVariants}
       whileHover={{ y: -5 }}
       onClick={() => navigate(`/products/${_id}`)}
-      className="bg-white rounded-2xl p-4 shadow-md hover:shadow-xl transition-all cursor-pointer group h-full flex flex-col"
+      className="bg-card rounded-2xl p-4 shadow-md hover:shadow-xl transition-all cursor-pointer group h-full flex flex-col border border-border"
     >
       <div
-        className={`relative bg-gray-50 rounded-xl p-4 mb-3 overflow-hidden h-40 flex items-center justify-center`}
+        className={`relative bg-muted rounded-xl p-4 mb-3 overflow-hidden h-40 flex items-center justify-center`}
       >
         <img
           src={getOptimizedImage(image, 400)} // Request 400px for card
           alt={name}
           loading={index > 4 ? 'lazy' : 'eager'}
-          className="w-full h-full object-contain group-hover:scale-110 transition-transform mix-blend-multiply relative z-10"
+          className="w-full h-full object-contain group-hover:scale-110 transition-transform mix-blend-multiply dark:mix-blend-normal relative z-10"
         />
         {/* Interior placeholder to bridge gap before image arrives */}
-        <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-xl" />
+        <div className="absolute inset-0 bg-muted/50 animate-pulse rounded-xl" />
         {stock !== undefined && stock < 10 && stock > 0 && (
           <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider z-20">
             Low
@@ -113,15 +114,15 @@ export default function ProductCard({
           onClick={handleWishlistFn}
           className={`absolute top-2 left-2 p-1.5 rounded-full transition-colors cursor-pointer z-20 ${
             isInWishlist
-              ? 'bg-red-50 text-red-500 hover:bg-red-100'
-              : 'bg-white/50 hover:bg-white text-gray-400 hover:text-red-500'
+              ? 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
+              : 'bg-card/50 hover:bg-card text-muted-text hover:text-red-500 border border-border'
           }`}
         >
           <Heart size={16} fill={isInWishlist ? 'currentColor' : 'none'} />
         </button>
       </div>
       <div className="flex flex-col flex-grow text-left">
-        <p className="text-gray-900 font-bold text-sm mb-1 line-clamp-2 leading-tight">
+        <p className="text-text font-bold text-sm mb-1 line-clamp-2 leading-tight">
           {name}
         </p>
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
@@ -145,15 +146,15 @@ export default function ProductCard({
               disabled={stock === 0}
               className={`px-3 sm:px-4 py-1.5 rounded-lg border font-bold text-[10px] sm:text-xs uppercase transition-all whitespace-nowrap flex items-center justify-center ${
                 stock === 0
-                  ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
-                  : 'border-green-600 text-green-600 hover:bg-green-50 cursor-pointer min-w-[80px]'
+                  ? 'border-border text-muted-text cursor-not-allowed bg-muted'
+                  : 'border-primary text-primary hover:bg-primary-light cursor-pointer min-w-[80px]'
               }`}
             >
               {stock === 0 ? 'SOLD OUT' : 'ADD'}
             </button>
           ) : (
             <div
-              className="flex items-center gap-2 bg-green-50 rounded-lg px-2 py-1 border border-green-200"
+              className="flex items-center gap-2 bg-primary-light rounded-lg px-2 py-1 border border-primary/20"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -167,11 +168,11 @@ export default function ProductCard({
                     }
                   }
                 }}
-                className="w-6 h-6 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50 cursor-pointer"
+                className="w-6 h-6 flex items-center justify-center bg-card rounded text-primary shadow-sm hover:bg-muted cursor-pointer border border-border"
               >
                 <Minus size={14} strokeWidth={3} />
               </button>
-              <span className="text-sm font-bold text-green-700 min-w-[20px] text-center">
+              <span className="text-sm font-bold text-primary min-w-[20px] text-center">
                 {quantity}
               </span>
               <button

@@ -63,14 +63,14 @@ export default function ManagerSupportTickets() {
       <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
         <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fadeIn">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-white rounded-2xl shadow-sm text-primary border border-gray-100">
+            <div className="p-3 bg-card rounded-2xl shadow-sm text-primary border border-border">
               <Ticket size={28} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              <h1 className="text-3xl font-bold tracking-tight text-text">
                 My Assigned Tickets
               </h1>
-              <p className="text-gray-500 mt-1">
+              <p className="text-muted-text mt-1">
                 Manage and resolve your customer support requests
               </p>
             </div>
@@ -88,7 +88,7 @@ export default function ManagerSupportTickets() {
         {loading && tickets.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[400px] animate-fadeIn">
             <Loader />
-            <p className="mt-4 text-gray-500 animate-pulse">
+            <p className="mt-4 text-muted-text animate-pulse">
               Syncing your tickets...
             </p>
           </div>
@@ -134,15 +134,13 @@ export default function ManagerSupportTickets() {
             )}
           </>
         ) : (
-          <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl animate-fadeIn">
-            <div className="p-4 bg-gray-100 rounded-full text-gray-400">
+          <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-card/40 backdrop-blur-md border border-dashed border-border rounded-3xl animate-fadeIn">
+            <div className="p-4 bg-muted rounded-full text-muted-text">
               <SearchX size={48} />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-800">
-                No matches found
-              </h3>
-              <p className="text-gray-500 max-w-xs mx-auto">
+              <h3 className="text-xl font-bold text-text">No matches found</h3>
+              <p className="text-muted-text max-w-xs mx-auto">
                 No tickets currently match the "
                 {filterOptions.find((o) => o.value === statusFilter)?.label}"
                 status on this page.

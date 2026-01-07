@@ -138,14 +138,14 @@ export default function Analytics() {
         {/* HEADER */}
         <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fadeIn">
           <div className="flex items-center gap-4">
-            <div className="p-4 bg-white rounded-3xl shadow-sm text-primary border border-gray-100">
+            <div className="p-4 bg-card rounded-3xl shadow-sm text-primary border border-border">
               <Package size={32} />
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+              <h1 className="text-text text-3xl font-extrabold tracking-tight">
                 Manager Analytics
               </h1>
-              <p className="text-gray-500 font-medium">
+              <p className="text-muted-text font-medium">
                 Revenue, inventory & product insights
               </p>
             </div>
@@ -173,7 +173,7 @@ export default function Analytics() {
               title="Revenue Trend"
               description="Monthly growth and financial trajectory"
             >
-              <div className="h-[350px] w-full bg-white/20 rounded-3xl p-4">
+              <div className="h-[350px] w-full bg-muted/30 rounded-3xl p-4">
                 <RevenueBarChart
                   data={analytics.revenueBar}
                   onSegmentClick={(label) =>

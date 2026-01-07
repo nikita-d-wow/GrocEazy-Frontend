@@ -48,7 +48,7 @@ const TicketAssignSelect: React.FC<TicketAssignSelectProps> = ({
           ${
             isOpen
               ? 'bg-primary/10 text-primary shadow-sm'
-              : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-100'
+              : 'bg-muted text-muted-text hover:bg-muted/80 border border-border'
           }
           ${isAssigning || ['resolved', 'closed'].includes(status) ? 'opacity-70 cursor-not-allowed' : ''}
         `}
@@ -76,8 +76,8 @@ const TicketAssignSelect: React.FC<TicketAssignSelectProps> = ({
             className="fixed inset-0 z-[60]"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute left-0 lg:left-auto lg:right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-[70] py-1 overflow-hidden animate-in fade-in zoom-in duration-200 origin-top-left lg:origin-top-right">
-            <div className="px-3 py-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50">
+          <div className="absolute left-0 lg:left-auto lg:right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-lg z-[70] py-1 overflow-hidden animate-in fade-in zoom-in duration-200 origin-top-left lg:origin-top-right">
+            <div className="px-3 py-2 text-[10px] font-bold text-muted-text uppercase tracking-wider bg-muted">
               Select Manager
             </div>
             <div className="max-h-60 overflow-y-auto">
@@ -94,7 +94,7 @@ const TicketAssignSelect: React.FC<TicketAssignSelectProps> = ({
                       w-full flex items-center justify-between px-4 py-2.5 text-xs text-left
                       transition-colors duration-200
                       hover:bg-primary/5 hover:text-primary
-                      ${currentManager?._id === manager._id ? 'bg-primary/5 text-primary font-medium' : 'text-gray-700'}
+                      ${currentManager?._id === manager._id ? 'bg-primary/5 text-primary font-medium' : 'text-text'}
                     `}
                   >
                     <span>{manager.name || manager.email}</span>

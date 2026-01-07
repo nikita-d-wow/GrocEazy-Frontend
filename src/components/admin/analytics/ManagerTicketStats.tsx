@@ -55,39 +55,39 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-12">
       {/* OVERALL STATS */}
-      <div className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+      <div className="lg:col-span-2 bg-card border border-border rounded-2xl p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-2 bg-primary/10 rounded-lg text-primary">
             <BarChart3 size={20} />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800">System Overview</h3>
-            <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tight">
+            <h3 className="font-semibold text-text">System Overview</h3>
+            <p className="text-[10px] text-muted-text uppercase font-bold tracking-tight">
               Global Stats
             </p>
           </div>
         </div>
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-500">Total Tickets</span>
+            <span className="text-sm text-muted-text">Total Tickets</span>
             <div className="flex flex-col items-end">
-              <span className="text-lg font-bold text-gray-800">
+              <span className="text-lg font-bold text-text">
                 {totalCount ?? tickets.length}
               </span>
             </div>
           </div>
-          <div className="flex justify-between items-center border-t border-gray-50 pt-3">
-            <span className="text-sm text-gray-500">Assigned</span>
+          <div className="flex justify-between items-center border-t border-border pt-3">
+            <span className="text-sm text-muted-text">Assigned</span>
             <span className="text-lg font-bold text-primary">
               {assignedCount}
             </span>
           </div>
-          <div className="flex justify-between items-center border-t border-gray-50 pt-3">
+          <div className="flex justify-between items-center border-t border-border pt-3">
             <div className="flex flex-col">
-              <span className="text-sm text-gray-500">Unassigned</span>
+              <span className="text-sm text-muted-text">Unassigned</span>
             </div>
             <span
-              className={`text-lg font-bold ${unassignedCount > 0 ? 'text-amber-600' : 'text-gray-800'}`}
+              className={`text-lg font-bold ${unassignedCount > 0 ? 'text-amber-500' : 'text-text'}`}
             >
               {unassignedCount}
             </span>
@@ -96,23 +96,21 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
       </div>
 
       {/* MANAGER LIST */}
-      <div className="lg:col-span-3 bg-white border border-gray-200 rounded-2xl p-6 shadow-sm overflow-hidden">
+      <div className="lg:col-span-3 bg-card border border-border rounded-2xl p-6 shadow-sm overflow-hidden">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2 bg-primary/10 rounded-lg text-primary">
             <Users size={20} />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-800">
-              Manager Distribution
-            </h3>
-            <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tight">
+            <h3 className="font-semibold text-text">Manager Distribution</h3>
+            <p className="text-[10px] text-muted-text uppercase font-bold tracking-tight">
               System-Wide
             </p>
           </div>
         </div>
 
         {managers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+          <div className="flex flex-col items-center justify-center py-8 text-muted-text bg-muted rounded-xl border border-dashed border-border">
             <AlertCircle size={32} className="mb-2 opacity-20" />
             <p className="text-sm font-medium">No managers found</p>
             <p className="text-[10px] opacity-70 mt-1 text-center max-w-[200px]">
@@ -125,7 +123,7 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
             {stats.map((manager) => (
               <div
                 key={manager._id}
-                className="flex flex-col p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm group"
+                className="flex flex-col p-4 rounded-2xl bg-muted border border-border hover:border-primary/20 hover:bg-card transition-all shadow-sm group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3 min-w-0">
@@ -135,10 +133,10 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
                         .toUpperCase()}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-gray-800 truncate">
+                      <p className="text-xs font-bold text-text truncate">
                         {manager.name || 'Unnamed'}
                       </p>
-                      <p className="text-[10px] text-gray-500 truncate">
+                      <p className="text-[10px] text-muted-text truncate">
                         {manager.email}
                       </p>
                     </div>
@@ -146,19 +144,19 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mt-auto">
-                  <div className="flex flex-col p-2 bg-white rounded-xl border border-gray-100 items-center justify-center">
-                    <span className="text-[10px] uppercase text-amber-600 font-bold mb-0.5">
+                  <div className="flex flex-col p-2 bg-card rounded-xl border border-border items-center justify-center">
+                    <span className="text-[10px] uppercase text-amber-500 font-bold mb-0.5">
                       Active
                     </span>
-                    <span className="text-sm font-black text-gray-900">
+                    <span className="text-sm font-black text-text">
                       {manager.active}
                     </span>
                   </div>
-                  <div className="flex flex-col p-2 bg-white rounded-xl border border-gray-100 items-center justify-center">
-                    <span className="text-[10px] uppercase text-gray-400 font-bold mb-0.5">
+                  <div className="flex flex-col p-2 bg-card rounded-xl border border-border items-center justify-center">
+                    <span className="text-[10px] uppercase text-muted-text font-bold mb-0.5">
                       Total
                     </span>
-                    <span className="text-sm font-bold text-gray-500">
+                    <span className="text-sm font-bold text-muted-text">
                       {manager.total}
                     </span>
                   </div>

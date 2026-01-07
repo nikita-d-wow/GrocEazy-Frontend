@@ -144,8 +144,8 @@ const ProductDetailsPage: FC = () => {
   if (!product) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh]">
-        <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-500 font-medium">Loading details...</p>
+        <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
+        <p className="text-muted-text font-medium">Loading details...</p>
       </div>
     );
   }
@@ -161,35 +161,33 @@ const ProductDetailsPage: FC = () => {
       : product.categoryId;
 
   return (
-    <div className="bg-white min-h-screen pb-24 font-sans text-gray-900">
+    <div className="min-h-screen pb-24 font-sans text-text">
       {/* Breadcrumb Header */}
-      <div className="bg-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm text-gray-500 overflow-x-auto whitespace-nowrap no-scrollbar">
+      <div className="bg-transparent overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 py-2 sm:py-3 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs md:text-sm text-muted-text overflow-x-auto whitespace-nowrap no-scrollbar">
           <Link
             to="/"
-            className="hover:text-green-600 shrink-0 transition-colors"
+            className="hover:text-primary shrink-0 transition-colors"
           >
             Home
           </Link>
           <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
           <Link
             to={`/products?category=${categoryId}`}
-            className="hover:text-green-600 shrink-0 transition-colors"
+            className="hover:text-primary shrink-0 transition-colors"
           >
             {categoryName}
           </Link>
           <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-          <span className="text-gray-900 font-medium truncate">
-            {product.name}
-          </span>
+          <span className="text-text font-medium truncate">{product.name}</span>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-12 items-start">
           {/* LEFT: Image Gallery */}
-          <div className="bg-white rounded-3xl p-6 border-b md:border border-gray-100 shadow-sm md:sticky md:top-32">
-            <div className="relative mb-6 flex justify-center h-[350px] md:h-[450px]">
+          <div className="bg-card rounded-3xl p-6 border-b md:border border-border shadow-sm md:sticky md:top-32">
+            <div className="relative mb-6 flex justify-center h-[350px] md:h-[450px] bg-white dark:bg-slate-200 rounded-2xl overflow-hidden p-6">
               <img
                 src={getOptimizedImage(
                   product.images[selectedImage] || product.images[0],
@@ -208,11 +206,11 @@ const ProductDetailsPage: FC = () => {
                     onClick={() => setSelectedImage(idx)}
                     className={`w-16 h-16 rounded-xl transition-all duration-300 flex-shrink-0 relative p-1 ${
                       idx === selectedImage
-                        ? 'ring-4 ring-green-600 ring-offset-2 scale-110 shadow-xl z-20'
-                        : 'bg-white hover:ring-2 hover:ring-green-300 z-0'
+                        ? 'ring-4 ring-primary ring-offset-2 scale-110 shadow-xl z-20'
+                        : 'bg-card hover:ring-2 hover:ring-primary/30 z-0'
                     }`}
                   >
-                    <div className="w-full h-full rounded-lg overflow-hidden bg-white">
+                    <div className="w-full h-full rounded-lg overflow-hidden bg-white dark:bg-slate-200 p-1">
                       <img
                         src={getOptimizedImage(img, 200)}
                         className="w-full h-full object-contain"
@@ -230,18 +228,18 @@ const ProductDetailsPage: FC = () => {
             <div className="mb-6">
               <Link
                 to={`/products?category=${categoryId}`}
-                className="text-sm font-bold text-gray-500 hover:text-green-600 mb-1 block transition-colors"
+                className="text-sm font-bold text-muted-text hover:text-primary mb-1 block transition-colors"
               >
                 View all by {categoryName}
               </Link>
-              <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+              <h1 className="text-2xl md:text-4xl font-extrabold text-text leading-tight mb-4">
                 {product.name}
               </h1>
 
               <div className="flex items-center justify-between gap-4 mb-4">
-                <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-lg w-fit">
-                  <Clock className="w-4 h-4 text-gray-700" />
-                  <span className="text-xs font-bold text-gray-800 uppercase tracking-wide">
+                <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-lg w-fit">
+                  <Clock className="w-4 h-4 text-muted-text" />
+                  <span className="text-xs font-bold text-text uppercase tracking-wide">
                     10 MINS
                   </span>
                 </div>
@@ -250,8 +248,8 @@ const ProductDetailsPage: FC = () => {
                   onClick={handleWishlistToggle}
                   className={`p-2.5 rounded-xl transition-all shadow-sm ${
                     isInWishlist
-                      ? 'bg-red-50 text-red-500 border border-red-100'
-                      : 'bg-white text-gray-400 border border-gray-100 hover:text-red-500'
+                      ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
+                      : 'bg-card text-muted-text border border-border hover:text-rose-500'
                   }`}
                 >
                   <Heart
@@ -261,14 +259,14 @@ const ProductDetailsPage: FC = () => {
                 </button>
               </div>
 
-              <div className="text-lg font-medium text-gray-500 mb-6">
+              <div className="text-lg font-medium text-muted-text mb-6">
                 {product.size}
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8 border-b pb-8 border-gray-100">
-                <div className="text-3xl font-bold text-gray-900">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8 border-b pb-8 border-border">
+                <div className="text-3xl font-bold text-text">
                   ₹{product.price}
-                  <span className="text-sm font-normal text-gray-400 ml-2 block sm:inline">
+                  <span className="text-sm font-normal text-muted-text opacity-60 ml-2 block sm:inline">
                     (Inclusive of all taxes)
                   </span>
                 </div>
@@ -278,15 +276,15 @@ const ProductDetailsPage: FC = () => {
                     <button
                       onClick={handleAddToCart}
                       disabled={product.stock === 0}
-                      className="w-full bg-green-700 hover:bg-green-800 disabled:bg-gray-300 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                      className="w-full bg-primary hover:bg-primary-dark disabled:bg-muted disabled:text-muted-text font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:translate-y-0"
                     >
                       {product.stock > 0 ? 'ADD' : 'Out of Stock'}
                     </button>
                   ) : (
-                    <div className="flex items-center justify-between w-full bg-green-700 text-white rounded-xl shadow-lg font-bold overflow-hidden">
+                    <div className="flex items-center justify-between w-full bg-primary text-white rounded-xl shadow-lg font-bold overflow-hidden">
                       <button
                         onClick={decrementCart}
-                        className="p-3 hover:bg-green-800 transition-colors flex-1 flex justify-center"
+                        className="p-3 hover:bg-primary-dark transition-colors flex-1 flex justify-center"
                       >
                         <Minus className="w-5 h-5" />
                       </button>
@@ -294,7 +292,7 @@ const ProductDetailsPage: FC = () => {
                       <button
                         onClick={incrementCart}
                         disabled={cartQuantity >= product.stock}
-                        className="p-3 hover:bg-green-800 transition-colors flex-1 flex justify-center disabled:opacity-50"
+                        className="p-3 hover:bg-primary-dark transition-colors flex-1 flex justify-center disabled:opacity-50"
                       >
                         <Plus className="w-5 h-5" />
                       </button>
@@ -304,30 +302,30 @@ const ProductDetailsPage: FC = () => {
               </div>
 
               {product.description && (
-                <div className="mb-8 border-b pb-8 border-gray-100">
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">
+                <div className="mb-8 border-b pb-8 border-border">
+                  <h3 className="text-lg font-bold text-text mb-3">
                     Product Details
                   </h3>
-                  <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+                  <p className="text-muted-text leading-relaxed text-sm md:text-base">
                     {product.description}
                   </p>
                 </div>
               )}
 
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
-                <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">
+              <div className="bg-card rounded-2xl shadow-sm border border-border p-6 space-y-6">
+                <h3 className="text-sm font-bold text-text mb-2 uppercase tracking-wider">
                   Why shop from GrocEazy?
                 </h3>
                 <div className="space-y-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-emerald-100/50">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-emerald-500/20">
                       ⚡
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 text-sm md:text-base">
+                      <h4 className="font-bold text-text text-sm md:text-base">
                         Superfast Delivery
                       </h4>
-                      <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
+                      <p className="text-xs md:text-sm text-muted-text mt-1 leading-relaxed">
                         Get your order delivered to your doorstep at the
                         earliest from dark stores near you.
                       </p>
@@ -335,14 +333,14 @@ const ProductDetailsPage: FC = () => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-amber-100/50">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-amber-500/20">
                       🏷️
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 text-sm md:text-base">
+                      <h4 className="font-bold text-text text-sm md:text-base">
                         Best Prices & Offers
                       </h4>
-                      <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
+                      <p className="text-xs md:text-sm text-muted-text mt-1 leading-relaxed">
                         Best price destination with offers directly from the
                         manufacturers.
                       </p>
@@ -350,14 +348,14 @@ const ProductDetailsPage: FC = () => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-purple-100/50">
+                    <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-purple-500/20">
                       ✨
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 text-sm md:text-base">
+                      <h4 className="font-bold text-text text-sm md:text-base">
                         Curated for Every Occasion
                       </h4>
-                      <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
+                      <p className="text-xs md:text-sm text-muted-text mt-1 leading-relaxed">
                         Find an exhaustive range of products tailored to your
                         lifestyle and needs.
                       </p>
@@ -373,7 +371,7 @@ const ProductDetailsPage: FC = () => {
         {similarProducts.length > 0 && (
           <div className="mt-16 animate-fadeIn">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+              <h2 className="text-xl md:text-2xl font-bold text-text">
                 Similar Products
               </h2>
             </div>
@@ -409,10 +407,10 @@ const ProductDetailsPage: FC = () => {
           return (
             <div className="mt-12 animate-fadeIn">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+                <h2 className="text-xl md:text-2xl font-bold text-text">
                   Top 10 Products
                 </h2>
-                <span className="text-xs text-green-600 font-semibold md:hidden">
+                <span className="text-xs text-primary font-semibold md:hidden">
                   Scroll right →
                 </span>
               </div>

@@ -27,6 +27,7 @@ export default function ProductsSection() {
 
   // Show only first 8 products
   const displayProducts = products
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .filter((p: any) => p.isActive !== false)
     .slice(0, 8);
 
@@ -42,7 +43,7 @@ export default function ProductsSection() {
           {[...Array(4)].map((_, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-4 border border-gray-100 flex flex-col h-80"
+              className="bg-card rounded-2xl p-4 border border-border flex flex-col h-80"
             >
               <Skeleton width="100%" height={160} className="mb-4 rounded-xl" />
               <Skeleton variant="text" width="80%" />
@@ -61,10 +62,10 @@ export default function ProductsSection() {
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+          <h2 className="text-3xl md:text-4xl font-bold text-text">
             Our Products
           </h2>
-          <p className="text-gray-500 mt-1">Fresh selections for you</p>
+          <p className="text-muted-text mt-1">Fresh selections for you</p>
         </div>
         <Button
           onClick={() => navigate('/products')}

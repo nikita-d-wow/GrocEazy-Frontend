@@ -62,10 +62,10 @@ export default function MyTickets() {
     <div className="min-h-screen max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-10">
       <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fadeIn">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-text tracking-tight">
             My Support Tickets
           </h1>
-          <p className="text-gray-500 mt-1 font-medium">
+          <p className="text-muted-text mt-1 font-medium">
             View and track your support requests
           </p>
         </div>
@@ -87,7 +87,9 @@ export default function MyTickets() {
         <EmptyState
           title="No support tickets yet"
           description="When you contact support, your tickets will appear here."
-          icon={<AlertCircle size={48} className="text-gray-200" />}
+          icon={
+            <AlertCircle size={48} className="text-muted-text opacity-30" />
+          }
         />
       ) : (
         <>
@@ -105,15 +107,15 @@ export default function MyTickets() {
               ))}
             </div>
           ) : (
-            <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl animate-fadeIn">
-              <div className="p-4 bg-gray-100 rounded-full text-gray-400">
+            <div className="h-[300px] flex flex-col items-center justify-center text-center space-y-4 bg-card/40 backdrop-blur-md border border-dashed border-border rounded-3xl animate-fadeIn">
+              <div className="p-4 bg-muted rounded-full text-muted-text opacity-50">
                 <SearchX size={48} />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-800">
+                <h3 className="text-xl font-bold text-text">
                   No matches found
                 </h3>
-                <p className="text-gray-500 max-w-xs mx-auto">
+                <p className="text-muted-text max-w-xs mx-auto">
                   No tickets currently match the "
                   {filterOptions.find((o) => o.value === statusFilter)?.label}"
                   status on this page.
@@ -150,16 +152,16 @@ export default function MyTickets() {
 
 function TicketCard({ ticket }: { ticket: SupportTicket }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+    <div className="bg-card border border-border rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
       <div>
-        <p className="text-xs uppercase tracking-widest text-gray-400 font-semibold">
+        <p className="text-xs uppercase tracking-widest text-muted-text opacity-50 font-semibold">
           Ticket ID
         </p>
-        <p className="text-sm font-medium text-gray-600">{ticket._id}</p>
-        <p className="mt-2 text-lg font-bold text-gray-900">{ticket.subject}</p>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm font-medium text-muted-text">{ticket._id}</p>
+        <p className="mt-2 text-lg font-bold text-text">{ticket.subject}</p>
+        <p className="text-sm text-muted-text mt-1">
           Created on{' '}
-          <span className="font-medium">
+          <span className="font-medium text-text">
             {new Date(ticket.createdAt).toLocaleDateString()}
           </span>
         </p>
@@ -178,9 +180,9 @@ function StatusChip({ status }: { status: SupportTicket['status'] }) {
   if (status === 'open') {
     return (
       <Chip
-        icon={<AlertCircle size={16} className="text-yellow-600" />}
+        icon={<AlertCircle size={16} className="text-yellow-500" />}
         label="Open"
-        className="bg-yellow-100 text-yellow-700"
+        className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"
       />
     );
   }
@@ -188,18 +190,18 @@ function StatusChip({ status }: { status: SupportTicket['status'] }) {
   if (status === 'in_progress') {
     return (
       <Chip
-        icon={<Clock size={16} className="text-blue-600" />}
+        icon={<Clock size={16} className="text-blue-500" />}
         label="In Progress"
-        className="bg-blue-100 text-blue-700"
+        className="bg-blue-500/10 text-blue-500 border border-blue-500/20"
       />
     );
   }
 
   return (
     <Chip
-      icon={<CheckCircle2 size={16} className="text-green-600" />}
+      icon={<CheckCircle2 size={16} className="text-primary" />}
       label="Resolved"
-      className="bg-green-100 text-green-700"
+      className="bg-primary/10 text-primary border border-primary/20"
     />
   );
 }

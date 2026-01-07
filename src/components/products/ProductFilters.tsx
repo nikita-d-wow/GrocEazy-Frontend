@@ -44,17 +44,17 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit sticky top-20">
-      <h3 className="font-bold text-gray-800 mb-6 text-lg">Filters</h3>
+    <div className="w-full bg-card rounded-xl shadow-sm border border-border p-6 h-fit sticky top-20">
+      <h3 className="font-bold text-text mb-6 text-lg">Filters</h3>
 
       <div className="mb-8">
-        <h4 className="font-semibold text-gray-700 mb-4 text-sm uppercase tracking-wide">
+        <h4 className="font-semibold text-muted-text mb-4 text-sm uppercase tracking-wide">
           Categories
         </h4>
         {loading ? (
           <div className="space-y-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />
+              <div key={i} className="h-8 bg-muted rounded animate-pulse" />
             ))}
           </div>
         ) : (
@@ -62,8 +62,8 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
             <li
               className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${
                 !filters.selectedCategory
-                  ? 'bg-green-50 text-green-700 font-semibold shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-primary-light text-primary font-semibold shadow-sm'
+                  : 'text-muted-text hover:bg-muted hover:text-text'
               }`}
               onClick={() =>
                 setFilters({
@@ -80,8 +80,8 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
                 key={category._id}
                 className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${
                   filters.selectedCategory === category._id
-                    ? 'bg-green-50 text-green-700 font-semibold shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-primary-light text-primary font-semibold shadow-sm'
+                    : 'text-muted-text hover:bg-muted hover:text-text'
                 }`}
                 onClick={() => handleCategoryChange(category._id)}
               >
@@ -93,7 +93,7 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
       </div>
 
       <div className="mb-8">
-        <h4 className="font-semibold text-gray-700 mb-3 text-sm uppercase tracking-wide">
+        <h4 className="font-semibold text-muted-text mb-3 text-sm uppercase tracking-wide">
           Price Range
         </h4>
         <PriceRangeSlider

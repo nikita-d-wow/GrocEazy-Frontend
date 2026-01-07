@@ -45,14 +45,14 @@ const OrdersManagement = () => {
         {/* Header Section */}
         <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="p-4 bg-white rounded-3xl shadow-sm text-primary border border-gray-100">
+            <div className="p-4 bg-card rounded-3xl shadow-sm text-primary border border-border">
               <Package size={32} />
             </div>
             <div>
-              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+              <h1 className="text-3xl font-extrabold text-text tracking-tight">
                 Order Management
               </h1>
-              <p className="text-gray-500 font-medium">
+              <p className="text-muted-text font-medium">
                 Review and update customer orders efficiently
               </p>
             </div>
@@ -105,8 +105,8 @@ const OrdersManagement = () => {
               )}
             </>
           ) : (
-            <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl">
-              <div className="p-4 bg-gray-100 rounded-full text-gray-400">
+            <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-card/40 backdrop-blur-md border border-dashed border-border rounded-3xl">
+              <div className="p-4 bg-muted rounded-full text-muted-text">
                 {statusFilter === 'all' ? (
                   <Package size={48} />
                 ) : (
@@ -114,12 +114,12 @@ const OrdersManagement = () => {
                 )}
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-800">
+                <h3 className="text-xl font-bold text-text">
                   {statusFilter === 'all'
                     ? 'No orders found'
                     : 'No matches found'}
                 </h3>
-                <p className="text-gray-500 max-w-xs mx-auto">
+                <p className="text-muted-text max-w-xs mx-auto">
                   {statusFilter === 'all'
                     ? 'When customers place orders, they will appear here for you to manage.'
                     : `No orders currently match the "${statusFilter}" status on this page.`}

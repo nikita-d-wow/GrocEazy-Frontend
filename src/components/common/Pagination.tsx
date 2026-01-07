@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
+  // eslint-disable-next-line no-unused-vars
   onPageChange: (page: number) => void | Promise<void>;
   className?: string;
   isLoading?: boolean;
@@ -20,7 +21,7 @@ const Pagination: FC<PaginationProps> = ({
 }) => {
   const isFirstRender = React.useRef(true);
 
-  const scrollToTop = () => {
+  const scrollToTop = React.useCallback(() => {
     // Immediate scroll (auto) feels faster for paginated data
     setTimeout(() => {
       if (scrollTargetId) {
@@ -32,7 +33,7 @@ const Pagination: FC<PaginationProps> = ({
       }
       window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, 50);
-  };
+  }, [scrollTargetId]);
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -40,7 +41,7 @@ const Pagination: FC<PaginationProps> = ({
       return;
     }
     scrollToTop();
-  }, [currentPage, scrollTargetId]);
+  }, [currentPage, scrollToTop]);
 
   const handlePageChange = (page: number) => {
     if (isLoading || page < 1 || page > totalPages) {
@@ -89,8 +90,8 @@ const Pagination: FC<PaginationProps> = ({
         disabled={currentPage === 1 || isLoading}
         aria-label="Previous page"
         className="
-          p-2.5 rounded-xl border border-gray-100 bg-white
-          text-gray-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200
+          p-2.5 rounded-xl border border-border bg-card
+          text-muted-text hover:bg-primary-light hover:text-primary hover:border-primary/20
           disabled:opacity-30 disabled:cursor-not-allowed
           transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer
         "
@@ -117,8 +118,8 @@ const Pagination: FC<PaginationProps> = ({
                 min-w-[42px] h-[42px] px-2 rounded-xl font-bold transition-all duration-300
                 ${
                   currentPage === page
-                    ? 'bg-[#bbf7d0] text-green-900 shadow-sm scale-110 border border-green-200'
-                    : 'bg-white border border-gray-100 text-gray-500 hover:bg-green-50 hover:text-green-600 hover:border-green-100'
+                    ? 'bg-primary-light text-primary shadow-sm scale-110 border border-primary/20'
+                    : 'bg-card border border-border text-muted-text hover:bg-primary-light hover:text-primary hover:border-primary/20'
                 }
                 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer
               `}
@@ -135,8 +136,8 @@ const Pagination: FC<PaginationProps> = ({
         disabled={currentPage === totalPages || isLoading}
         aria-label="Next page"
         className="
-          p-2.5 rounded-xl border border-gray-100 bg-white
-          text-gray-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200
+          p-2.5 rounded-xl border border-border bg-card
+          text-muted-text hover:bg-primary-light hover:text-primary hover:border-primary/20
           disabled:opacity-30 disabled:cursor-not-allowed
           transition-all duration-300 shadow-sm hover:shadow-md cursor-pointer
         "

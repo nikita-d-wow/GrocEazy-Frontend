@@ -82,7 +82,7 @@ export default function AdminSupportTickets() {
       {/* SILENT REFRESH INDICATOR */}
       {refreshing && (
         <div className="fixed top-0 left-0 right-0 h-1 z-50 overflow-hidden">
-          <div className="h-full bg-indigo-600 animate-progress origin-left" />
+          <div className="h-full bg-primary animate-progress origin-left" />
         </div>
       )}
 
@@ -91,7 +91,7 @@ export default function AdminSupportTickets() {
         <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="flex items-center gap-3">
             <ShieldCheck className="text-primary" size={28} />
-            <h1 className="text-3xl font-semibold text-gray-800">
+            <h1 className="text-3xl font-semibold text-text">
               Support Tickets
             </h1>
           </div>
@@ -135,7 +135,7 @@ export default function AdminSupportTickets() {
         {loading && tickets.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[400px]">
             <Loader />
-            <p className="mt-4 text-gray-500 animate-pulse">
+            <p className="mt-4 text-muted-text animate-pulse">
               Loading tickets...
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function AdminSupportTickets() {
             <EmptyState
               title="No Support Tickets"
               description="Everything is running smoothly ✨"
-              icon={<ShieldCheck size={48} className="text-indigo-200" />}
+              icon={<ShieldCheck size={48} className="text-primary/20" />}
             />
           </div>
         ) : (
@@ -174,11 +174,11 @@ export default function AdminSupportTickets() {
                         animate-slideUp
                         relative
                         rounded-2xl
-                        bg-white/60 backdrop-blur-xl
-                        border border-white/70
-                        shadow-lg
+                        bg-card
+                        border border-border
+                        shadow-sm
                         transition-all duration-300
-                        hover:shadow-2xl hover:bg-primary/5
+                        hover:shadow-md hover:bg-primary-light/30
                         cursor-pointer
                       "
                     >
@@ -187,11 +187,11 @@ export default function AdminSupportTickets() {
                         <div className="flex flex-col sm:flex-row sm:justify-between items-start gap-4">
                           <div className="min-w-0 flex-1">
                             <Link to={`/admin/support/${ticket._id}`}>
-                              <h2 className="text-lg font-semibold text-gray-800 hover:text-indigo-600 transition-colors">
+                              <h2 className="text-lg font-semibold text-text hover:text-primary transition-colors">
                                 {ticket.subject}
                               </h2>
                             </Link>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="text-xs text-muted-text mt-1">
                               Ticket ID • {ticket._id}
                             </p>
                           </div>
@@ -209,25 +209,25 @@ export default function AdminSupportTickets() {
                         </div>
 
                         {/* DESCRIPTION */}
-                        <p className="mt-5 text-sm text-gray-700 line-clamp-2">
+                        <p className="mt-5 text-sm text-text line-clamp-2">
                           {ticket.description}
                         </p>
 
                         {/* META */}
-                        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-gray-100 pt-6">
+                        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-border pt-6">
                           {/* CREATOR */}
-                          <div className="flex items-center gap-3 bg-slate-50/50 p-3 rounded-xl">
-                            <div className="w-9 h-9 rounded-full bg-white border flex items-center justify-center text-indigo-600">
+                          <div className="flex items-center gap-3 bg-muted p-3 rounded-xl">
+                            <div className="w-9 h-9 rounded-full bg-card border border-border flex items-center justify-center text-primary">
                               <User size={18} />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[10px] uppercase text-gray-400 font-bold">
+                              <p className="text-[10px] uppercase text-muted-text font-bold">
                                 Raised By
                               </p>
-                              <p className="font-semibold text-gray-800 truncate">
+                              <p className="font-semibold text-text truncate">
                                 {ticket.user?.name || 'Customer'}
                               </p>
-                              <p className="text-xs text-gray-500 truncate">
+                              <p className="text-xs text-muted-text truncate">
                                 {ticket.user?.email}
                               </p>
                             </div>
@@ -235,7 +235,7 @@ export default function AdminSupportTickets() {
 
                           {/* ASSIGNMENT – FIXED */}
                           <div className="relative assignee-select">
-                            <p className="text-[10px] uppercase text-gray-400 font-bold mb-1 ml-1">
+                            <p className="text-[10px] uppercase text-muted-text font-bold mb-1 ml-1">
                               Assignee
                             </p>
                             <TicketAssignSelect
@@ -248,10 +248,10 @@ export default function AdminSupportTickets() {
 
                           {/* DATE */}
                           <div>
-                            <p className="text-[10px] uppercase text-gray-400 font-bold mb-1 ml-1">
+                            <p className="text-[10px] uppercase text-muted-text font-bold mb-1 ml-1">
                               Created At
                             </p>
-                            <span className="flex items-center gap-2 text-gray-700">
+                            <span className="flex items-center gap-2 text-text">
                               <Calendar size={14} />
                               {new Date(ticket.createdAt).toLocaleDateString()}
                             </span>
@@ -263,15 +263,15 @@ export default function AdminSupportTickets() {
                 })}
               </div>
             ) : (
-              <div className="mt-10 h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl animate-fadeIn">
-                <div className="p-4 bg-gray-100 rounded-full text-gray-400">
+              <div className="mt-10 h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-card border border-dashed border-border rounded-3xl animate-fadeIn">
+                <div className="p-4 bg-muted rounded-full text-muted-text">
                   <SearchX size={48} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">
+                  <h3 className="text-xl font-bold text-text">
                     No matches found
                   </h3>
-                  <p className="text-gray-500 max-w-xs mx-auto">
+                  <p className="text-muted-text max-w-xs mx-auto">
                     No tickets currently match the selected filters across all{' '}
                     {statsTickets.length > 0 ? statsTickets.length : total}{' '}
                     tickets.
@@ -281,7 +281,7 @@ export default function AdminSupportTickets() {
                       setStatusFilter('all');
                       setManagerFilter('all');
                     }}
-                    className="mt-4 text-indigo-600 font-semibold hover:underline cursor-pointer"
+                    className="mt-4 text-primary font-semibold hover:underline cursor-pointer"
                   >
                     Clear all filters
                   </button>

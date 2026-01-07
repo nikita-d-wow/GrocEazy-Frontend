@@ -31,10 +31,10 @@ export default function CategoriesSection() {
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16 animate-fadeIn">
       <div className="mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+        <h2 className="text-3xl md:text-4xl font-bold text-text">
           Shop By Category
         </h2>
-        <p className="text-gray-500 mt-1">Explore our collection</p>
+        <p className="text-muted-text mt-1">Explore our collection</p>
       </div>
 
       {visibleCategories.length === 0 ? (

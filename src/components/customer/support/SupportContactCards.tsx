@@ -12,8 +12,8 @@ export default function SupportContactCards() {
         >
           {c.icon}
           <div>
-            <p className="font-semibold text-gray-800">{c.title}</p>
-            <p className="text-gray-600 text-sm">{c.text}</p>
+            <p className="font-semibold text-text">{c.title}</p>
+            <p className="text-muted-text text-sm">{c.text}</p>
           </div>
         </div>
       ))}

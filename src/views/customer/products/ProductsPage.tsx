@@ -160,21 +160,21 @@ const ProductsPage: FC = () => {
   }
 
   return (
-    <div className="relative bg-white min-h-screen">
+    <div className="relative min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 relative z-10 transition-all duration-300">
-        <div className="bg-white">
+        <div className="bg-transparent">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+              <h1 className="text-3xl font-bold text-text tracking-tight">
                 Explore Products
               </h1>
-              <p className="text-gray-500 mt-1">
+              <p className="text-muted-text mt-1">
                 Find the best fresh products and groceries.
               </p>
             </div>
             <div className="mt-4 md:mt-0">
-              <span className="text-gray-600 font-medium">
+              <span className="text-muted-text font-medium">
                 {isSearching
                   ? `${searchResults.length}  results found`
                   : `${totalResults} results found`}
@@ -184,7 +184,7 @@ const ProductsPage: FC = () => {
 
           <div className="flex flex-col lg:flex-row gap-8 relative items-start">
             {/* ---------------- MOBILE CATEGORY SIDEBAR ---------------- */}
-            <div className="lg:hidden w-full overflow-x-auto overflow-y-visible py-2 bg-white sticky top-[65px] z-30 border-b border-gray-100 no-scrollbar">
+            <div className="lg:hidden w-full overflow-x-auto overflow-y-visible py-2 sticky top-[65px] z-30 border-b border-border no-scrollbar">
               <MobileCategorySidebar
                 selectedCategory={selectedCategory}
                 onSelectCategory={(id) =>
@@ -208,7 +208,7 @@ const ProductsPage: FC = () => {
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="bg-white rounded-2xl h-80 animate-pulse border border-gray-100"
+                      className="bg-card rounded-2xl h-80 animate-pulse border border-border"
                     />
                   ))}
                 </div>

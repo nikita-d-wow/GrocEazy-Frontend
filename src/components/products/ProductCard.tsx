@@ -94,13 +94,15 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="group bg-white rounded-2xl p-4 hover:shadow-xl transition cursor-pointer"
+      className="group bg-card rounded-2xl p-4 border border-border hover:shadow-xl transition cursor-pointer"
     >
-      <img
-        src={product.images[0]}
-        alt={product.name}
-        className="h-48 w-full object-cover rounded-xl"
-      />
+      <div className="aspect-square w-full overflow-hidden rounded-xl bg-white dark:bg-slate-200">
+        <img
+          src={product.images[0]}
+          alt={product.name}
+          className="h-full w-full object-contain p-2 group-hover:scale-110 transition-transform duration-500"
+        />
+      </div>
 
       <h3 className="font-bold mt-3">{product.name}</h3>
       <p className="text-xl font-extrabold mt-2">₹{product.price}</p>
@@ -110,8 +112,8 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           onClick={handleAddToCart}
           className="
             mt-4 w-full py-2 rounded-lg uppercase font-bold
-            bg-green-50 border border-green-200
-            text-green-700 hover:bg-green-100
+            bg-primary/10 border border-primary/20
+            text-primary hover:bg-primary/20
             transition-colors cursor-pointer
             flex items-center justify-center
           "
@@ -127,34 +129,36 @@ const ProductCard: FC<ProductCardProps> = ({ product }) => {
           onClick={(e) => e.stopPropagation()}
           className="
             mt-4 flex items-center justify-between
-            bg-green-50 rounded-lg px-2 py-1
-            border border-green-200
+            bg-primary/10 rounded-lg px-2 py-1
+            border border-primary/20
           "
         >
           <button
             onClick={handleDecrement}
             className="
               w-8 h-8 flex items-center justify-center
-              bg-white rounded shadow-sm
-              hover:bg-gray-50 cursor-pointer
+              bg-card rounded shadow-sm
+              hover:bg-muted cursor-pointer
+              transition-colors
             "
           >
             {loading === 'dec' ? (
-              <Loader2 size={16} className="animate-spin text-green-700" />
+              <Loader2 size={16} className="animate-spin text-primary" />
             ) : (
               <Minus size={16} strokeWidth={3} />
             )}
           </button>
 
-          <span className="font-bold text-green-700">{quantity}</span>
+          <span className="font-bold text-primary">{quantity}</span>
 
           <button
             onClick={handleIncrement}
             className="
               w-8 h-8 flex items-center justify-center
-              bg-green-600 rounded text-white
-              shadow-sm hover:bg-green-700
+              bg-primary rounded text-white
+              shadow-sm hover:bg-primary-dark
               cursor-pointer
+              transition-colors
             "
           >
             {loading === 'inc' ? (

@@ -36,9 +36,9 @@ export default function CustomerTicketDetails() {
   if (!ticket) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center p-8 bg-white/60 backdrop-blur-xl rounded-3xl border border-white/50 shadow-xl animate-fadeIn">
+        <div className="text-center p-8 glass-card rounded-3xl shadow-xl animate-fadeIn">
           <Loader />
-          <p className="text-gray-500 mt-6 font-medium animate-pulse">
+          <p className="text-muted-text mt-6 font-medium animate-pulse">
             Fetching ticket details...
           </p>
           <button
@@ -58,17 +58,17 @@ export default function CustomerTicketDetails() {
         {/* BACK BUTTON */}
         <button
           onClick={() => navigate('/customer/tickets')}
-          className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors group mb-4"
+          className="flex items-center gap-2 text-muted-text hover:text-primary transition-colors group mb-4"
         >
-          <div className="p-2 rounded-full bg-white/50 group-hover:bg-white shadow-sm transition-all">
+          <div className="p-2 rounded-full bg-card group-hover:bg-muted shadow-sm transition-all border border-border">
             <ArrowLeft size={20} />
           </div>
-          <span className="font-medium">Back to My Tickets</span>
+          <span className="font-medium text-text">Back to My Tickets</span>
         </button>
 
         {/* MAIN CARD */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-emerald-400" />
+        <div className="glass-card shadow-xl rounded-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-emerald-400 opacity-70" />
 
           <div className="p-6 sm:p-10">
             {/* HEADER */}
@@ -78,11 +78,11 @@ export default function CustomerTicketDetails() {
                   <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-wider uppercase border border-primary/20">
                     Support Ticket
                   </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-400 font-mono bg-gray-50 px-2 py-1 rounded">
+                  <span className="flex items-center gap-1 text-xs text-muted-text font-mono bg-muted px-2 py-1 rounded border border-border">
                     <Hash size={12} /> {ticket._id}
                   </span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-2xl sm:text-3xl font-bold text-text leading-tight">
                   {ticket.subject}
                 </h1>
               </div>
@@ -93,12 +93,12 @@ export default function CustomerTicketDetails() {
             </div>
 
             {/* DESCRIPTION */}
-            <div className="bg-white/50 rounded-xl p-6 border border-white/50 shadow-inner mb-8">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <div className="bg-muted/50 rounded-xl p-6 border border-border shadow-inner mb-8">
+              <h3 className="text-sm font-semibold text-text mb-3 flex items-center gap-2">
                 <AlertCircle size={16} className="text-primary" />
                 Your Message
               </h3>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <p className="text-muted-text leading-relaxed whitespace-pre-wrap">
                 {ticket.description}
               </p>
             </div>
@@ -106,21 +106,21 @@ export default function CustomerTicketDetails() {
             {/* INFO GRID */}
             <div className="grid grid-cols-1 gap-6">
               {/* TICKET INFO */}
-              <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-100">
-                <h3 className="text-sm font-bold text-blue-900 mb-4 flex items-center gap-2">
-                  <Calendar size={18} className="text-blue-600" />
+              <div className="p-5 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20">
+                <h3 className="text-sm font-bold text-blue-500 mb-4 flex items-center gap-2">
+                  <Calendar size={18} className="text-blue-500" />
                   Ticket Details
                 </h3>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-sm">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-card border border-border flex items-center justify-center text-blue-500 shadow-sm flex-shrink-0">
                       <Calendar size={16} />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase text-gray-400 font-bold">
+                      <p className="text-[10px] uppercase text-muted-text opacity-60 font-bold">
                         Created On
                       </p>
-                      <p className="font-semibold text-gray-700">
+                      <p className="font-semibold text-text">
                         {new Date(ticket.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -140,17 +140,17 @@ function StatusChip({ status }: { status: string }) {
     open: {
       label: 'Open',
       icon: <AlertCircle size={16} />,
-      color: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+      color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
     },
     in_progress: {
       label: 'In Progress',
       icon: <Clock size={16} />,
-      color: 'bg-blue-100 text-blue-700 border-blue-200',
+      color: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     },
     resolved: {
       label: 'Resolved',
       icon: <CheckCircle2 size={16} />,
-      color: 'bg-green-100 text-green-700 border-green-200',
+      color: 'bg-primary/10 text-primary border-primary/20',
     },
   };
 

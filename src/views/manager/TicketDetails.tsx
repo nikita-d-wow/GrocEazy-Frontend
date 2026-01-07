@@ -71,16 +71,16 @@ export default function TicketDetails() {
         {/* BACK BUTTON */}
         <button
           onClick={() => navigate('/manager/support')}
-          className="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors group mb-4"
+          className="flex items-center gap-2 text-muted-text hover:text-primary transition-colors group mb-4 pt-4"
         >
-          <div className="p-2 rounded-full bg-white/50 group-hover:bg-white shadow-sm transition-all">
+          <div className="p-2 rounded-full bg-card group-hover:bg-muted shadow-sm transition-all border border-border">
             <ArrowLeft size={20} />
           </div>
           <span className="font-medium">Back to Tickets</span>
         </button>
 
         {/* MAIN CARD */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl relative">
+        <div className="bg-card backdrop-blur-xl border border-border shadow-xl rounded-2xl relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-emerald-400" />
 
           <div className="p-8">
@@ -95,7 +95,7 @@ export default function TicketDetails() {
                     <Hash size={12} /> {ticket._id}
                   </span>
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-3xl font-bold text-text leading-tight">
                   {ticket.subject}
                 </h1>
               </div>
@@ -112,12 +112,12 @@ export default function TicketDetails() {
             </div>
 
             {/* DESCRIPTION */}
-            <div className="bg-white/50 rounded-xl p-6 border border-white/50 shadow-inner mb-8">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <div className="bg-muted/30 rounded-xl p-6 border border-border shadow-inner mb-8">
+              <h3 className="text-sm font-semibold text-text mb-3 flex items-center gap-2">
                 <AlertCircle size={16} className="text-primary" />
                 Issue Description
               </h3>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <p className="text-text leading-relaxed whitespace-pre-wrap">
                 {ticket.description}
               </p>
             </div>
@@ -125,29 +125,32 @@ export default function TicketDetails() {
             {/* META GRID */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* CUSTOMER INFO */}
-              <div className="p-5 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/50 border border-orange-100">
-                <h3 className="text-sm font-bold text-orange-900 mb-4 flex items-center gap-2">
-                  <User size={18} className="text-orange-600" />
+              <div className="p-5 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-900/10 dark:to-orange-900/20 border border-orange-100 dark:border-orange-900/20">
+                <h3 className="text-sm font-bold text-orange-900 dark:text-orange-400 mb-4 flex items-center gap-2">
+                  <User
+                    size={18}
+                    className="text-orange-600 dark:text-orange-500"
+                  />
                   Customer Details
                 </h3>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm text-gray-700">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-orange-500 shadow-sm">
+                  <div className="flex items-center gap-3 text-sm text-text">
+                    <div className="w-8 h-8 rounded-full bg-card flex items-center justify-center text-orange-500 shadow-sm">
                       <User size={16} />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Name</p>
+                      <p className="text-xs text-muted-text">Name</p>
                       <p className="font-medium">
                         {ticket.user?.name || 'Guest User'}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-700">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-orange-500 shadow-sm">
+                  <div className="flex items-center gap-3 text-sm text-text">
+                    <div className="w-8 h-8 rounded-full bg-card flex items-center justify-center text-orange-500 shadow-sm">
                       <Mail size={16} />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Email</p>
+                      <p className="text-xs text-muted-text">Email</p>
                       <p className="font-medium break-all">
                         {ticket.user?.email}
                       </p>
@@ -157,29 +160,32 @@ export default function TicketDetails() {
               </div>
 
               {/* TICKET INFO */}
-              <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-100">
-                <h3 className="text-sm font-bold text-blue-900 mb-4 flex items-center gap-2">
-                  <Clock size={18} className="text-blue-600" />
+              <div className="p-5 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/10 dark:to-blue-900/20 border border-blue-100 dark:border-blue-900/20">
+                <h3 className="text-sm font-bold text-blue-900 dark:text-blue-400 mb-4 flex items-center gap-2">
+                  <Clock
+                    size={18}
+                    className="text-blue-600 dark:text-blue-500"
+                  />
                   Ticket Information
                 </h3>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-sm text-gray-700">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm">
+                  <div className="flex items-center gap-3 text-sm text-text">
+                    <div className="w-8 h-8 rounded-full bg-card flex items-center justify-center text-blue-500 shadow-sm">
                       <Calendar size={16} />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Created At</p>
+                      <p className="text-xs text-muted-text">Created At</p>
                       <p className="font-medium">
                         {new Date(ticket.createdAt).toLocaleString()}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-700">
-                    <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-500 shadow-sm">
+                  <div className="flex items-center gap-3 text-sm text-text">
+                    <div className="w-8 h-8 rounded-full bg-card flex items-center justify-center text-blue-500 shadow-sm">
                       <CheckCircle2 size={16} />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Assigned To</p>
+                      <p className="text-xs text-muted-text">Assigned To</p>
                       <p className="font-medium">
                         {ticket.assignedManager?.name || 'Unassigned'}
                       </p>

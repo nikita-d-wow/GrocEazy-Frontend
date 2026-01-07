@@ -27,9 +27,8 @@ export default function MetricCard({
       onClick={onClick}
       className={`
         relative group overflow-visible p-6 rounded-3xl
-        bg-white/40 backdrop-blur-xl border border-white/40
-        shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]
-        hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]
+        bg-card border border-border
+        shadow-sm hover:shadow-md
         hover:scale-[1.02] hover:-translate-y-1
         transition-all duration-500 ease-out
         ${onClick ? 'cursor-pointer' : ''}
@@ -42,11 +41,11 @@ export default function MetricCard({
 
       <div className="relative flex items-center justify-between z-10">
         <div className="space-y-1">
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+          <p className="text-xs font-bold text-muted-text uppercase tracking-widest">
             {title}
           </p>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl font-black text-gray-900 tracking-tight">
+            <h3 className="text-3xl font-black text-text tracking-tight">
               {value}
             </h3>
             {onClick && (
@@ -77,22 +76,22 @@ export default function MetricCard({
             invisible group-hover:visible
             opacity-0 group-hover:opacity-100
             absolute top-full left-0 right-0 mt-4 z-[100]
-            bg-white/95 backdrop-blur-2xl border border-gray-100
+            bg-card border border-border
             rounded-3xl shadow-2xl p-5
             transition-all duration-500 transform translate-y-4 group-hover:translate-y-0
             pointer-events-none
           "
         >
-          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-100/50">
+          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-border">
             <div
               className={`p-1.5 rounded-lg bg-gradient-to-br ${bg} bg-opacity-10`}
             >
               <PackageSearch size={16} className="text-white" />
             </div>
-            <span className="text-xs uppercase font-extrabold text-gray-400 tracking-wider">
+            <span className="text-xs uppercase font-extrabold text-muted-text tracking-wider">
               Quick Preview
             </span>
-            <span className="ml-auto bg-gray-100/50 text-gray-600 px-2 py-0.5 rounded-full text-[10px] font-bold">
+            <span className="ml-auto bg-muted text-muted-text px-2 py-0.5 rounded-full text-[10px] font-bold border border-border">
               {productList.length} items
             </span>
           </div>
@@ -103,7 +102,7 @@ export default function MetricCard({
                 key={product._id}
                 className="flex items-center justify-between gap-4 p-2 rounded-xl hover:bg-gray-50/50 transition-colors"
               >
-                <span className="text-xs text-gray-700 truncate font-semibold">
+                <span className="text-xs text-text truncate font-semibold">
                   {product.name}
                 </span>
                 <span
@@ -111,8 +110,8 @@ export default function MetricCard({
                   text-[10px] font-black px-2 py-1 rounded-lg
                   ${
                     product.stock === 0
-                      ? 'bg-rose-50 text-rose-600'
-                      : 'bg-amber-50 text-amber-600'
+                      ? 'bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400'
+                      : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400'
                   }
                 `}
                 >
@@ -129,7 +128,7 @@ export default function MetricCard({
           </div>
 
           {/* Arrow */}
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 border-l border-t border-gray-100" />
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-card rotate-45 border-l border-t border-border" />
         </div>
       )}
     </div>

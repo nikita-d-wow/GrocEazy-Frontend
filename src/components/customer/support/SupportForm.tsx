@@ -50,11 +50,11 @@ export default function SupportForm() {
   return (
     <div
       className="
-        bg-white/70 backdrop-blur-md shadow-xl border border-gray-200
+        bg-card/70 backdrop-blur-md shadow-xl border border-border
         rounded-xl p-7 animate-slideUp hover:shadow-2xl transition-all duration-300
       "
     >
-      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-gray-800">
+      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-text">
         <Send size={20} className="text-primary" />
         Send us a Message
       </h2>

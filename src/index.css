@@ -5,6 +5,17 @@
   font-family: 'Outfit', sans-serif;
 }
 
+html,
+body,
+#root {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  min-height: 100vh;
+}
+
 /* Global scroll-behavior removed to avoid conflict with JS scrollTo */
 
 /* Custom Scrollbar for a premium feel */
@@ -14,35 +25,69 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--muted);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--border);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--muted-foreground);
 }
 
 .app-container {
   @apply px-6 sm:px-10 lg:px-20;
 }
 
+:root {
+  --background: #ffffff;
+  --foreground: #1e1e1e;
+  --card: #ffffff;
+  --card-foreground: #1e1e1e;
+  --border: #f1f5f9;
+  --primary: #16a34a;
+  --primary-dark: #15803d;
+  --primary-light: #f0fdf4;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
+  --accent: #f8fafc;
+  --accent-foreground: #1e1e1e;
+}
+
+.dark {
+  --background: #0b0f19;
+  --foreground: #e2e8f0;
+  --card: #151c2c;
+  --card-foreground: #f8fafc;
+  --border: rgba(255, 255, 255, 0.06);
+  --primary: #22c55e;
+  --primary-dark: #16a34a;
+  --primary-light: #064e3b;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+}
+
 @theme {
-  --color-primary: #16a34a;
-  /* main brand green */
-  --color-primary-dark: #3e8e41;
-  /* hover green */
-  --color-primary-light: #e7f5e9;
-  /* soft background */
+  --color-bg: var(--background);
+  --color-text: var(--foreground);
+  --color-card: var(--card);
+  --color-card-text: var(--card-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-light: var(--primary-light);
+  --color-muted: var(--muted);
+  --color-muted-text: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-foreground);
+
+  /* Preserve original accent colors */
   --color-accent-yellow: #f8e9a1;
-  /* offers / sale */
   --color-accent-orange: #f9a825;
-  /* CTA button */
-  --color-text-dark: #1e1e1e;
-  --color-surface: #ffffff;
 }
 
 @layer utilities {
@@ -146,7 +191,7 @@
   }
 
   .glass-card {
-    @apply bg-white/70 backdrop-blur-lg border border-white/50 shadow-lg rounded-2xl transition duration-300;
+    @apply bg-card/70 backdrop-blur-lg border border-border shadow-lg rounded-2xl transition duration-300;
   }
 
   .ticket-card-hover {

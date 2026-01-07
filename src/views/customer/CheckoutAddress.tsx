@@ -98,7 +98,7 @@ const CheckoutAddress = () => {
       <div className="flex items-center gap-4 mb-8">
         <button
           onClick={() => navigate('/checkout')}
-          className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-600 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
+          className="p-2.5 rounded-xl bg-card border border-border text-muted-text hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
           title="Back to Order Summary"
         >
           <ChevronLeft
@@ -107,10 +107,10 @@ const CheckoutAddress = () => {
           />
         </button>
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-3xl font-extrabold text-text tracking-tight">
             Delivery Address
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-muted-text text-sm">
             Select the address where you want your order delivered.
           </p>
         </div>
@@ -119,21 +119,21 @@ const CheckoutAddress = () => {
       {!isStockValid && (
         <div className="mb-8 overflow-hidden relative group">
           <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-orange-500/10 blur-xl group-hover:opacity-100 opacity-60 transition-opacity" />
-          <div className="relative p-5 glass-card border-red-200/50 bg-red-50/80 backdrop-blur-md rounded-3xl flex items-start gap-4 text-red-700 shadow-xl shadow-red-500/5 animate-fadeDown">
-            <div className="p-2.5 bg-red-100 rounded-2xl text-red-600 shadow-inner">
+          <div className="relative p-5 glass-card border-rose-500/20 bg-rose-500/10 backdrop-blur-md rounded-3xl flex items-start gap-4 text-rose-500 shadow-xl shadow-rose-500/5 animate-fadeDown">
+            <div className="p-2.5 bg-rose-500/20 rounded-2xl text-rose-500 shadow-inner">
               <AlertCircle size={24} />
             </div>
             <div>
               <p className="font-bold text-lg leading-tight mb-1">
                 Stock Availability Issue
               </p>
-              <p className="text-sm text-red-600/80 font-medium">
+              <p className="text-sm text-rose-500/80 font-medium">
                 Items in your cart have changed availability. Please return to
                 your cart to review and update quantities.
               </p>
               <button
                 onClick={() => navigate('/cart')}
-                className="mt-3 text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all text-red-700"
+                className="mt-3 text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all text-rose-500"
               >
                 Return to Cart <ArrowRight size={14} />
               </button>
@@ -158,9 +158,12 @@ const CheckoutAddress = () => {
           </div>
 
           {addresses.length === 0 && (
-            <div className="border border-dashed border-gray-300 rounded-xl p-10 text-center glass-card">
-              <MapPin size={36} className="mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600 mb-4">
+            <div className="border border-dashed border-border rounded-xl p-10 text-center glass-card">
+              <MapPin
+                size={36}
+                className="mx-auto text-muted-text opacity-50 mb-4"
+              />
+              <p className="text-muted-text mb-4">
                 You don’t have any saved addresses yet.
               </p>
             </div>
@@ -178,22 +181,22 @@ const CheckoutAddress = () => {
                     className={`cursor-pointer rounded-xl border p-5 transition-all duration-300
                       ${
                         isSelected
-                          ? 'border-primary bg-primary/10 shadow-2xl'
-                          : 'border-transparent bg-white/60 hover:bg-white/80 shadow-lg hover:shadow-2xl'
+                          ? 'border-primary bg-primary-light shadow-2xl'
+                          : 'border-border/50 bg-card/60 hover:bg-card/80 shadow-lg hover:shadow-2xl'
                       }`}
                   >
                     <div className="flex justify-between items-start gap-4">
                       <div className="space-y-1">
-                        <p className="text-sm text-gray-800 font-medium">
+                        <p className="text-sm text-text font-medium">
                           {address.street}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-text">
                           {address.city}, {address.state} - {address.zipCode}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-text">
                           {address.country}
                         </p>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-muted-text mt-1">
                           Phone: {user?.phone || 'N/A'}
                         </p>
                       </div>
@@ -211,18 +214,16 @@ const CheckoutAddress = () => {
 
         {/* ================= RIGHT ================= */}
         <aside className="glass-card p-6 h-fit">
-          <h2 className="text-lg font-bold text-gray-900 mb-4">
-            Order Summary
-          </h2>
+          <h2 className="text-lg font-bold text-text mb-4">Order Summary</h2>
 
-          <div className="space-y-3 text-sm text-gray-700">
+          <div className="space-y-3 text-sm text-muted-text">
             <div className="flex justify-between">
               <span>Payment Method</span>
-              <span className="font-medium">Cash on Delivery</span>
+              <span className="font-medium text-text">Cash on Delivery</span>
             </div>
             <div className="flex justify-between">
               <span>Total Items</span>
-              <span className="font-medium">{cartItems.length}</span>
+              <span className="font-medium text-text">{cartItems.length}</span>
             </div>
           </div>
 

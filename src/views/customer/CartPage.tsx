@@ -110,7 +110,9 @@ export default function CartPage() {
         <EmptyState
           title="Please Log In"
           description="You need to be logged in to view your cart."
-          icon={<ShoppingCart size={48} className="text-gray-400" />}
+          icon={
+            <ShoppingCart size={48} className="text-muted-text opacity-30" />
+          }
           action={{
             label: 'Sign In',
             onClick: () => navigate('/login'),

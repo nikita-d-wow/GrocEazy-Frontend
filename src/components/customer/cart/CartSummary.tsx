@@ -9,13 +9,13 @@ export default function CartSummary({ total }: CartSummaryProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 h-fit sticky top-24 animate-fadeIn">
-      <h2 className="text-2xl font-bold text-gray-900">Order Summary</h2>
+    <div className="bg-card rounded-3xl shadow-xl border border-border p-8 h-fit sticky top-24 animate-fadeIn">
+      <h2 className="text-2xl font-bold text-text">Order Summary</h2>
 
-      <div className="mt-6 space-y-5 text-gray-700">
+      <div className="mt-6 space-y-5 text-muted-text">
         <div className="flex justify-between">
           <span>Subtotal</span>
-          <span>₹{total}</span>
+          <span className="text-text">₹{total}</span>
         </div>
 
         <div className="flex justify-between">
@@ -23,9 +23,9 @@ export default function CartSummary({ total }: CartSummaryProps) {
           <span className="text-primary font-semibold">Free</span>
         </div>
 
-        <hr className="my-4 border-gray-300" />
+        <hr className="my-4 border-border" />
 
-        <div className="flex justify-between text-2xl font-bold text-gray-900">
+        <div className="flex justify-between text-2xl font-bold text-text">
           <span>Total</span>
           <span>₹{total}</span>
         </div>
