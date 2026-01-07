@@ -10,9 +10,8 @@ export default function ChartCard({
   children: ReactNode;
 }) {
   return (
-    <div className="relative group p-8 rounded-[2rem] bg-white/40 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.12)] transition-all duration-500 animate-fadeIn overflow-hidden cursor-pointer">
-      {/* Subtle Background Glow */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500" />
+    <div className="relative group p-8 rounded-[2rem] bg-white border border-gray-100 shadow-[0_8px_32px_0_rgba(31,38,135,0.04)] hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.08)] transition-all duration-500 animate-fadeIn overflow-hidden cursor-pointer">
+      {/* Subtle Background Glow Removed */}
 
       <div className="relative z-10 mb-8 flex items-baseline justify-between">
         <div>

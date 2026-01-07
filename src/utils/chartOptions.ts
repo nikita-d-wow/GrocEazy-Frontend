@@ -3,8 +3,17 @@ export const barOptions = {
   maintainAspectRatio: false,
   plugins: { legend: { display: false } },
   scales: {
-    x: { grid: { display: false }, ticks: { maxTicksLimit: 6 } },
-    y: { grid: { color: '#e5e7eb' } },
+    x: {
+      grid: { display: false },
+      ticks: {
+        maxTicksLimit: 12,
+        autoSkip: false,
+      },
+    },
+    y: {
+      beginAtZero: true,
+      grid: { color: '#e5e7eb' },
+    },
   },
 };
 
