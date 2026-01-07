@@ -7,6 +7,7 @@ import { fetchProducts } from '../../redux/actions/productActions';
 import FilterSelect from '../../components/common/FilterSelect';
 import { ORDER_STATUS_META } from '../../utils/orderStatus';
 import Loader from '../../components/common/Loader';
+import Pagination from '../../components/common/Pagination';
 import type { RootState } from '../../redux/rootReducer';
 import type { OrderActionTypes } from '../../redux/types/orderTypes';
 import type { ThunkDispatch } from 'redux-thunk';
@@ -110,37 +111,13 @@ export default function OrdersPage() {
           ))}
 
           {/* Pagination Controls */}
-          {pagination && pagination.pages > 1 && (
-            <div className="flex justify-center items-center gap-4 mt-8">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer ${
-                  currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:text-green-600'
-                }`}
-              >
-                Previous
-              </button>
-              <span className="text-sm text-gray-600 font-medium">
-                Page {currentPage} of {pagination.pages}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, pagination.pages))
-                }
-                disabled={currentPage === pagination.pages}
-                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors cursor-pointer ${
-                  currentPage === pagination.pages
-                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:text-green-600'
-                }`}
-              >
-                Next
-              </button>
-            </div>
-          )}
+          <div className="mt-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={pagination?.pages || 1}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         </div>
       )}
     </div>
