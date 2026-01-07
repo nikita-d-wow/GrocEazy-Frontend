@@ -22,7 +22,7 @@ export default function RevenueBarChartWrapper({
   };
 
   return (
-    <div className="h-[360px] cursor-pointer">
+    <div className="h-[320px] cursor-pointer">
       <Bar
         data={{
           labels: data.labels,
@@ -32,7 +32,7 @@ export default function RevenueBarChartWrapper({
               backgroundColor: bright.indigo,
               hoverBackgroundColor: bright.purple,
               borderRadius: 8,
-              barThickness: 40,
+              maxBarThickness: 40,
             },
           ],
         }}

@@ -64,6 +64,15 @@ export default function Header() {
     ) {
       return false;
     }
+
+    // Support ticket paths should also highlight the Contact nav item
+    if (
+      path === '/contact' &&
+      location.pathname.startsWith('/customer/tickets')
+    ) {
+      return true;
+    }
+
     return location.pathname.startsWith(path);
   };
 

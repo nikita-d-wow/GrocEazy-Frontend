@@ -132,11 +132,7 @@ export default function Analytics() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-emerald-500/5 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute -bottom-[10%] left-[20%] w-[35%] h-[35%] bg-emerald-500/5 rounded-full blur-[110px]" />
-      </div>
+      {/* Decorative Background Elements Removed */}
 
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-12 space-y-16">
         {/* HEADER */}
@@ -177,7 +173,7 @@ export default function Analytics() {
               title="Revenue Trend"
               description="Monthly growth and financial trajectory"
             >
-              <div className="h-[300px] w-full bg-white/20 rounded-3xl p-4">
+              <div className="h-[350px] w-full bg-white/20 rounded-3xl p-4">
                 <RevenueBarChart
                   data={analytics.revenueBar}
                   onSegmentClick={(label) =>
@@ -197,7 +193,7 @@ export default function Analytics() {
               title="Inventory Health"
               description="Stock optimization status"
             >
-              <div className="h-[300px] w-full flex items-center justify-center">
+              <div className="h-[350px] w-full flex items-center justify-center">
                 <InventoryPieChart
                   data={analytics.inventoryHealth}
                   onSegmentClick={(segment) => {
@@ -233,7 +229,7 @@ export default function Analytics() {
               title="Product Status"
               description="Availability & Catalog coverage"
             >
-              <div className="h-[300px] w-full flex items-center justify-center">
+              <div className="h-[350px] w-full flex items-center justify-center">
                 <ProductStatusPieChart
                   data={analytics.productStatus}
                   onSegmentClick={(segment) => {
