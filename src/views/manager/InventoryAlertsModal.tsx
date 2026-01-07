@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Bell, Mail, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -15,6 +15,17 @@ export const InventoryAlertsModal: FC<InventoryAlertsModalProps> = ({
   const [emailAlerts, setEmailAlerts] = useState(false);
   const [lowStockThreshold, setLowStockThreshold] = useState(5);
   const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   const handleSave = () => {
     // This is where we would call the backend API to save settings

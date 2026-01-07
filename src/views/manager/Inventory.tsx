@@ -3,13 +3,17 @@ import { useSelector } from 'react-redux';
 import { Package, AlertTriangle, CheckCircle } from 'lucide-react';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
-import { fetchManagerProducts } from '../../redux/actions/productActions';
+import {
+  fetchManagerProducts,
+  fetchAnalyticsProducts,
+} from '../../redux/actions/productActions';
 import { fetchCategories } from '../../redux/actions/categoryActions';
 import {
   selectProducts,
   selectProductLoading,
   selectProductPagination,
   selectProductError,
+  selectAnalyticsProducts,
 } from '../../redux/selectors/productSelectors';
 import { selectCategories } from '../../redux/selectors/categorySelectors';
 import Pagination from '../../components/common/Pagination';
@@ -117,9 +121,12 @@ export const Inventory: FC = () => {
   const [isAlertsOpen, setIsAlertsOpen] = useState(false);
   const [page, setPage] = useState(1);
 
-  // 1. Fetch Categories only once on mount
+  const analyticsProducts = useSelector(selectAnalyticsProducts);
+
+  // 1. Fetch Categories and Analytics Products (for charts) on mount
   useEffect(() => {
     dispatch(fetchCategories());
+    dispatch(fetchAnalyticsProducts());
   }, [dispatch]);
 
   // 2. Fetch Products when page or search term changes
@@ -221,7 +228,7 @@ export const Inventory: FC = () => {
       )}
 
       <InventoryCharts
-        products={products}
+        products={analyticsProducts} // Use full list for charts
         categories={categories}
         onStockClick={(status) => {
           setStockFilter(status);

@@ -1,9 +1,9 @@
 import type { Order } from '../../../redux/types/orderTypes';
-import { statusChip, CARD_BG } from './OrderConstant';
+import { statusChip } from './OrderConstant';
 import { Link } from 'react-router-dom';
-
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../redux/store';
+import { ChevronRight, Package } from 'lucide-react';
 
 export default function OrderCard({ order }: { order: Order }) {
   // Access global products to fix missing population
@@ -16,69 +16,99 @@ export default function OrderCard({ order }: { order: Order }) {
     return allProducts.find((p) => p._id === id) || item.productId || {};
   };
 
+  // Get first 4 images for thumbnails
+  const thumbnails = order.items.slice(0, 4).map((item) => {
+    const product = getProduct(item);
+    return product.images?.[0] || 'https://via.placeholder.com/150';
+  });
+
+  const remainingItems = order.items.length - 4;
+
   return (
     <Link
       to={`/orders/${order._id}`}
       className={`
-        block rounded-3xl p-6 border border-gray-200/50
-        shadow-[0_4px_20px_rgba(0,0,0,0.06)] 
-        hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)]
+        block rounded-3xl p-6 border border-gray-100 bg-white
+        shadow-[0_2px_10px_rgba(0,0,0,0.03)] 
+        hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)]
         hover:-translate-y-1 transition-all duration-300 
-        animate-slideUp ${CARD_BG} cursor-pointer group relative overflow-hidden
+        animate-slideUp cursor-pointer group relative overflow-hidden
       `}
     >
-      {/* GrocEazy Brand Header */}
-      <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-100">
-        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-          <span className="font-bold text-primary text-xl">G</span>
-        </div>
+      {/* Status Line */}
+      <div
+        className={`absolute top-0 left-0 w-1 h-full transition-colors duration-300 
+        ${
+          order.status === 'Delivered'
+            ? 'bg-green-500'
+            : order.status === 'Cancelled'
+              ? 'bg-red-500'
+              : 'bg-blue-500'
+        }
+      `}
+      />
+
+      {/* Header */}
+      <div className="flex justify-between items-start mb-6 pl-2">
         <div>
-          <h3 className="font-bold text-gray-900 leading-none">GrocEazy</h3>
-          <span className="text-xs text-gray-500">Order #{order._id}</span>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 tracking-wide uppercase">
+              Order #{order._id.slice(-8)}
+            </span>
+            <span className="text-gray-400 text-xs">
+              •{' '}
+              {new Date(order.createdAt).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </span>
+          </div>
+          <h3 className="font-bold text-gray-900 text-lg">
+            ₹
+            {Number(order.totalAmount).toLocaleString('en-IN', {
+              minimumFractionDigits: 2,
+            })}
+          </h3>
         </div>
-        <div className="ml-auto">
+        <div className="transform transition-transform group-hover:scale-105">
           {statusChip[order.status] || statusChip['Pending']}
         </div>
       </div>
 
-      {/* Items List */}
-      <div className="space-y-3 mb-6">
-        {order.items.slice(0, 4).map((item, idx) => {
-          const product = getProduct(item);
-          const name = product.name || 'Unknown Item';
-          return (
-            <div
-              key={idx}
-              className="flex items-center text-sm group-hover:bg-gray-50/50 p-1 rounded transition-colors"
-            >
-              <span className="font-medium text-gray-700 truncate max-w-[200px]">
-                {name}
-              </span>
-              <span className="text-gray-500 whitespace-nowrap font-medium ml-1">
-                * {item.quantity}
-              </span>
-            </div>
-          );
-        })}
-        {order.items.length > 4 && (
-          <p className="text-xs text-gray-400 pl-1">
-            + {order.items.length - 4} more items...
-          </p>
+      {/* Thumbnails Row */}
+      <div className="flex items-center gap-3 mb-6 pl-2">
+        {thumbnails.map((src, idx) => (
+          <div
+            key={idx}
+            className="relative w-14 h-14 rounded-xl border border-gray-100 overflow-hidden bg-gray-50 flex-shrink-0"
+          >
+            <img
+              src={src}
+              alt="Item"
+              className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 transition-opacity"
+            />
+          </div>
+        ))}
+        {remainingItems > 0 && (
+          <div className="w-14 h-14 rounded-xl border border-gray-100 bg-gray-50 flex items-center justify-center text-gray-500 font-medium text-xs">
+            +{remainingItems}
+          </div>
+        )}
+        {order.items.length === 0 && (
+          <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <Package size={16} /> No items
+          </div>
         )}
       </div>
 
-      {/* Footer: Date & Total */}
-      <div className="flex justify-between items-center text-sm pt-2">
-        <span className="text-gray-500">
-          {new Date(order.createdAt).toLocaleDateString()}
+      {/* Footer / CTA */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-50 pl-2">
+        <span className="text-sm text-gray-500 font-medium">
+          {order.items.reduce((acc, item) => acc + item.quantity, 0)} Items
         </span>
-        <div className="text-right">
-          <span className="text-xs text-gray-400 block mb-0.5">
-            Total Amount
-          </span>
-          <span className="font-bold text-gray-900 text-lg">
-            ₹{Number(order.totalAmount).toFixed(2)}
-          </span>
+        <div className="flex items-center gap-1 text-primary font-semibold text-sm group-hover:gap-2 transition-all">
+          View Details <ChevronRight size={16} />
         </div>
       </div>
     </Link>
