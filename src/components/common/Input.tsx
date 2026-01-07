@@ -23,14 +23,14 @@ const Input: FC<InputProps> = ({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 ml-1"
+          className="block text-sm font-medium text-text ml-1"
         >
           {label}
         </label>
       )}
       <div className="relative group">
         {leftIcon && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 group-focus-within:text-green-500 transition-colors">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-text group-focus-within:text-primary transition-colors">
             {leftIcon}
           </div>
         )}
@@ -42,28 +42,28 @@ const Input: FC<InputProps> = ({
             }
           }}
           className={`
-            w-full bg-white text-gray-900 border-2 rounded-xl 
+            w-full bg-card text-text border-2 rounded-xl 
             ${leftIcon ? 'pl-10' : 'pl-4'} 
             ${rightIcon ? 'pr-10' : 'pr-4'} 
             py-2.5 outline-none transition-all duration-200
             ${
               error
-                ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-50'
-                : 'border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-4 focus:ring-green-50'
+                ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
+                : 'border-border hover:border-muted-text/30 focus:border-primary focus:ring-4 focus:ring-primary/10'
             }
             ${className}
-            placeholder:text-gray-400
+            placeholder:text-muted-text/50
           `}
           {...props}
         />
         {rightIcon && (
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400">
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-text">
             {rightIcon}
           </div>
         )}
       </div>
       {error && (
-        <p className="text-red-500 text-xs ml-1 font-medium animate-pulse">
+        <p className="text-rose-500 text-xs ml-1 font-medium animate-pulse">
           {error}
         </p>
       )}

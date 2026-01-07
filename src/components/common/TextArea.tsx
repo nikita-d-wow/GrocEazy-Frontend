@@ -19,7 +19,7 @@ const TextArea: FC<TextAreaProps> = ({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 ml-1"
+          className="block text-sm font-medium text-text ml-1"
         >
           {label}
         </label>
@@ -28,21 +28,21 @@ const TextArea: FC<TextAreaProps> = ({
         <textarea
           id={inputId}
           className={`
-            w-full bg-white text-gray-900 border-2 rounded-xl 
+            w-full bg-card text-text border-2 rounded-xl 
             px-4 py-2.5 outline-none transition-all duration-200
             ${
               error
-                ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-50'
-                : 'border-gray-200 hover:border-gray-300 focus:border-green-500 focus:ring-4 focus:ring-green-50'
+                ? 'border-rose-500/50 focus:border-rose-500 focus:ring-4 focus:ring-rose-500/10'
+                : 'border-border hover:border-muted-text/30 focus:border-primary focus:ring-4 focus:ring-primary/10'
             }
-            placeholder:text-gray-400
+            placeholder:text-muted-text/50
             ${className}
           `}
           {...props}
         />
       </div>
       {error && (
-        <p className="text-red-500 text-xs ml-1 font-medium animate-pulse">
+        <p className="text-rose-500 text-xs ml-1 font-medium animate-pulse">
           {error}
         </p>
       )}

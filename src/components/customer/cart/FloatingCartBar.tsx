@@ -29,7 +29,7 @@ export default function FloatingCartBar() {
       >
         <Link
           to="/cart"
-          className="flex items-center justify-between bg-green-600 text-white p-2.5 md:p-3 rounded-full shadow-[0_12px_40px_rgb(0,0,0,0.3)] border border-white/20 backdrop-blur-md transition-transform active:scale-95 mx-auto"
+          className="flex items-center justify-between bg-primary text-white p-2.5 md:p-3 rounded-full shadow-[0_12px_40px_rgb(0,0,0,0.3)] border border-white/20 backdrop-blur-md transition-transform active:scale-95 mx-auto"
         >
           <div className="flex items-center gap-3 pr-4">
             {/* Overlapping Images */}
@@ -37,7 +37,7 @@ export default function FloatingCartBar() {
               {productImages.map((img, idx) => (
                 <div
                   key={idx}
-                  className="w-10 h-10 rounded-full border-2 border-white bg-white overflow-hidden shadow-md flex-shrink-0"
+                  className="w-10 h-10 rounded-full border-2 border-card bg-card overflow-hidden shadow-md flex-shrink-0"
                   style={{ zIndex: idx }}
                 >
                   <img
@@ -48,8 +48,8 @@ export default function FloatingCartBar() {
                 </div>
               ))}
               {productImages.length === 0 && (
-                <div className="w-10 h-10 rounded-full border-2 border-white bg-white flex items-center justify-center">
-                  <ShoppingCart className="w-5 h-5 text-green-600" />
+                <div className="w-10 h-10 rounded-full border-2 border-card bg-card flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5 text-primary" />
                 </div>
               )}
             </div>

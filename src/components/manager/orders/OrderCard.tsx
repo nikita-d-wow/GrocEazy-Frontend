@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Package, Calendar, IndianRupee, Hash } from 'lucide-react';
 
 interface Props {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   order: any;
-  onStatusChange: (id: string, status: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  onStatusChange: (_id: string, _status: string) => void;
 }
 
 const OrderCard = ({ order, onStatusChange }: Props) => {
@@ -23,7 +25,7 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
         navigate(`/manager/orders/${order._id}`);
       }}
       className="
-        bg-white/70 backdrop-blur-xl border border-white/60
+        bg-card/70 backdrop-blur-xl border border-border
         rounded-2xl p-4 sm:p-6
         hover:shadow-xl hover:-translate-y-1
         transition-all duration-300 cursor-pointer
@@ -40,14 +42,14 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
             <Package size={24} />
           </div>
           <div className="min-w-0">
-            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors flex items-center gap-2">
+            <h3 className="text-lg font-bold text-text group-hover:text-primary transition-colors flex items-center gap-2">
               {customerName}
             </h3>
-            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 font-medium">
-              <span className="flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded text-[10px] font-mono border border-gray-200 uppercase">
+            <div className="flex items-center gap-3 mt-1 text-xs text-muted-text font-medium">
+              <span className="flex items-center gap-1 bg-muted px-2 py-0.5 rounded text-[10px] font-mono border border-border uppercase">
                 <Hash size={10} /> {order._id.slice(-8)}
               </span>
-              <span className="w-1 h-1 rounded-full bg-gray-300" />
+              <span className="w-1 h-1 rounded-full bg-border" />
               <span className="flex items-center gap-1">
                 <Calendar size={12} className="text-primary/60" />
                 {new Date(order.createdAt).toLocaleDateString('en-IN', {
@@ -62,15 +64,15 @@ const OrderCard = ({ order, onStatusChange }: Props) => {
         {/* MIDDLE SECTION: Minimal Stats */}
         <div className="flex items-center gap-8 lg:gap-12">
           <div className="hidden sm:block">
-            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">
+            <p className="text-[10px] uppercase font-bold text-muted-text tracking-wider mb-1">
               Items
             </p>
-            <p className="text-sm font-bold text-gray-700">
+            <p className="text-sm font-bold text-text">
               {order.items?.length || 0} units
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider mb-1">
+            <p className="text-[10px] uppercase font-bold text-muted-text tracking-wider mb-1">
               Total Amount
             </p>
             <p className="text-xl font-black text-primary flex items-center">

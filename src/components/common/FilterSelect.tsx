@@ -13,6 +13,7 @@ interface FilterSelectProps {
   label: string;
   options: Option[];
   value: string;
+  // eslint-disable-next-line no-unused-vars
   onChange: (value: string) => void;
   className?: string;
   align?: 'left' | 'right';
@@ -60,7 +61,7 @@ const FilterSelect = ({
   return (
     <div className={`relative ${className}`} ref={containerRef}>
       <div className="flex flex-col gap-1.5">
-        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 drop-shadow-sm">
+        <span className="text-[10px] font-bold text-muted-text uppercase tracking-widest ml-1 drop-shadow-sm">
           {label}
         </span>
         <button
@@ -68,25 +69,25 @@ const FilterSelect = ({
           onClick={() => setIsOpen(!isOpen)}
           className={`
             flex items-center justify-between gap-3 px-4 py-2.5
-            bg-white border-2 border-gray-100
-            rounded-2xl shadow-sm hover:shadow-md hover:border-green-500/30
+            bg-card border-2 border-border
+            rounded-2xl shadow-sm hover:shadow-md hover:border-primary/30
             transition-all duration-300 group min-w-[160px] cursor-pointer
-            ${isOpen ? 'ring-4 ring-green-500/10 border-green-500/50' : ''}
+            ${isOpen ? 'ring-4 ring-primary/10 border-primary/50' : ''}
           `}
         >
           <div className="flex items-center gap-2.5">
             <Filter
               size={16}
-              className={`transition-colors ${isOpen ? 'text-green-600' : 'text-gray-400 group-hover:text-green-500'}`}
+              className={`transition-colors ${isOpen ? 'text-primary' : 'text-muted-text group-hover:text-primary'}`}
             />
-            <span className="text-sm font-bold text-gray-700 whitespace-nowrap truncate max-w-[120px] sm:max-w-none">
+            <span className="text-sm font-bold text-text whitespace-nowrap truncate max-w-[120px] sm:max-w-none">
               {selectedOption ? selectedOption.label : 'Select...'}
             </span>
           </div>
           <ChevronDown
             size={16}
-            className={`text-gray-400 transition-transform duration-300 ${
-              isOpen ? 'rotate-180 text-green-600' : ''
+            className={`text-muted-text transition-transform duration-300 ${
+              isOpen ? 'rotate-180 text-primary' : ''
             }`}
           />
         </button>
@@ -102,21 +103,21 @@ const FilterSelect = ({
             className={`
               absolute ${align === 'right' ? 'right-0' : 'left-0'} top-full mt-3 z-[999]
               w-full min-w-[220px] p-2
-              bg-white border-2 border-gray-100
-              rounded-2xl shadow-2xl shadow-gray-200/50
+              bg-card border-2 border-border
+              rounded-2xl shadow-xl
               flex flex-col gap-1 max-h-[400px]
             `}
           >
             {searchable && (
               <div className="relative mb-2 px-1 pt-1">
-                <Search className="absolute left-4 top-4 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-4 top-4 w-4 h-4 text-muted-text" />
                 <input
                   type="text"
                   autoFocus
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-8 py-2.5 bg-gray-50 border-2 border-transparent focus:border-green-100 rounded-xl text-sm outline-none transition-all"
+                  className="w-full pl-10 pr-8 py-2.5 bg-muted border-2 border-transparent focus:border-primary-light rounded-xl text-sm outline-none transition-all text-text"
                 />
                 {searchTerm && (
                   <button
@@ -148,8 +149,8 @@ const FilterSelect = ({
                         px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200
                         ${
                           isSelected
-                            ? 'bg-green-50 text-green-700'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 cursor-pointer'
+                            ? 'bg-primary-light text-primary'
+                            : 'text-muted-text hover:bg-muted hover:text-text cursor-pointer'
                         }
                       `}
                     >
@@ -157,7 +158,7 @@ const FilterSelect = ({
                         {option.icon && (
                           <span
                             className={
-                              isSelected ? 'text-green-600' : 'text-gray-400'
+                              isSelected ? 'text-primary' : 'text-muted-text'
                             }
                           >
                             {option.icon}
@@ -175,14 +176,14 @@ const FilterSelect = ({
                             damping: 20,
                           }}
                         >
-                          <Check size={16} className="text-green-600" />
+                          <Check size={16} className="text-primary" />
                         </motion.div>
                       )}
                     </button>
                   );
                 })
               ) : (
-                <div className="px-4 py-8 text-sm text-gray-400 text-center">
+                <div className="px-4 py-8 text-sm text-muted-text text-center">
                   No matches found
                 </div>
               )}

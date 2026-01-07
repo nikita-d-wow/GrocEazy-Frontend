@@ -45,11 +45,11 @@ const ProductRow = React.memo(
   }) => {
     return (
       <tr
-        className={`hover:bg-gray-50/50 transition-opacity ${!product.isActive ? 'opacity-60' : ''}`}
+        className={`hover:bg-muted/50 transition-colors ${!product.isActive ? 'opacity-60' : ''}`}
       >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-gray-100 p-1 flex-shrink-0">
+            <div className="h-12 w-12 rounded-xl bg-muted p-1 flex-shrink-0">
               <img
                 className="h-full w-full rounded-lg object-cover"
                 src={
@@ -63,18 +63,18 @@ const ProductRow = React.memo(
               />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900">
+              <div className="text-sm font-semibold text-text">
                 {product.name}
               </div>
               {product.size && (
-                <div className="text-xs text-gray-500">{product.size}</div>
+                <div className="text-xs text-muted-text">{product.size}</div>
               )}
             </div>
           </div>
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-medium text-text">
             ₹{product.price.toFixed(2)}
           </span>
         </td>
@@ -84,20 +84,20 @@ const ProductRow = React.memo(
             <span
               className={`text-sm font-medium ${
                 Number(product.stock) === 0
-                  ? 'text-red-600 font-bold'
+                  ? 'text-rose-500 font-bold'
                   : product.stock <= (product.lowStockThreshold || 5)
-                    ? 'text-orange-600'
-                    : 'text-gray-900'
+                    ? 'text-amber-500'
+                    : 'text-text'
               }`}
             >
               {product.stock}
             </span>
             {Number(product.stock) === 0 ? (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-rose-500/10 text-rose-500 border border-rose-500/20">
                 Out of Stock
               </span>
             ) : product.stock <= (product.lowStockThreshold || 5) ? (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
                 Low
               </span>
             ) : null}
@@ -106,11 +106,11 @@ const ProductRow = React.memo(
 
         <td className="px-6 py-4">
           {product.isActive ? (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
               Active
             </span>
           ) : (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-muted text-muted-text border border-border">
               Inactive
             </span>
           )}
@@ -120,13 +120,13 @@ const ProductRow = React.memo(
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => onEdit(product)}
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
+              className="p-2 text-muted-text hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-colors"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(product._id)}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              className="p-2 text-muted-text hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -209,8 +209,8 @@ const ProductManagement: FC = () => {
     <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Products</h1>
-          <p className="text-gray-500">Manage store inventory</p>
+          <h1 className="text-3xl font-bold text-text">Products</h1>
+          <p className="text-muted-text">Manage store inventory</p>
         </div>
         <Button
           onClick={handleAddNew}
@@ -221,11 +221,11 @@ const ProductManagement: FC = () => {
         </Button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
-        <div className="p-4 border-b border-gray-100">
+      <div className="bg-card rounded-2xl shadow-sm border border-border mb-6 relative z-30">
+        <div className="p-4 border-b border-border">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div className="w-full lg:max-w-md">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
+              <span className="text-[10px] font-bold text-muted-text uppercase tracking-widest ml-1 mb-1.5 block">
                 Search
               </span>
               <DebouncedSearch
@@ -286,36 +286,36 @@ const ProductManagement: FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden relative">
           {loading && (
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
-              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+            <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
+              <div className="bg-card p-3 rounded-full shadow-lg border border-border">
                 <Loader size="sm" />
               </div>
             </div>
           )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-gray-50/50">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Stock
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider text-right">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {displayProducts.map((product) => (
                   <ProductRow
                     key={product._id}

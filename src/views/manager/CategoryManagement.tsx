@@ -38,10 +38,10 @@ const CategoryRow = React.memo(
     onDelete: (id: string) => void;
   }) => {
     return (
-      <tr className="hover:bg-gray-50/50">
+      <tr className="hover:bg-muted/50 transition-colors">
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-gray-100 p-1 flex-shrink-0">
+            <div className="h-12 w-12 rounded-xl bg-muted p-1 flex-shrink-0">
               <img
                 className="h-full w-full rounded-lg object-cover"
                 src={
@@ -55,7 +55,7 @@ const CategoryRow = React.memo(
               />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900">
+              <div className="text-sm font-semibold text-text">
                 {category.name}
               </div>
             </div>
@@ -63,14 +63,14 @@ const CategoryRow = React.memo(
         </td>
 
         <td className="px-6 py-4">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
             {category.productCount || 0}{' '}
             {category.productCount === 1 ? 'Product' : 'Products'}
           </span>
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-muted-text">
             {new Date(category.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
@@ -83,13 +83,13 @@ const CategoryRow = React.memo(
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => onEdit(category)}
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
+              className="p-2 text-muted-text hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-colors"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(category._id)}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              className="p-2 text-muted-text hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -156,25 +156,25 @@ const CategoryManagement: FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-500 mt-1">Organize your products catalog</p>
+          <h1 className="text-3xl font-bold text-text">Categories</h1>
+          <p className="text-muted-text mt-1">Organize your products catalog</p>
         </div>
         <Button
           onClick={handleAddNew}
           leftIcon={<Plus className="w-5 h-5" />}
           variant="primary"
-          className="shadow-xl shadow-green-200 w-full sm:w-auto justify-center"
+          className="shadow-xl shadow-primary/20 w-full sm:w-auto justify-center"
         >
           Add Category
         </Button>
       </div>
 
       {/* Search & Sort Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
-        <div className="p-4 border-b border-gray-100">
+      <div className="bg-card rounded-2xl shadow-sm border border-border mb-6 relative z-30">
+        <div className="p-4 border-b border-border">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <div className="w-full lg:max-w-md">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
+              <span className="text-[10px] font-bold text-muted-text uppercase tracking-widest ml-1 mb-1.5 block">
                 Search
               </span>
               <DebouncedSearch
@@ -222,33 +222,33 @@ const CategoryManagement: FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden flex flex-col relative">
           {loading && (
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
-              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+            <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
+              <div className="bg-card p-3 rounded-full shadow-lg border border-border">
                 <Loader size="sm" />
               </div>
             </div>
           )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-gray-50/50">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Products
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Created Date
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider text-right">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {categories.map((category) => (
                   <CategoryRow
                     key={category._id}
@@ -262,7 +262,7 @@ const CategoryManagement: FC = () => {
           </div>
 
           {pagination && pagination.pages > 1 && (
-            <div className="p-4 border-t border-gray-50">
+            <div className="p-4 border-t border-border">
               <Pagination
                 currentPage={page}
                 totalPages={pagination.pages}

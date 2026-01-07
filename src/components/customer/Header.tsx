@@ -14,6 +14,7 @@ import {
   selectWishlistItems,
   selectWishlistPagination,
 } from '../../redux/selectors/wishlistSelectors';
+import ThemeToggle from '../common/ThemeToggle';
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -77,7 +78,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full bg-white/90 backdrop-blur-md border-b border-green-50 sticky top-0 z-50 transition-all duration-300">
+    <header className="w-full bg-bg/90 backdrop-blur-md border-b border-border sticky top-0 z-50 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-3 flex items-center justify-between">
         {/* Logo - Link added with role-based navigation */}
         <Link
@@ -86,22 +87,22 @@ export default function Header() {
           }
           className="flex items-center gap-2 group mr-8 cursor-pointer select-none"
         >
-          <h1 className="text-2xl font-bold text-gray-800 tracking-tight flex items-center">
+          <h1 className="text-2xl font-bold text-text tracking-tight flex items-center">
             Groc
-            <span className="text-green-600">Eazy</span>
+            <span className="text-primary">Eazy</span>
           </h1>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8 text-gray-600 font-medium">
+        <nav className="hidden md:flex items-center gap-8 text-muted-text font-medium">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               className={`px-3 py-2 rounded-lg transition-all duration-200 ${
                 isActive(item.path)
-                  ? 'text-green-600 bg-green-50 shadow-sm'
-                  : 'hover:text-green-600 hover:bg-green-50'
+                  ? 'text-primary bg-primary-light shadow-sm'
+                  : 'hover:text-primary hover:bg-primary-light'
               }`}
             >
               {item.label}
@@ -112,7 +113,6 @@ export default function Header() {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
           {/* Search */}
-          {/* Search */}
           {!['admin', 'manager'].includes(role) && (
             <div className="relative group">
               <input
@@ -121,9 +121,9 @@ export default function Header() {
                 onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                 onKeyDown={handleSearch}
                 placeholder="Search available products..."
-                className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
+                className="w-64 pl-10 pr-4 py-2.5 bg-muted border-2 border-transparent focus:bg-bg focus:border-primary-light rounded-xl text-sm transition-all outline-none text-text"
               />
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
+              <Search className="absolute left-3 top-3 w-4 h-4 text-muted-text group-focus-within:text-primary transition-colors" />
             </div>
           )}
 
@@ -135,7 +135,7 @@ export default function Header() {
                 className={`p-2.5 rounded-xl transition-all duration-200 ${
                   isActive('/wishlist')
                     ? 'bg-pink-50 text-pink-500 shadow-sm'
-                    : 'hover:bg-pink-50 text-gray-500 hover:text-pink-500'
+                    : 'hover:bg-pink-50 text-muted-text hover:text-pink-500'
                 }`}
               >
                 <div className="relative">
@@ -152,14 +152,14 @@ export default function Header() {
                 to="/cart"
                 className={`p-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 ${
                   isActive('/cart')
-                    ? 'bg-green-50 text-green-600 shadow-sm'
-                    : 'hover:bg-green-50 text-gray-500 hover:text-green-600'
+                    ? 'bg-primary-light text-primary shadow-sm'
+                    : 'hover:bg-primary-light text-muted-text hover:text-primary'
                 }`}
               >
                 <div className="relative">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
                       {cartCount}
                     </span>
                   )}
@@ -168,13 +168,15 @@ export default function Header() {
             </div>
           )}
 
+          <ThemeToggle />
+
           {/* User Profile / Sign In */}
           {isLoggedIn ? (
             <UserProfileDropdown />
           ) : (
             <Link
               to="/login"
-              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm hover:shadow-md cursor-pointer"
+              className="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-xl font-medium transition-all shadow-sm hover:shadow-md cursor-pointer"
             >
               Sign In
             </Link>
@@ -183,6 +185,7 @@ export default function Header() {
 
         {/* Mobile Header Actions */}
         <div className="flex md:hidden items-center gap-2 flex-1 justify-end">
+          <ThemeToggle />
           {isCustomer && (
             <>
               {/* Mobile Search - Visible directly in header */}
@@ -193,9 +196,9 @@ export default function Header() {
                   onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                   onKeyDown={handleSearch}
                   placeholder="Search..."
-                  className="w-full pl-9 pr-3 py-2 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-xs transition-all outline-none"
+                  className="w-full pl-9 pr-3 py-2 bg-muted border-2 border-transparent focus:bg-bg focus:border-primary-light rounded-xl text-xs transition-all outline-none text-text"
                 />
-                <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-gray-400" />
+                <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-muted-text" />
               </div>
 
               <Link
@@ -203,7 +206,7 @@ export default function Header() {
                 className={`p-1.5 rounded-lg transition-all duration-200 ${
                   isActive('/wishlist')
                     ? 'bg-pink-50 text-pink-500'
-                    : 'text-gray-500 hover:bg-pink-50 hover:text-pink-500'
+                    : 'text-muted-text hover:bg-pink-50 hover:text-pink-500'
                 }`}
               >
                 <div className="relative">
@@ -219,14 +222,14 @@ export default function Header() {
                 to="/cart"
                 className={`p-1.5 rounded-lg transition-all duration-200 flex items-center gap-2 ${
                   isActive('/cart')
-                    ? 'bg-green-50 text-green-600'
-                    : 'text-gray-500 hover:bg-green-50 hover:text-green-600'
+                    ? 'bg-primary-light text-primary'
+                    : 'text-muted-text hover:bg-primary-light hover:text-primary'
                 }`}
               >
                 <div className="relative">
                   <ShoppingCart className="w-5 h-5" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-green-600 text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 border border-white shadow-sm">
                       {cartCount}
                     </span>
                   )}
@@ -237,7 +240,7 @@ export default function Header() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setOpen(!open)}
-            className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+            className="p-2 text-muted-text hover:bg-muted rounded-xl transition-colors"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -246,7 +249,7 @@ export default function Header() {
 
       {/* Mobile Dropdown */}
       {open && (
-        <div className="md:hidden px-4 pt-2 pb-6 bg-white border-t border-gray-100 shadow-xl space-y-4 animate-in slide-in-from-top duration-300">
+        <div className="md:hidden px-4 pt-2 pb-6 bg-bg border-t border-border shadow-xl space-y-4 animate-in slide-in-from-top duration-300">
           <div className="flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
@@ -255,8 +258,8 @@ export default function Header() {
                 onClick={() => setOpen(false)}
                 className={`px-4 py-3 rounded-xl font-medium transition-colors ${
                   isActive(item.path)
-                    ? 'bg-green-50 text-green-700 shadow-sm'
-                    : 'hover:bg-green-50 text-gray-700'
+                    ? 'bg-primary-light text-primary shadow-sm'
+                    : 'hover:bg-primary-light text-text'
                 }`}
               >
                 {item.label}
@@ -265,7 +268,7 @@ export default function Header() {
           </div>
 
           {isLoggedIn ? (
-            <div className="pt-4 border-t border-gray-100 space-y-1">
+            <div className="pt-4 border-t border-border space-y-1">
               {/* Mobile Profile Summary */}
               <div
                 onClick={() => {
@@ -274,18 +277,18 @@ export default function Header() {
                     setOpen(false);
                   }
                 }}
-                className={`flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-xl transition-colors ${isCustomer ? 'cursor-pointer' : ''}`}
+                className={`flex items-center justify-between px-4 py-3 hover:bg-muted rounded-xl transition-colors ${isCustomer ? 'cursor-pointer' : ''}`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold">
+                  <div className="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary font-bold">
                     {user.name?.[0] || user.email?.[0]}
                   </div>
                   <div>
-                    <div className="font-semibold text-gray-900">
+                    <div className="font-semibold text-text">
                       {user.name || 'User'}
                     </div>
                     {isCustomer && (
-                      <div className="text-xs text-green-600 font-medium tracking-tight">
+                      <div className="text-xs text-primary font-medium tracking-tight">
                         View Profile
                       </div>
                     )}
@@ -299,17 +302,15 @@ export default function Header() {
                     navigate('/orders');
                     setOpen(false);
                   }}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-muted rounded-xl cursor-pointer transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-400 font-bold">
                       <ShoppingBag size={20} />
                     </div>
                     <div>
-                      <div className="font-semibold text-gray-900">
-                        My Orders
-                      </div>
-                      <div className="text-xs text-blue-600 font-medium tracking-tight">
+                      <div className="font-semibold text-text">My Orders</div>
+                      <div className="text-xs text-blue-600 dark:text-blue-400 font-medium tracking-tight">
                         Track & History
                       </div>
                     </div>
@@ -320,7 +321,7 @@ export default function Header() {
               <div className="pt-2 px-1 text-center">
                 <button
                   onClick={handleLogout}
-                  className="w-full bg-gray-50 text-red-600 px-4 py-3 rounded-xl font-semibold hover:bg-red-50 transition-colors mt-2 cursor-pointer"
+                  className="w-full bg-muted text-red-600 px-4 py-3 rounded-xl font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mt-2 cursor-pointer"
                 >
                   Sign Out
                 </button>
@@ -329,7 +330,7 @@ export default function Header() {
           ) : (
             <Link
               to="/login"
-              className="block w-full text-center bg-gray-900 text-white px-6 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all"
+              className="block w-full text-center bg-primary text-white px-6 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all"
             >
               Sign In
             </Link>

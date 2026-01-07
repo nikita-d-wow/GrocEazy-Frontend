@@ -130,7 +130,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="border-green-100 hover:border-green-200"
+            className="border-border hover:border-primary/30"
             required
           />
 
@@ -143,7 +143,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             onChange={handleChange}
             min="0"
             step="0.01"
-            className="border-green-100 hover:border-green-200"
+            className="border-border hover:border-primary/30"
             required
           />
 
@@ -154,7 +154,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             value={formData.stock}
             onChange={handleChange}
             min="0"
-            className="border-green-100 hover:border-green-200"
+            className="border-border hover:border-primary/30"
             required
           />
 
@@ -165,7 +165,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             value={formData.lowStockThreshold}
             onChange={handleChange}
             min="0"
-            className="border-green-100 hover:border-green-200"
+            className="border-border hover:border-primary/30"
           />
 
           <Input
@@ -174,7 +174,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             value={formData.size || ''}
             onChange={handleChange}
             placeholder="e.g., 500g, 1kg, 1L"
-            className="border-green-100 hover:border-green-200"
+            className="border-border hover:border-primary/30"
           />
 
           <Input
@@ -183,7 +183,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             value={formData.dietary || ''}
             onChange={handleChange}
             placeholder="e.g., Vegan, Gluten-Free"
-            className="border-green-100 hover:border-green-200"
+            className="border-border hover:border-primary/30"
           />
 
           {/* Category Dropdown */}
@@ -210,7 +210,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-medium text-text mb-1.5">
             Description
           </label>
           <textarea
@@ -218,7 +218,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             value={formData.description}
             onChange={handleChange}
             rows={4}
-            className="w-full px-4 py-2 border-2 border-green-100 rounded-xl hover:border-green-200 transition-all outline-none focus:border-green-500 focus:ring-4 focus:ring-green-50"
+            className="w-full px-4 py-2 border-2 border-border rounded-xl hover:border-primary/30 transition-all outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 bg-card text-text"
             required
           />
         </div>
@@ -231,19 +231,16 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             name="isActive"
             checked={formData.isActive}
             onChange={handleChange}
-            className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500"
+            className="w-5 h-5 text-primary border-border rounded focus:ring-primary"
           />
-          <label
-            htmlFor="isActive"
-            className="text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="isActive" className="text-sm font-medium text-text">
             Product is active (visible to customers)
           </label>
         </div>
 
         {/* Images */}
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-text">
             Product Images
           </label>
 
@@ -255,7 +252,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
                   <img
                     src={preview}
                     alt={`Preview ${idx + 1}`}
-                    className="w-full h-24 object-cover rounded-lg border-2 border-gray-200"
+                    className="w-full h-24 object-cover rounded-lg border-2 border-border"
                   />
                   <button
                     type="button"
@@ -271,9 +268,9 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
 
           {/* Upload Button */}
           <label className="cursor-pointer">
-            <div className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-500 transition-colors">
-              <Upload className="w-5 h-5 text-gray-400" />
-              <span className="text-sm text-gray-600">
+            <div className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-border rounded-xl hover:border-primary transition-colors">
+              <Upload className="w-5 h-5 text-muted-text" />
+              <span className="text-sm text-muted-text">
                 Upload product images (multiple files)
               </span>
             </div>

@@ -39,11 +39,11 @@ export default function WishlistCard({ item, isInCart }: Props) {
       onClick={() => navigate(`/products/${item.product._id}`)}
       className="
         group relative
-        bg-white/40 backdrop-blur-2xl
-        border border-white/40
+        bg-card/70 backdrop-blur-2xl
+        border border-border
         rounded-[2rem] p-5
-        shadow-xl shadow-gray-200/50
-        hover:shadow-2xl hover:shadow-red-500/10
+        shadow-sm
+        hover:shadow-2xl hover:shadow-primary/5
         transition-all duration-500
         hover:-translate-y-2
         flex flex-col h-full
@@ -51,7 +51,7 @@ export default function WishlistCard({ item, isInCart }: Props) {
       "
     >
       {/* IMAGE CONTAINER */}
-      <div className="relative aspect-square mb-4 overflow-hidden rounded-2xl bg-gray-50/50 border border-white/20 group-hover:shadow-inner transition-all duration-500">
+      <div className="relative aspect-square mb-4 overflow-hidden rounded-2xl bg-muted border border-border group-hover:shadow-inner transition-all duration-500">
         <img
           src={item.product.images[0]}
           alt={item.product.name}
@@ -59,10 +59,10 @@ export default function WishlistCard({ item, isInCart }: Props) {
         />
 
         {isOutOfStock && (
-          <div className="absolute inset-0 bg-black/5 flex items-center justify-center backdrop-blur-[2px]">
-            <div className="bg-white/90 px-4 py-1.5 rounded-full shadow-lg border border-red-100 flex items-center gap-2 animate-pulse">
-              <AlertCircle size={14} className="text-red-500" />
-              <span className="text-xs font-bold text-red-600 uppercase tracking-wider">
+          <div className="absolute inset-0 bg-muted/30 flex items-center justify-center backdrop-blur-[2px]">
+            <div className="bg-card/90 px-4 py-1.5 rounded-full shadow-lg border border-rose-500/20 flex items-center gap-2 animate-pulse">
+              <AlertCircle size={14} className="text-rose-500" />
+              <span className="text-xs font-bold text-rose-600 uppercase tracking-wider">
                 Out of Stock
               </span>
             </div>
@@ -72,24 +72,24 @@ export default function WishlistCard({ item, isInCart }: Props) {
 
       <div className="flex-1 flex flex-col">
         <div className="flex justify-between items-start gap-2 mb-2">
-          <h3 className="font-bold text-gray-900 text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="font-bold text-text text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
             {item.product.name}
           </h3>
         </div>
 
-        <p className="text-gray-500 text-xs line-clamp-2 mb-3 font-medium">
+        <p className="text-muted-text text-xs line-clamp-2 mb-3 font-medium">
           {item.product.description}
         </p>
 
-        <div className="mt-auto pt-2 border-t border-white/20 flex items-center justify-between">
+        <div className="mt-auto pt-2 border-t border-border flex items-center justify-between">
           <p className="text-primary font-black text-2xl tracking-tight">
             <span className="text-sm font-bold mr-0.5">₹</span>
             {item.product.price}
           </p>
 
           {isInCart && (
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-50 text-green-600 border border-green-100 shadow-sm animate-fade">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-primary-light text-primary border border-primary/20 shadow-sm animate-fade">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
               <span className="text-[10px] font-bold uppercase">In Cart</span>
             </div>
           )}
@@ -117,7 +117,7 @@ export default function WishlistCard({ item, isInCart }: Props) {
             py-3 rounded-2xl font-bold text-sm transition-all duration-300
             ${
               isMoveDisabled
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200/50'
+                ? 'bg-muted text-muted-text cursor-not-allowed border border-border'
                 : 'bg-primary text-white shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:bg-primary-dark active:scale-95 cursor-pointer border border-primary/20'
             }
           `}
@@ -137,8 +137,8 @@ export default function WishlistCard({ item, isInCart }: Props) {
           disabled={isDeleting}
           className="
             p-3.5 rounded-2xl cursor-pointer
-            bg-red-50 text-red-600 border border-red-100
-            hover:bg-red-600 hover:text-white
+            bg-rose-500/10 text-rose-500 border border-rose-500/20
+            hover:bg-rose-500 hover:text-white
             active:scale-95 transition-all duration-300
             disabled:opacity-70 disabled:cursor-not-allowed
             shadow-sm hover:shadow-md

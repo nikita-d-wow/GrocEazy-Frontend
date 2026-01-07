@@ -24,7 +24,7 @@ export default function CategoriesPage() {
     <div className="relative">
       <div className="absolute inset-0 opacity-80 pointer-events-none" />
       <div className="relative z-10 max-w-6xl mx-auto px-4 py-10 min-h-[60vh]">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">
+        <h1 className="text-3xl font-bold text-text mb-8 tracking-tight">
           Shop by Categories
         </h1>
 
@@ -33,7 +33,7 @@ export default function CategoriesPage() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="h-48 rounded-2xl bg-gray-100 animate-pulse"
+                className="h-48 rounded-2xl bg-muted animate-pulse border border-border"
               />
             ))}
           </div>

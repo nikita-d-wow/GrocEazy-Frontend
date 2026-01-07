@@ -80,9 +80,9 @@ export default function OrdersPage() {
   if (error) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[60vh] text-center">
-        <PackageX className="w-16 h-16 text-gray-300 mb-4" />
-        <h3 className="text-xl font-semibold text-gray-900">Oops!</h3>
-        <p className="text-gray-500 mt-2">{error}</p>
+        <PackageX className="w-16 h-16 text-muted-text opacity-30 mb-4" />
+        <h3 className="text-xl font-semibold text-text">Oops!</h3>
+        <p className="text-muted-text mt-2">{error}</p>
         <button
           onClick={() => dispatch(getMyOrders())}
           className="mt-4 text-primary font-medium hover:underline cursor-pointer"
@@ -98,14 +98,14 @@ export default function OrdersPage() {
       {/* Header Section */}
       <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-white rounded-3xl shadow-sm text-primary border border-gray-100 hidden sm:block">
+          <div className="p-4 bg-card rounded-3xl shadow-sm text-primary border border-border hidden sm:block">
             <Package size={32} />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+            <h1 className="text-3xl font-extrabold text-text tracking-tight">
               My Orders
             </h1>
-            <p className="text-gray-500 font-medium text-lg">
+            <p className="text-muted-text font-medium text-lg">
               Track your past purchases and deliveries
             </p>
           </div>
@@ -124,18 +124,18 @@ export default function OrdersPage() {
       </div>
 
       {orders.length === 0 ? (
-        <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-300">
-          <div className="p-4 bg-gray-100 rounded-full w-fit mx-auto text-gray-400 mb-3">
+        <div className="text-center py-20 bg-muted rounded-3xl border border-dashed border-border">
+          <div className="p-4 bg-card rounded-full w-fit mx-auto text-muted-text opacity-50 mb-3">
             {statusFilter === 'all' ? (
               <PackageX className="w-12 h-12" />
             ) : (
               <SearchX className="w-12 h-12" />
             )}
           </div>
-          <p className="text-gray-500 text-lg">
+          <p className="text-muted-text text-lg">
             {statusFilter === 'all' ? 'No orders found.' : 'No matches found.'}
           </p>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-muted-text opacity-60 text-sm mt-1">
             {statusFilter === 'all'
               ? 'Start shopping to see your orders here!'
               : `No orders currently match the "${statusFilter}" status.`}

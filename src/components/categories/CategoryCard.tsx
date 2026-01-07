@@ -4,6 +4,7 @@ import { categoryBgVariants } from '../../utils/colors';
 
 interface Props {
   category: Category;
+  // eslint-disable-next-line no-unused-vars
   onClick?: (id: string) => void;
   index?: number;
 }
@@ -18,9 +19,9 @@ const CategoryCard: FC<Props> = ({ category, onClick, index }) => {
   return (
     <div
       onClick={() => onClick?.(category._id)}
-      className={`group ${bg} rounded-2xl p-6 cursor-pointer transition-all hover:-translate-y-1`}
+      className={`group ${bg} rounded-2xl p-6 cursor-pointer transition-all hover:-translate-y-1 shadow-sm border border-border/50`}
     >
-      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white p-2 shadow">
+      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-card p-2 shadow border border-border/50">
         <img
           src={
             category.image ||
@@ -30,9 +31,7 @@ const CategoryCard: FC<Props> = ({ category, onClick, index }) => {
           className="w-full h-full object-contain"
         />
       </div>
-      <h3 className="text-center font-semibold text-gray-900">
-        {category.name}
-      </h3>
+      <h3 className="text-center font-semibold text-text">{category.name}</h3>
     </div>
   );
 };

@@ -25,15 +25,15 @@ const Button: FC<ButtonProps> = ({
 
   const variants = {
     primary:
-      'bg-gradient-to-r from-green-300 to-emerald-300 hover:from-green-400 hover:to-emerald-400 text-gray-900 shadow-lg shadow-green-200/50 focus:ring-green-400 border border-transparent',
+      'bg-gradient-to-r from-green-300 to-emerald-300 hover:from-green-400 hover:to-emerald-400 text-gray-900 shadow-sm focus:ring-green-400 border border-transparent',
     secondary:
-      'bg-gradient-to-r from-amber-300 to-yellow-300 hover:from-amber-400 hover:to-yellow-400 text-gray-900 shadow-lg shadow-amber-200/50 focus:ring-amber-400 border border-transparent',
+      'bg-gradient-to-r from-amber-300 to-yellow-300 hover:from-amber-400 hover:to-yellow-400 text-gray-900 shadow-sm focus:ring-amber-400 border border-transparent',
     outline:
-      'bg-white text-gray-700 border-2 border-gray-200 hover:border-green-300 hover:text-green-600 hover:bg-green-50 focus:ring-green-300',
+      'bg-card text-text border-2 border-border hover:border-primary/30 hover:text-primary hover:bg-primary-light focus:ring-primary-light',
     danger:
-      'bg-gradient-to-r from-red-300 to-rose-300 hover:from-red-400 hover:to-rose-400 text-gray-900 shadow-lg shadow-red-200/50 focus:ring-red-400 border border-transparent',
+      'bg-gradient-to-r from-red-300 to-rose-300 hover:from-red-400 hover:to-rose-400 text-gray-900 shadow-sm focus:ring-red-400 border border-transparent',
     ghost:
-      'bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-400',
+      'bg-transparent text-muted-text hover:bg-muted hover:text-text focus:ring-border',
   };
 
   const sizes = {

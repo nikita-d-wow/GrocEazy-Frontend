@@ -27,21 +27,27 @@ function App() {
     // Scenario: User has Refresh Token but Access Token is missing (or expired/flush)
     if (!token && refreshToken) {
       // Attempt to restore session
-      api.post('/api/auth/refresh', { refreshToken })
-        .then(res => {
+      api
+        .post('/api/auth/refresh', { refreshToken })
+        .then((res) => {
           const { accessToken, refreshToken: newRefresh, user } = res.data;
 
           localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, accessToken);
-          if (newRefresh) localStorage.setItem(AUTH_KEYS.REFRESH_TOKEN, newRefresh);
-          if (user) localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(user));
+          if (newRefresh) {
+            localStorage.setItem(AUTH_KEYS.REFRESH_TOKEN, newRefresh);
+          }
+          if (user) {
+            localStorage.setItem(AUTH_KEYS.USER, JSON.stringify(user));
+          }
 
           dispatch({
             type: AUTH_LOGIN_SUCCESS,
-            payload: { accessToken, user }
+            payload: { accessToken, user },
           });
         })
         .catch((err) => {
-          console.error("Session restoration failed", err);
+          // eslint-disable-next-line no-console
+          console.error('Session restoration failed', err);
           // If restore fails, clear everything to be safe
           localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);
           localStorage.removeItem(AUTH_KEYS.REFRESH_TOKEN);
@@ -52,7 +58,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div>
+    <div className="bg-bg text-text min-h-screen transition-colors duration-300">
       <Toaster />
       <ScrollToTop />
       <Routes>

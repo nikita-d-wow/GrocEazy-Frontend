@@ -6,6 +6,7 @@ import type { CartItemProps } from '../../../types/Cart';
 
 interface ExtraProps {
   isInWishlist?: boolean;
+  // eslint-disable-next-line no-unused-vars
   moveToWishlist: (_cartId: string, _productId: string) => void;
 }
 
@@ -82,9 +83,9 @@ export default function CartItem({
     <div
       onClick={() => navigate(`/products/${item.productId}`)}
       className="
-        bg-white p-4 sm:p-6
+        bg-card p-4 sm:p-6
         rounded-2xl sm:rounded-3xl
-        border border-gray-200
+        border border-border
         shadow-sm
         transition
         flex flex-col sm:flex-row gap-4 sm:gap-6
@@ -99,17 +100,17 @@ export default function CartItem({
           className="
             w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28
             rounded-xl object-cover
-            border border-gray-100
+            border border-border
             shrink-0
           "
         />
 
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 text-base sm:text-lg line-clamp-2">
+          <p className="font-semibold text-text text-base sm:text-lg line-clamp-2">
             {item.name}
           </p>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-muted-text mt-1">
             Price:{' '}
             <span className="text-primary font-semibold">
               ₹{item.unitPrice}
@@ -120,19 +121,19 @@ export default function CartItem({
             <div
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm shadow-sm ${
                 item.stock > 0
-                  ? 'bg-green-50/50 border-green-100 text-green-700'
-                  : 'bg-red-50/50 border-red-100 text-red-700'
+                  ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-500'
+                  : 'bg-rose-500/5 border-rose-500/20 text-rose-500'
               }`}
             >
               <div
-                className={`w-1.5 h-1.5 rounded-full animate-pulse ${item.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}
+                className={`w-1.5 h-1.5 rounded-full animate-pulse ${item.stock > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`}
               />
               {item.stock > 0 ? `In Stock: ${item.stock}` : 'Out of Stock'}
             </div>
 
             {item.quantity > item.stock && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 text-red-700 text-[10px] font-bold uppercase tracking-wider shadow-sm animate-pulse">
-                <AlertCircle size={10} className="text-orange-600" />
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-rose-500/10 text-rose-500 text-[10px] font-bold uppercase tracking-wider shadow-sm animate-pulse">
+                <AlertCircle size={10} className="text-amber-500" />
                 Insufficient Stock
               </div>
             )}
@@ -147,19 +148,19 @@ export default function CartItem({
                 p-2 rounded-lg border transition-all active:scale-95
                 ${
                   isDecrementDisabled
-                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
-                    : 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100 cursor-pointer shadow-sm'
+                    ? 'bg-muted border-border text-muted-text cursor-not-allowed opacity-50'
+                    : 'bg-rose-500/10 border-rose-500/20 text-rose-500 hover:bg-rose-500/20 cursor-pointer shadow-sm'
                 }
               `}
             >
               {loading === 'dec' ? (
-                <Loader2 size={16} className="animate-spin text-red-600" />
+                <Loader2 size={16} className="animate-spin text-rose-500" />
               ) : (
                 <Minus size={16} />
               )}
             </button>
 
-            <span className="font-semibold text-gray-900 tabular-nums">
+            <span className="font-semibold text-text tabular-nums">
               {item.quantity}
             </span>
 
@@ -171,8 +172,8 @@ export default function CartItem({
                 p-2 rounded-lg border transition-all active:scale-95
                 ${
                   isIncrementDisabled
-                    ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed opacity-50'
-                    : 'bg-green-50 border-green-200 hover:bg-green-100 text-green-700 cursor-pointer shadow-sm'
+                    ? 'bg-muted border-border text-muted-text cursor-not-allowed opacity-50'
+                    : 'bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary cursor-pointer shadow-sm'
                 }
               `}
             >
@@ -195,7 +196,7 @@ export default function CartItem({
           items-center sm:items-end
           gap-3 sm:gap-4
           pt-2 sm:pt-0
-          border-t sm:border-t-0 border-gray-100
+          border-t sm:border-t-0 border-border
         "
       >
         <button
@@ -207,8 +208,8 @@ export default function CartItem({
             text-xs font-bold uppercase tracking-wide transition-all duration-300
             ${
               isInWishlist
-                ? 'bg-red-50 text-red-500 border border-red-100 shadow-sm cursor-default'
-                : 'bg-white text-gray-400 border border-gray-100 hover:text-red-500 hover:border-red-100 hover:bg-red-50/50 hover:shadow-md cursor-pointer'
+                ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20 shadow-sm cursor-default'
+                : 'bg-card text-muted-text border border-border hover:text-rose-500 hover:border-rose-500/20 hover:bg-rose-500/10 hover:shadow-md cursor-pointer'
             }
           `}
         >
@@ -225,14 +226,14 @@ export default function CartItem({
         </button>
 
         <div className="flex items-center gap-3">
-          <p className="font-bold text-gray-900">
+          <p className="font-bold text-text">
             ₹{item.unitPrice * item.quantity}
           </p>
 
           <button
             onClick={handleRemove}
             disabled={isRemoving}
-            className="text-red-500 hover:text-red-700 cursor-pointer disabled:opacity-50 transition-all"
+            className="text-rose-500 hover:text-rose-600 cursor-pointer disabled:opacity-50 transition-all"
           >
             {isRemoving ? (
               <Loader2 size={18} className="animate-spin" />

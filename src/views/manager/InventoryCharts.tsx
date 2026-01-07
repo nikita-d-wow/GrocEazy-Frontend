@@ -41,7 +41,15 @@ const CustomXAxisTick = ({
   const words = payload.value.split(' ');
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={0} y={0} dy={25} textAnchor="middle" fill="#666" fontSize={12}>
+      <text
+        x={0}
+        y={0}
+        dy={25}
+        textAnchor="middle"
+        fill="currentColor"
+        fontSize={12}
+        className="text-muted-text"
+      >
         {words.map((word, index) => (
           <tspan key={index} x={0} dy={index === 0 ? 0 : 12}>
             {word}
@@ -132,8 +140,8 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       {/* Stock Status Pie Chart */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Stock Overview</h3>
+      <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+        <h3 className="text-lg font-bold text-text mb-4">Stock Overview</h3>
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -168,8 +176,8 @@ export const InventoryCharts: FC<InventoryChartsProps> = ({
       </div>
 
       {/* Category Stock Bar Chart */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">
+      <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+        <h3 className="text-lg font-bold text-text mb-4">
           Stock by Category (Top 8)
         </h3>
         <div className="h-[400px] w-full">

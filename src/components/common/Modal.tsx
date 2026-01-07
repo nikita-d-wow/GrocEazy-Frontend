@@ -52,23 +52,21 @@ const Modal: FC<ModalProps> = ({
         className={`
           relative w-full ${maxWidthClasses[maxWidth]}
           max-h-[90vh]
-          rounded-3xl bg-white
+          rounded-3xl bg-card border border-border
           shadow-[0_25px_60px_rgba(0,0,0,0.12)]
           overflow-hidden flex flex-col
         `}
       >
         {/* Header */}
-        <div className="px-6 py-5 bg-gradient-to-r from-green-50 to-emerald-50">
+        <div className="px-6 py-5 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-b border-border">
           <div className="flex items-center justify-between">
-            {title && (
-              <h3 className="text-2xl font-bold text-gray-900">{title}</h3>
-            )}
+            {title && <h3 className="text-2xl font-bold text-text">{title}</h3>}
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-white/80 transition"
+              className="p-2 rounded-full hover:bg-muted transition"
               aria-label="Close modal"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-5 h-5 text-muted-text" />
             </button>
           </div>
         </div>

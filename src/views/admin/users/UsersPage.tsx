@@ -72,10 +72,8 @@ export default function UsersPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              User Management
-            </h1>
-            <p className="text-gray-500">
+            <h1 className="text-2xl font-bold text-text">User Management</h1>
+            <p className="text-muted-text">
               Manage customers, managers, and admins.
             </p>
           </div>
@@ -87,13 +85,13 @@ export default function UsersPage() {
                 Search
               </span>
               <div className="relative group">
-                <Search className="absolute left-3 top-3 w-4 h-4 text-gray-500 group-hover:text-primary transition-colors" />
+                <Search className="absolute left-3 top-3 w-4 h-4 text-muted-text group-hover:text-primary transition-colors" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search users..."
-                  className="pl-10 pr-4 py-2.5 bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl text-sm font-semibold text-gray-700 placeholder:text-gray-500 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-64 shadow-sm hover:shadow-md transition-all duration-300"
+                  className="pl-10 pr-4 py-2.5 bg-card border border-border rounded-2xl text-sm font-semibold text-text placeholder:text-muted-text focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-64 shadow-sm hover:shadow-md transition-all duration-300"
                 />
               </div>
             </div>
@@ -112,34 +110,34 @@ export default function UsersPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-4 md:px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     User
                   </th>
-                  <th className="hidden md:table-cell px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="hidden md:table-cell px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-4 md:px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 md:px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="hidden md:table-cell px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="hidden md:table-cell px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Joined
                   </th>
-                  <th className="px-4 md:px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  <th className="px-4 md:px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider text-right">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {loading ? (
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-6 py-10 text-center text-gray-500"
+                      className="px-6 py-10 text-center text-muted-text"
                     >
                       Loading users...
                     </td>
@@ -148,13 +146,13 @@ export default function UsersPage() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-6 py-10 text-center text-red-500"
+                      className="px-6 py-10 text-center text-rose-500"
                     >
                       Error: {error}
                       <br />
                       <button
                         onClick={() => window.location.reload()}
-                        className="text-blue-600 underline text-sm mt-2"
+                        className="text-primary hover:underline text-sm mt-2 font-semibold"
                       >
                         Retry
                       </button>
@@ -164,7 +162,7 @@ export default function UsersPage() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-6 py-10 text-center text-gray-500"
+                      className="px-6 py-10 text-center text-muted-text"
                     >
                       No users found.
                     </td>
@@ -173,19 +171,19 @@ export default function UsersPage() {
                   users.map((user) => (
                     <tr
                       key={user._id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-muted/50 transition-colors"
                     >
                       <td className="px-4 md:px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold flex-shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold flex-shrink-0">
                             {user.name?.charAt(0) ||
                               user.email.charAt(0).toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium text-gray-900 truncate max-w-[120px] sm:max-w-none">
+                            <p className="font-medium text-text truncate max-w-[120px] sm:max-w-none">
                               {user.name || 'Unknown'}
                             </p>
-                            <p className="text-xs text-gray-500 truncate max-w-[120px] sm:max-w-none">
+                            <p className="text-xs text-muted-text truncate max-w-[120px] sm:max-w-none">
                               {user.email}
                             </p>
                             {/* Mobile Only Role Badge */}
@@ -195,10 +193,10 @@ export default function UsersPage() {
                                 text-[10px] px-2 py-0.5 rounded-full font-medium border
                                 ${
                                   user.role === 'admin'
-                                    ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                    ? 'bg-purple-500/10 text-purple-500 border-purple-500/20'
                                     : user.role === 'manager'
-                                      ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                      : 'bg-green-50 text-green-700 border-green-200'
+                                      ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                      : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                 }
                             `}
                               >
@@ -215,10 +213,10 @@ export default function UsersPage() {
                                       px-2.5 py-1 rounded-full text-xs font-semibold border
                                       ${
                                         user.role === 'admin'
-                                          ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                          ? 'bg-purple-500/10 text-purple-500 border-purple-500/20'
                                           : user.role === 'manager'
-                                            ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                            : 'bg-green-50 text-green-700 border-green-200'
+                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                            : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
                                       }
                                   `}
                         >
@@ -228,18 +226,18 @@ export default function UsersPage() {
                       </td>
                       <td className="px-4 md:px-6 py-4">
                         {user.isActive ? (
-                          <span className="flex items-center gap-1.5 text-green-600 text-sm font-medium">
-                            <span className="w-2 h-2 rounded-full bg-green-500"></span>{' '}
+                          <span className="flex items-center gap-1.5 text-emerald-500 text-sm font-medium">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>{' '}
                             <span className="hidden sm:inline">Active</span>
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1.5 text-red-600 text-sm font-medium">
-                            <span className="w-2 h-2 rounded-full bg-red-500"></span>{' '}
+                          <span className="flex items-center gap-1.5 text-rose-500 text-sm font-medium">
+                            <span className="w-2 h-2 rounded-full bg-rose-500"></span>{' '}
                             <span className="hidden sm:inline">Inactive</span>
                           </span>
                         )}
                       </td>
-                      <td className="hidden md:table-cell px-6 py-4 text-sm text-gray-500">
+                      <td className="hidden md:table-cell px-6 py-4 text-sm text-muted-text">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-4 md:px-6 py-4 text-right flex items-center justify-end gap-2">
@@ -253,10 +251,10 @@ export default function UsersPage() {
                           p-2 rounded-full transition-colors 
                           ${
                             user.role === 'admin'
-                              ? 'opacity-30 cursor-not-allowed bg-gray-100 text-gray-400'
+                              ? 'opacity-30 cursor-not-allowed bg-muted text-muted-text'
                               : user.isActive
-                                ? 'hover:bg-red-50 text-red-600'
-                                : 'hover:bg-green-50 text-green-600'
+                                ? 'hover:bg-rose-500/10 text-rose-500'
+                                : 'hover:bg-emerald-500/10 text-emerald-500'
                           }
                         `}
                           title={
@@ -275,7 +273,7 @@ export default function UsersPage() {
                         </button>
                         <button
                           onClick={() => openModal(user)}
-                          className="p-2 hover:bg-gray-100 text-gray-600 rounded-full transition-colors"
+                          className="p-2 hover:bg-muted text-muted-text rounded-full transition-colors"
                           title="View User Details"
                         >
                           <Eye size={18} />
@@ -290,7 +288,7 @@ export default function UsersPage() {
 
           {/* Pagination */}
           {pagination && pagination.pages > 1 && (
-            <div className="border-t border-gray-200 px-4 py-4 flex justify-center">
+            <div className="border-t border-border px-4 py-4 flex justify-center">
               <Pagination
                 currentPage={page}
                 totalPages={pagination.pages}

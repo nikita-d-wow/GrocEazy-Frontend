@@ -10,6 +10,7 @@ export default function OrderCard({ order }: { order: Order }) {
   const allProducts = useSelector((state: RootState) => state.product.products);
 
   // Helper to get product details (handles unpopulated IDs)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getProduct = (item: any) => {
     const id =
       typeof item.productId === 'string' ? item.productId : item.productId?._id;
@@ -28,9 +29,9 @@ export default function OrderCard({ order }: { order: Order }) {
     <Link
       to={`/orders/${order._id}`}
       className={`
-        block rounded-3xl p-6 border border-gray-100 bg-white
-        shadow-[0_2px_10px_rgba(0,0,0,0.03)] 
-        hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)]
+        block rounded-3xl p-6 border border-border bg-card
+        shadow-[0_2px_10px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]
+        hover:shadow-[0_10px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.6)]
         hover:-translate-y-1 transition-all duration-300 
         animate-slideUp cursor-pointer group relative overflow-hidden
       `}
@@ -40,9 +41,9 @@ export default function OrderCard({ order }: { order: Order }) {
         className={`absolute top-0 left-0 w-1 h-full transition-colors duration-300 
         ${
           order.status === 'Delivered'
-            ? 'bg-green-500'
+            ? 'bg-emerald-500'
             : order.status === 'Cancelled'
-              ? 'bg-red-500'
+              ? 'bg-rose-500'
               : 'bg-blue-500'
         }
       `}
@@ -52,10 +53,10 @@ export default function OrderCard({ order }: { order: Order }) {
       <div className="flex justify-between items-start mb-6 pl-2">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 tracking-wide uppercase">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-muted text-muted-text tracking-wide uppercase">
               Order #{order._id.slice(-8)}
             </span>
-            <span className="text-gray-400 text-xs">
+            <span className="text-muted-text opacity-60 text-xs">
               •{' '}
               {new Date(order.createdAt).toLocaleDateString(undefined, {
                 month: 'short',
@@ -64,7 +65,7 @@ export default function OrderCard({ order }: { order: Order }) {
               })}
             </span>
           </div>
-          <h3 className="font-bold text-gray-900 text-lg">
+          <h3 className="font-bold text-text text-lg">
             ₹
             {Number(order.totalAmount).toLocaleString('en-IN', {
               minimumFractionDigits: 2,
@@ -81,30 +82,30 @@ export default function OrderCard({ order }: { order: Order }) {
         {thumbnails.map((src, idx) => (
           <div
             key={idx}
-            className="relative w-14 h-14 rounded-xl border border-gray-100 overflow-hidden bg-gray-50 flex-shrink-0"
+            className="relative w-14 h-14 rounded-xl border border-border overflow-hidden bg-muted flex-shrink-0"
           >
             <img
               src={src}
               alt="Item"
-              className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:opacity-100 transition-opacity"
+              className="w-full h-full object-cover mix-blend-multiply dark:mix-blend-normal opacity-90 group-hover:opacity-100 transition-opacity"
             />
           </div>
         ))}
         {remainingItems > 0 && (
-          <div className="w-14 h-14 rounded-xl border border-gray-100 bg-gray-50 flex items-center justify-center text-gray-500 font-medium text-xs">
+          <div className="w-14 h-14 rounded-xl border border-border bg-muted flex items-center justify-center text-muted-text font-medium text-xs">
             +{remainingItems}
           </div>
         )}
         {order.items.length === 0 && (
-          <div className="flex items-center gap-2 text-gray-400 text-sm">
+          <div className="flex items-center gap-2 text-muted-text opacity-60 text-sm">
             <Package size={16} /> No items
           </div>
         )}
       </div>
 
       {/* Footer / CTA */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-50 pl-2">
-        <span className="text-sm text-gray-500 font-medium">
+      <div className="flex items-center justify-between pt-4 border-t border-border pl-2">
+        <span className="text-sm text-muted-text font-medium">
           {order.items.reduce((acc, item) => acc + item.quantity, 0)} Items
         </span>
         <div className="flex items-center gap-1 text-primary font-semibold text-sm group-hover:gap-2 transition-all">

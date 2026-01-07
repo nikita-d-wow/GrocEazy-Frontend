@@ -32,29 +32,13 @@ export default function ProductStatusPieChartWrapper({
               data: [data.active, data.inactive],
               backgroundColor: [bright.emerald, bright.rose],
               hoverBackgroundColor: [bright.cyan, bright.pink],
-              borderWidth: 2,
-              borderColor: '#ffffff',
+              borderWidth: 0,
             },
           ],
         }}
         options={{
           ...pieOptions,
           onClick: handleClick,
-          plugins: {
-            ...pieOptions.plugins,
-            legend: {
-              position: 'bottom',
-              labels: {
-                padding: 18,
-                font: {
-                  size: 12,
-                  weight: 600,
-                  family: 'Outfit, sans-serif',
-                },
-                usePointStyle: true,
-              },
-            },
-          },
         }}
       />
     </div>

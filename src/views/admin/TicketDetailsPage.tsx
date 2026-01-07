@@ -57,20 +57,18 @@ export default function AdminTicketDetailsPage() {
 
   if (!ticket) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center bg-white p-8 rounded-2xl shadow-md border border-gray-100">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center bg-card p-8 rounded-2xl shadow-md border border-border">
+          <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4 text-muted-text">
             <Hash size={32} />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">
-            Ticket Not Found
-          </h2>
-          <p className="text-gray-500 mb-6">
+          <h2 className="text-xl font-bold text-text mb-2">Ticket Not Found</h2>
+          <p className="text-muted-text mb-6">
             The ticket you're looking for might have been deleted or moved.
           </p>
           <button
             onClick={() => navigate('/admin/tickets')}
-            className="px-6 py-2 bg-primary text-white rounded-xl font-semibold hover:bg-primary-dark transition-colors shadow-sm"
+            className="px-6 py-2 bg-primary text-text rounded-xl font-semibold hover:bg-primary-dark transition-colors shadow-sm"
           >
             Back to All Tickets
           </button>
@@ -82,13 +80,13 @@ export default function AdminTicketDetailsPage() {
   const statusUI = STATUS_MAP[ticket.status];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-10 px-6 sm:px-12 lg:px-20">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-bg py-10 px-6 sm:px-12 lg:px-20">
       <div className="max-w-5xl mx-auto space-y-8">
         {/* BACK BUTTON */}
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate('/admin/tickets')}
-            className="flex items-center gap-2 text-gray-500 hover:text-primary transition-all font-medium group"
+            className="flex items-center gap-2 text-muted-text hover:text-primary transition-all font-medium group"
           >
             <ArrowLeft
               className="group-hover:-translate-x-1 transition-transform"
@@ -96,31 +94,31 @@ export default function AdminTicketDetailsPage() {
             />
             <span>Back to Helpdesk</span>
           </button>
-          <div className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest bg-white px-3 py-1.5 rounded-lg border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-bold text-muted-text uppercase tracking-widest bg-card px-3 py-1.5 rounded-lg border border-border shadow-sm">
             <Hash size={14} /> {ticket._id}
           </div>
         </div>
 
         {/* MAIN HEADER CARD */}
-        <div className="bg-white border border-gray-200 shadow-sm rounded-3xl overflow-hidden relative p-8 sm:p-10">
+        <div className="bg-card border border-border shadow-sm rounded-3xl overflow-hidden relative p-8 sm:p-10">
           <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
 
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
             <div className="space-y-4 max-w-2xl">
               <div className="flex items-center gap-3">
                 <ShieldCheck className="text-primary" size={28} />
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight leading-tight">
+                <h1 className="text-3xl font-bold text-text tracking-tight leading-tight">
                   {ticket.subject}
                 </h1>
               </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-text">
                 <span
                   className={`px-4 py-1.5 rounded-full font-bold text-xs uppercase tracking-wider shadow-sm border ${statusUI.color}`}
                 >
                   {statusUI.label}
                 </span>
-                <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-lg">
-                  <Calendar size={14} className="text-gray-400" />
+                <span className="flex items-center gap-1.5 bg-muted px-3 py-1.5 rounded-lg">
+                  <Calendar size={14} className="text-muted-text" />
                   {new Date(ticket.createdAt).toLocaleDateString(undefined, {
                     month: 'long',
                     day: 'numeric',
@@ -150,8 +148,8 @@ export default function AdminTicketDetailsPage() {
                       disabled={isBtnDisabled}
                       className={`p-2.5 rounded-xl transition-all border ${
                         isCurrent
-                          ? 'bg-primary text-white border-primary shadow-sm'
-                          : 'bg-white text-gray-400 border-gray-100'
+                          ? 'bg-primary text-text border-primary shadow-sm'
+                          : 'bg-card text-muted-text border-border'
                       } ${
                         isBtnDisabled
                           ? 'opacity-50 cursor-not-allowed'
@@ -167,13 +165,13 @@ export default function AdminTicketDetailsPage() {
             </div>
           </div>
 
-          <div className="mt-10 pt-10 border-t border-gray-100">
-            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <div className="mt-10 pt-10 border-t border-border">
+            <h3 className="text-sm font-black text-muted-text uppercase tracking-widest mb-4 flex items-center gap-2">
               <AlertCircle size={16} className="text-primary" />
               Detailed Description
             </h3>
-            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-lg italic font-medium">
+            <div className="bg-muted rounded-2xl p-6 border border-border">
+              <p className="text-text leading-relaxed whitespace-pre-wrap text-lg italic font-medium">
                 "{ticket.description}"
               </p>
             </div>
@@ -183,8 +181,8 @@ export default function AdminTicketDetailsPage() {
         {/* DETAILS GRID */}
         <div className="grid md:grid-cols-2 gap-8">
           {/* CUSTOMER CARD */}
-          <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
-            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+          <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
+            <h3 className="text-sm font-black text-muted-text uppercase tracking-widest mb-6 flex items-center gap-2">
               <User size={18} className="text-primary" />
               Customer Information
             </h3>
@@ -194,10 +192,10 @@ export default function AdminTicketDetailsPage() {
                   <User size={20} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase">
+                  <p className="text-xs font-bold text-muted-text uppercase">
                     Contact Person
                   </p>
-                  <p className="text-lg font-bold text-gray-800">
+                  <p className="text-lg font-bold text-text">
                     {ticket.user?.name || 'Customer'}
                   </p>
                 </div>
@@ -207,10 +205,10 @@ export default function AdminTicketDetailsPage() {
                   <Mail size={20} />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-gray-400 uppercase">
+                  <p className="text-xs font-bold text-muted-text uppercase">
                     Email Address
                   </p>
-                  <p className="text-lg font-bold text-gray-800 truncate">
+                  <p className="text-lg font-bold text-text truncate">
                     {ticket.user?.email}
                   </p>
                 </div>
@@ -219,8 +217,8 @@ export default function AdminTicketDetailsPage() {
           </div>
 
           {/* ASSIGNMENT CARD */}
-          <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm">
-            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+          <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
+            <h3 className="text-sm font-black text-muted-text uppercase tracking-widest mb-6 flex items-center gap-2">
               <UserCheck size={18} className="text-primary" />
               Ticket Assignment
             </h3>
@@ -230,7 +228,7 @@ export default function AdminTicketDetailsPage() {
                   <UserCheck size={20} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase mb-1">
+                  <p className="text-xs font-bold text-muted-text uppercase mb-1">
                     Current Assignee
                   </p>
                   <TicketAssignSelect
@@ -246,10 +244,10 @@ export default function AdminTicketDetailsPage() {
                   <Clock size={20} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-gray-400 uppercase">
+                  <p className="text-xs font-bold text-muted-text uppercase">
                     Reference Time
                   </p>
-                  <p className="text-lg font-bold text-gray-800">
+                  <p className="text-lg font-bold text-text">
                     {new Date(ticket.createdAt).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',

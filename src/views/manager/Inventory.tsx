@@ -48,11 +48,11 @@ const InventoryRow = React.memo(
     const StatusIcon = status.icon;
     return (
       <tr
-        className={`hover:bg-gray-50/50 transition-opacity ${!product.isActive ? 'opacity-60' : ''}`}
+        className={`hover:bg-muted/50 transition-colors ${!product.isActive ? 'opacity-60' : ''}`}
       >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
-            <div className="h-10 w-10 rounded-lg bg-gray-100 p-1 flex-shrink-0">
+            <div className="h-10 w-10 rounded-lg bg-muted p-1 flex-shrink-0">
               <img
                 className="h-full w-full rounded-md object-cover"
                 src={
@@ -66,22 +66,22 @@ const InventoryRow = React.memo(
               />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900">
+              <div className="text-sm font-semibold text-text">
                 {product.name}
               </div>
               {product.size && (
-                <div className="text-xs text-gray-500">{product.size}</div>
+                <div className="text-xs text-muted-text">{product.size}</div>
               )}
             </div>
           </div>
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm text-gray-600">{categoryName}</span>
+          <span className="text-sm text-muted-text">{categoryName}</span>
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-medium text-text">
             ₹{product.price.toFixed(2)}
           </span>
         </td>
@@ -132,16 +132,15 @@ export const Inventory: FC = () => {
   // 2. Fetch Products when page or search term changes
   // If stock filter is active, fetch more items for client-side filtering
   useEffect(() => {
-    const limit = stockFilter ? 1000 : 10;
-    const fetchPage = stockFilter ? 1 : page;
+    // If stock filter is active, fetch more items for client-side filtering
     dispatch(
       fetchManagerProducts(
-        fetchPage,
-        limit,
+        stockFilter ? 1 : page,
+        stockFilter ? 1000 : 10,
         search,
         isActive,
         stockFilter,
-        categoryId // Pass categoryId
+        categoryId
       )
     );
   }, [dispatch, page, search, stockFilter, isActive, categoryId]);
@@ -166,20 +165,20 @@ export const Inventory: FC = () => {
     if (Number(stock) === 0) {
       return {
         label: 'Out of Stock',
-        color: 'text-red-600 bg-red-50',
+        color: 'text-rose-500 bg-rose-500/10 border-rose-500/20',
         icon: AlertTriangle,
       };
     }
     if (stock <= threshold) {
       return {
         label: 'Low Stock',
-        color: 'text-orange-600 bg-orange-50',
+        color: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
         icon: AlertTriangle,
       };
     }
     return {
       label: 'In Stock',
-      color: 'text-green-600 bg-green-50',
+      color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
       icon: CheckCircle,
     };
   };
@@ -207,22 +206,22 @@ export const Inventory: FC = () => {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-gray-500">
+          <h1 className="text-3xl font-bold text-text">Inventory</h1>
+          <p className="text-muted-text">
             Track and monitor product stock levels
           </p>
         </div>
         <button
           onClick={() => setIsAlertsOpen(true)}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-text font-medium hover:bg-muted transition-all shadow-sm"
         >
-          <AlertTriangle size={18} className="text-orange-500" />
+          <AlertTriangle size={18} className="text-amber-500" />
           Stock Alerts
         </button>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/20 rounded-lg text-rose-500">
           {error}
         </div>
       )}
@@ -254,9 +253,9 @@ export const Inventory: FC = () => {
 
       <div
         id="inventory-table"
-        className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 scroll-mt-24"
+        className="bg-card rounded-2xl shadow-sm border border-border mb-6 scroll-mt-24"
       >
-        <div className="p-4 border-b border-gray-100 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="p-4 border-b border-border flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
           <div className="w-full lg:max-w-md">
             <DebouncedSearch
               placeholder="Search inventory..."
@@ -337,7 +336,7 @@ export const Inventory: FC = () => {
                   setPage(1);
                   setSearch('');
                 }}
-                className="text-sm text-red-600 hover:text-red-700 font-medium px-3 py-2 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap"
+                className="text-sm text-rose-500 hover:text-rose-600 font-medium px-3 py-2 hover:bg-rose-500/10 rounded-lg transition-colors whitespace-nowrap"
               >
                 Reset Filters
               </button>
@@ -359,37 +358,37 @@ export const Inventory: FC = () => {
           icon={<Package className="w-12 h-12" />}
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden flex flex-col relative">
           {/* Subtle loading overlay for stale-while-revalidate */}
           {loading && (
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
-              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+            <div className="absolute inset-0 bg-background/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
+              <div className="bg-card p-3 rounded-full shadow-lg border border-border">
                 <Loader size="sm" />
               </div>
             </div>
           )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-gray-50/50">
+              <thead className="bg-muted">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Product Name
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Stock Level
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-semibold text-muted-text uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-border">
                 {products.map((product) => {
                   const status = getStockStatus(
                     product.stock,
@@ -431,7 +430,7 @@ export const Inventory: FC = () => {
           </div>
 
           {!stockFilter && pagination && pagination.pages > 1 && (
-            <div className="p-4 border-t border-gray-50">
+            <div className="p-4 border-t border-border">
               <Pagination
                 currentPage={page}
                 totalPages={pagination.pages}

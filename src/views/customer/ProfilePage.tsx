@@ -21,8 +21,8 @@ export default function ProfilePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-500 mt-2">
+        <h1 className="text-3xl font-bold text-text">My Profile</h1>
+        <p className="text-muted-text mt-2">
           Manage your personal information and delivery addresses
         </p>
       </div>
@@ -30,14 +30,14 @@ export default function ProfilePage() {
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Navigation */}
         <div className="w-full lg:w-64 flex-shrink-0">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
             <nav className="flex flex-row lg:flex-col">
               <button
                 onClick={() => setActiveTab('info')}
                 className={`flex-1 lg:flex-none flex items-center gap-3 px-6 py-4 text-sm font-medium transition-colors border-b lg:border-b-0 lg:border-l-4 ${
                   activeTab === 'info'
-                    ? 'border-green-600 bg-green-50 text-green-700'
-                    : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'border-primary bg-primary-light text-primary'
+                    : 'border-transparent text-muted-text hover:bg-muted hover:text-text'
                 }`}
               >
                 <User size={20} />
@@ -47,8 +47,8 @@ export default function ProfilePage() {
                 onClick={() => setActiveTab('address')}
                 className={`flex-1 lg:flex-none flex items-center gap-3 px-6 py-4 text-sm font-medium transition-colors border-b lg:border-b-0 lg:border-l-4 ${
                   activeTab === 'address'
-                    ? 'border-green-600 bg-green-50 text-green-700'
-                    : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'border-primary bg-primary-light text-primary'
+                    : 'border-transparent text-muted-text hover:bg-muted hover:text-text'
                 }`}
               >
                 <MapPin size={20} />
@@ -56,7 +56,7 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={() => navigate('/orders')}
-                className="flex-1 lg:flex-none flex items-center gap-3 px-6 py-4 text-sm font-medium transition-colors border-b lg:border-b-0 lg:border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                className="flex-1 lg:flex-none flex items-center gap-3 px-6 py-4 text-sm font-medium transition-colors border-b lg:border-b-0 lg:border-l-4 border-transparent text-muted-text hover:bg-muted hover:text-text"
               >
                 <ShoppingBag size={20} />
                 My Orders
@@ -67,10 +67,10 @@ export default function ProfilePage() {
 
         {/* Main Content */}
         <div className="flex-1">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6 sm:p-8">
             {activeTab === 'info' ? (
               <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100">
+                <h2 className="text-xl font-bold text-text mb-6 pb-4 border-b border-border">
                   Personal Information
                 </h2>
                 <ProfileInfo user={user} />
