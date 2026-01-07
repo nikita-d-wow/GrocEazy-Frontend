@@ -464,9 +464,11 @@ export default function OrderDetails() {
         <div className="ml-auto flex gap-3">
           <button
             onClick={handleDownloadInvoice}
-            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm cursor-pointer"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm cursor-pointer"
+            title="Download Invoice"
           >
-            <Download size={16} /> Invoice
+            <Download size={16} />{' '}
+            <span className="hidden sm:inline">Invoice</span>
           </button>
         </div>
       </div>
