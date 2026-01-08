@@ -1,4 +1,5 @@
-import React, { type FC, useEffect, useState, useCallback } from 'react';
+import * as React from 'react';
+import { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Package, AlertTriangle, CheckCircle } from 'lucide-react';
 
@@ -29,44 +30,38 @@ import { InventoryCharts } from './InventoryCharts';
 import { InventoryAlertsModal } from './InventoryAlertsModal';
 import type { Product } from '../../types/Product';
 
-interface StockStatus {
-  label: string;
-  color: string;
-  icon: React.ElementType;
-}
-
 const InventoryRow = React.memo(
   ({
     product,
     categoryName,
-    status,
+    index,
   }: {
     product: Product;
     categoryName: string;
-    status: StockStatus;
+    index: number;
   }) => {
-    const StatusIcon = status.icon;
     return (
       <tr
-        className={`hover:bg-gray-50/50 transition-opacity ${!product.isActive ? 'opacity-60' : ''}`}
+        className={`border-b border-gray-100 hover:bg-green-50/30 transition-all duration-200 animate-slideUp ${!product.isActive ? 'opacity-60' : ''}`}
+        style={{ animationDelay: `${index * 0.05}s` }}
       >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
-            <div className="h-10 w-10 rounded-lg bg-gray-100 p-1 flex-shrink-0">
+            <div className="h-14 w-14 rounded-2xl bg-white p-1.5 flex-shrink-0 shadow-sm border border-gray-100/50">
               <img
-                className="h-full w-full rounded-md object-cover"
+                className="h-full w-full rounded-xl object-cover"
                 src={
-                  optimizeCloudinaryUrl(product.images?.[0], 40) ||
+                  optimizeCloudinaryUrl(product.images?.[0]) ||
                   `https://ui-avatars.com/api/?name=${product.name}`
                 }
                 alt={product.name}
                 loading="lazy"
-                width={40}
-                height={40}
+                width={48}
+                height={48}
               />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900">
+              <div className="text-sm font-bold text-gray-900">
                 {product.name}
               </div>
               {product.size && (
@@ -77,28 +72,59 @@ const InventoryRow = React.memo(
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm text-gray-600">{categoryName}</span>
+          <span className="text-sm font-medium text-gray-600">
+            {categoryName}
+          </span>
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-bold text-gray-900">
             ₹{product.price.toFixed(2)}
           </span>
         </td>
 
         <td className="px-6 py-4">
-          <span className={`text-sm font-bold ${status.color.split(' ')[0]}`}>
-            {product.stock}
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className={`text-sm font-medium ${
+                Number(product.stock) === 0
+                  ? 'text-red-600 font-bold'
+                  : product.stock <= (product.lowStockThreshold || 5)
+                    ? 'text-orange-600'
+                    : 'text-gray-900'
+              }`}
+            >
+              {product.stock}
+            </span>
+            {Number(product.stock) === 0 ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                <AlertTriangle size={12} />
+                Out of Stock
+              </span>
+            ) : product.stock <= (product.lowStockThreshold || 5) ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                <AlertTriangle size={12} />
+                Low Stock
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
+                <CheckCircle size={12} />
+                In Stock
+              </span>
+            )}
+          </div>
         </td>
 
         <td className="px-6 py-4">
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${status.color}`}
-          >
-            <StatusIcon size={12} />
-            {status.label}
-          </span>
+          {product.isActive ? (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
+              Active
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200">
+              Inactive
+            </span>
+          )}
         </td>
       </tr>
     );
@@ -161,28 +187,6 @@ export const Inventory: FC = () => {
     setSearch(val);
     setPage(1);
   }, []);
-
-  const getStockStatus = (stock: number, threshold: number = 5) => {
-    if (Number(stock) === 0) {
-      return {
-        label: 'Out of Stock',
-        color: 'text-red-600 bg-red-50',
-        icon: AlertTriangle,
-      };
-    }
-    if (stock <= threshold) {
-      return {
-        label: 'Low Stock',
-        color: 'text-orange-600 bg-orange-50',
-        icon: AlertTriangle,
-      };
-    }
-    return {
-      label: 'In Stock',
-      color: 'text-green-600 bg-green-50',
-      icon: CheckCircle,
-    };
-  };
 
   const getCategoryId = (p: Product) => {
     if (typeof p.categoryId === 'object' && p.categoryId !== null) {
@@ -370,32 +374,27 @@ export const Inventory: FC = () => {
           )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-gray-50/50">
+              <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b-2 border-green-100">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Product Name
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Product
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Stock Level
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    Stock
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {products.map((product) => {
-                  const status = getStockStatus(
-                    product.stock,
-                    product.lowStockThreshold
-                  );
-
+                {products.map((product, index) => {
                   // Try to get category name from populated object first
                   let categoryName = 'N/A';
                   if (
@@ -422,7 +421,7 @@ export const Inventory: FC = () => {
                       key={product._id}
                       product={product}
                       categoryName={categoryName}
-                      status={status}
+                      index={index}
                     />
                   );
                 })}

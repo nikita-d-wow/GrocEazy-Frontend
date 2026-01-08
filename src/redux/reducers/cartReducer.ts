@@ -163,12 +163,32 @@ export function cartReducer(
       const { tempId, item } = action.payload;
       const prodId = getProductId(item);
 
+      // Check if we are replacing a temp item
+      const existingIdx = state.items.findIndex((i) => i._id === tempId);
+      let newItems;
+
+      if (existingIdx !== -1) {
+        newItems = [...state.items];
+        newItems[existingIdx] = item;
+      } else {
+        // If not found (no optimistic update or it was cleared), append it
+        newItems = [...state.items, item];
+      }
+
       return {
         ...state,
-        items: state.items.map((i) => (i._id === tempId ? item : i)),
+        items: newItems,
         itemMap: {
           ...state.itemMap,
           [prodId]: item,
+        },
+        pagination: {
+          ...state.pagination,
+          // Increment total only if we added a new item (not replaced)
+          total:
+            existingIdx === -1
+              ? state.pagination.total + 1
+              : state.pagination.total,
         },
       };
     }

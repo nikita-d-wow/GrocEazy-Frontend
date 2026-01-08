@@ -1,4 +1,5 @@
-import React, { type FC, useEffect, useState, useCallback } from 'react';
+import * as React from 'react';
+import { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Plus, Edit2, Trash2, Layers } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -26,24 +27,30 @@ import Button from '../../components/common/Button';
 import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import { TableSkeleton } from '../../components/common/Skeleton';
+import PageHeader from '../../components/common/PageHeader';
 
 const CategoryRow = React.memo(
   ({
     category,
     onEdit,
     onDelete,
+    index,
   }: {
     category: Category;
     onEdit: (category: Category) => void;
     onDelete: (id: string) => void;
+    index: number;
   }) => {
     return (
-      <tr className="hover:bg-gray-50/50">
+      <tr
+        className="border-b border-gray-100 hover:bg-green-50/30 transition-all duration-200 animate-slideUp"
+        style={{ animationDelay: `${index * 0.05}s` }}
+      >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-gray-100 p-1 flex-shrink-0">
+            <div className="h-14 w-14 rounded-2xl bg-white p-1.5 flex-shrink-0 shadow-sm border border-gray-100/50">
               <img
-                className="h-full w-full rounded-lg object-cover"
+                className="h-full w-full rounded-xl object-cover"
                 src={
                   optimizeCloudinaryUrl(category.image, 48) ||
                   `https://ui-avatars.com/api/?name=${category.name}`
@@ -55,7 +62,7 @@ const CategoryRow = React.memo(
               />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900">
+              <div className="text-sm font-bold text-gray-900">
                 {category.name}
               </div>
             </div>
@@ -63,14 +70,14 @@ const CategoryRow = React.memo(
         </td>
 
         <td className="px-6 py-4">
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
             {category.productCount || 0}{' '}
             {category.productCount === 1 ? 'Product' : 'Products'}
           </span>
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm text-gray-600">
+          <span className="text-sm font-medium text-gray-600">
             {new Date(category.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
@@ -83,13 +90,15 @@ const CategoryRow = React.memo(
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => onEdit(category)}
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
+              className="p-2.5 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-all duration-200 hover:shadow-sm border border-transparent hover:border-green-200"
+              title="Edit category"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(category._id)}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              className="p-2.5 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-200 hover:shadow-sm border border-transparent hover:border-red-200"
+              title="Delete category"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -153,21 +162,22 @@ const CategoryManagement: FC = () => {
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-500 mt-1">Organize your products catalog</p>
-        </div>
+      {/* Decorative Header */}
+      <PageHeader
+        title="Category Management"
+        highlightText="Category"
+        subtitle="Organize your products catalog and categories"
+        icon={Layers}
+      >
         <Button
           onClick={handleAddNew}
           leftIcon={<Plus className="w-5 h-5" />}
           variant="primary"
-          className="shadow-xl shadow-green-200 w-full sm:w-auto justify-center"
+          className="shadow-lg shadow-green-200/50 w-full sm:w-auto justify-center"
         >
           Add Category
         </Button>
-      </div>
+      </PageHeader>
 
       {/* Search & Sort Bar */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
@@ -249,12 +259,13 @@ const CategoryManagement: FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {categories.map((category) => (
+                {categories.map((category, index) => (
                   <CategoryRow
                     key={category._id}
                     category={category}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    index={index}
                   />
                 ))}
               </tbody>

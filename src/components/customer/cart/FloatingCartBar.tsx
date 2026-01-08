@@ -1,11 +1,39 @@
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useLocation, Link } from 'react-router-dom';
 import { ShoppingCart, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { selectCartItems } from '../../../redux/selectors/cartSelectors';
+import {
+  selectCartItems,
+  selectCartPagination,
+} from '../../../redux/selectors/cartSelectors';
+import { fetchCart } from '../../../redux/actions/cartActions';
+import type { AppDispatch } from '../../../redux/store';
 
 export default function FloatingCartBar() {
+  const dispatch = useDispatch<AppDispatch>();
+  const location = useLocation();
   const items = useSelector(selectCartItems);
+  const { limit, total } = useSelector(selectCartPagination);
+
+  // Sync logic: Restore full cart view when leaving /cart if we have a partial page
+  // We use a reasonably high limit (e.g. 100) to ensure we get "most" items for the count
+  // This prevents the "5 items" issue when returning from the paginated cart page
+  useEffect(() => {
+    if (location.pathname === '/cart') {
+      return;
+    }
+
+    // If we have fewer items loaded than the total known items, and limit is small (was likely set by CartPage)
+    // we fetch more to populate the accurate count.
+    if (limit < 100 && total > items.length) {
+      dispatch(fetchCart(1, 100));
+    }
+  }, [location.pathname, limit, total, items.length, dispatch]);
+
+  if (location.pathname === '/cart') {
+    return null;
+  }
 
   if (!items || items.length === 0) {
     return <AnimatePresence>{null}</AnimatePresence>;

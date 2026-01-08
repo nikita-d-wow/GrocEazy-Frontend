@@ -1,4 +1,5 @@
-import React, { type FC, useState } from 'react';
+import { type FC, useState } from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Minus, Plus, ShoppingCart, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';

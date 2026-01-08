@@ -19,20 +19,20 @@ export default function CategoryCard({
 
   return (
     <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ y: -5 }}
+      whileTap={{ scale: 0.98 }}
       onClick={() => navigate(path)}
-      className={`rounded-xl p-4 cursor-pointer transition-all flex flex-col items-center shadow-md hover:shadow-lg h-full justify-center ${bgColor}`}
+      className={`rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center shadow-sm hover:shadow-md h-full justify-center ${bgColor} border border-transparent hover:border-black/5 relative overflow-hidden group`}
     >
-      <div className="w-16 h-16 flex items-center justify-center mb-3">
+      <div className="w-16 h-16 flex items-center justify-center mb-3 relative z-10">
         <img
           src={getOptimizedImage(image, { width: 128, height: 128 })} // Request 128px for 2x retina
           alt={text}
           loading="lazy"
-          className="w-full h-full object-contain mix-blend-multiply transition-transform hover:rotate-6"
+          className="w-full h-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 drop-shadow-sm"
         />
       </div>
-      <p className="text-gray-900 font-bold text-center text-sm line-clamp-1">
+      <p className="text-gray-900 font-bold text-center text-sm md:text-[15px] line-clamp-1 relative z-10 tracking-tight">
         {text}
       </p>
     </motion.div>

@@ -1,6 +1,14 @@
-import React, { type FC, useEffect, useState, useCallback } from 'react';
+import * as React from 'react';
+import { type FC, useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { Plus, Edit2, Trash2, Package } from 'lucide-react';
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Package,
+  AlertTriangle,
+  CheckCircle,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import DebouncedSearch from '../../components/common/DebouncedSearch';
 
@@ -25,6 +33,7 @@ import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import FilterSelect from '../../components/common/FilterSelect';
 import { TableSkeleton } from '../../components/common/Skeleton';
+import PageHeader from '../../components/common/PageHeader';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -38,20 +47,23 @@ const ProductRow = React.memo(
     product,
     onEdit,
     onDelete,
+    index,
   }: {
     product: Product;
     onEdit: (product: Product) => void;
     onDelete: (id: string) => void;
+    index: number;
   }) => {
     return (
       <tr
-        className={`hover:bg-gray-50/50 transition-opacity ${!product.isActive ? 'opacity-60' : ''}`}
+        className={`border-b border-gray-100 hover:bg-green-50/30 transition-all duration-200 animate-slideUp ${!product.isActive ? 'opacity-60' : ''}`}
+        style={{ animationDelay: `${index * 0.05}s` }}
       >
         <td className="px-6 py-4">
           <div className="flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-xl bg-gray-100 p-1 flex-shrink-0">
+            <div className="h-14 w-14 rounded-2xl bg-white p-1.5 flex-shrink-0 shadow-sm border border-gray-100/50">
               <img
-                className="h-full w-full rounded-lg object-cover"
+                className="h-full w-full rounded-xl object-cover"
                 src={
                   optimizeCloudinaryUrl(product.images?.[0]) ||
                   `https://ui-avatars.com/api/?name=${product.name}`
@@ -63,7 +75,7 @@ const ProductRow = React.memo(
               />
             </div>
             <div>
-              <div className="text-sm font-semibold text-gray-900">
+              <div className="text-sm font-bold text-gray-900">
                 {product.name}
               </div>
               {product.size && (
@@ -74,7 +86,7 @@ const ProductRow = React.memo(
         </td>
 
         <td className="px-6 py-4">
-          <span className="text-sm font-medium text-gray-900">
+          <span className="text-sm font-bold text-gray-900">
             ₹{product.price.toFixed(2)}
           </span>
         </td>
@@ -93,24 +105,31 @@ const ProductRow = React.memo(
               {product.stock}
             </span>
             {Number(product.stock) === 0 ? (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200">
+                <AlertTriangle size={12} />
                 Out of Stock
               </span>
             ) : product.stock <= (product.lowStockThreshold || 5) ? (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
-                Low
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                <AlertTriangle size={12} />
+                Low Stock
               </span>
-            ) : null}
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
+                <CheckCircle size={12} />
+                In Stock
+              </span>
+            )}
           </div>
         </td>
 
         <td className="px-6 py-4">
           {product.isActive ? (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200">
               Active
             </span>
           ) : (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-50 text-gray-600 border border-gray-200">
               Inactive
             </span>
           )}
@@ -120,13 +139,15 @@ const ProductRow = React.memo(
           <div className="flex justify-end space-x-2">
             <button
               onClick={() => onEdit(product)}
-              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg"
+              className="p-2.5 text-gray-400 hover:text-green-700 hover:bg-green-50 rounded-xl transition-all duration-200 hover:shadow-sm border border-transparent hover:border-green-200"
+              title="Edit product"
             >
               <Edit2 className="w-4 h-4" />
             </button>
             <button
               onClick={() => onDelete(product._id)}
-              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              className="p-2.5 text-gray-400 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-200 hover:shadow-sm border border-transparent hover:border-red-200"
+              title="Delete product"
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -207,19 +228,21 @@ const ProductManagement: FC = () => {
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">Products</h1>
-          <p className="text-gray-500">Manage store inventory</p>
-        </div>
+      {/* Decorative Header */}
+      <PageHeader
+        title="Product Management"
+        highlightText="Product"
+        subtitle="Manage your store inventory and product catalog"
+        icon={Package}
+      >
         <Button
           onClick={handleAddNew}
           leftIcon={<Plus className="w-5 h-5" />}
-          className="w-full sm:w-auto justify-center"
+          className="w-full sm:w-auto justify-center shadow-lg shadow-green-200/50"
         >
           Add Product
         </Button>
-      </div>
+      </PageHeader>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
         <div className="p-4 border-b border-gray-100">
@@ -296,32 +319,33 @@ const ProductManagement: FC = () => {
           )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead className="bg-gray-50/50">
+              <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b-2 border-green-100">
                 <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Product
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Stock
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {displayProducts.map((product) => (
+                {displayProducts.map((product, index) => (
                   <ProductRow
                     key={product._id}
                     product={product}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    index={index}
                   />
                 ))}
               </tbody>

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 // Force re-index
 import { getOptimizedImage } from '../../utils/imageUtils';
 import type { RootState } from '../../redux/store';
-import React from 'react';
+import * as React from 'react';
 import { motion } from 'framer-motion';
 // import { categoryBgVariants } from '../../utils/colors';
 import { useAppDispatch } from '../../redux/actions/useDispatch';
@@ -86,46 +86,50 @@ export default function ProductCard({
       variants={itemVariants}
       whileHover={{ y: -5 }}
       onClick={() => navigate(`/products/${_id}`)}
-      className="bg-white rounded-2xl p-4 shadow-md hover:shadow-xl transition-all cursor-pointer group h-full flex flex-col"
+      className="bg-white rounded-[20px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer group h-full flex flex-col border border-gray-100/50 hover:border-green-100"
     >
       <div
-        className={`relative bg-gray-50 rounded-xl p-4 mb-3 overflow-hidden h-40 flex items-center justify-center`}
+        className={`relative bg-gray-50/50 group-hover:bg-gradient-to-tr group-hover:from-green-50/50 group-hover:to-emerald-50/50 rounded-2xl p-4 mb-3 overflow-hidden h-44 flex items-center justify-center transition-colors duration-500`}
       >
         <img
           src={getOptimizedImage(image, 400)} // Request 400px for card
           alt={name}
           loading={index > 4 ? 'lazy' : 'eager'}
-          className="w-full h-full object-contain group-hover:scale-110 transition-transform mix-blend-multiply relative z-10"
+          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 relative z-10 drop-shadow-sm"
         />
-        {/* Interior placeholder to bridge gap before image arrives */}
-        <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-xl" />
+
         {stock !== undefined && stock < 10 && stock > 0 && (
-          <span className="absolute top-2 right-2 bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider z-20">
-            Low
+          <span className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm border border-amber-100 text-amber-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider z-20 shadow-sm">
+            Low Stock
           </span>
         )}
         {stock === 0 && (
-          <span className="absolute top-2 right-2 bg-red-100 text-red-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider z-20">
+          <span className="absolute top-2 right-2 bg-red-50/90 backdrop-blur-sm border border-red-100 text-red-600 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider z-20 shadow-sm">
             Sold Out
           </span>
         )}
         <button
           onClick={handleWishlistFn}
-          className={`absolute top-2 left-2 p-1.5 rounded-full transition-colors cursor-pointer z-20 ${
+          className={`absolute top-2 left-2 p-2 rounded-full transition-all duration-300 cursor-pointer z-20 ${
             isInWishlist
-              ? 'bg-red-50 text-red-500 hover:bg-red-100'
-              : 'bg-white/50 hover:bg-white text-gray-400 hover:text-red-500'
+              ? 'bg-red-50 text-red-500 shadow-sm'
+              : 'bg-white/60 hover:bg-white text-gray-400 hover:text-red-500 hover:shadow-sm'
           }`}
         >
-          <Heart size={16} fill={isInWishlist ? 'currentColor' : 'none'} />
+          <Heart
+            size={16}
+            fill={isInWishlist ? 'currentColor' : 'none'}
+            className="transition-transform active:scale-90"
+          />
         </button>
       </div>
-      <div className="flex flex-col flex-grow text-left">
-        <p className="text-gray-900 font-bold text-sm mb-1 line-clamp-2 leading-tight">
+
+      <div className="flex flex-col flex-grow text-left px-1">
+        <p className="text-gray-900 font-bold text-[15px] mb-1 line-clamp-2 leading-tight group-hover:text-green-800 transition-colors">
           {name}
         </p>
-        <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-          <p className="text-green-600 font-bold text-base">₹{price}</p>
+        <div className="mt-auto pt-3 flex items-center justify-between gap-2">
+          <p className="text-gray-900 font-bold text-lg">₹{price}</p>
           {quantity === 0 ? (
             <button
               onClick={(e) => {
