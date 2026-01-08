@@ -8,7 +8,7 @@ import {
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
 import type { IAddress } from '../../redux/types/authTypes';
@@ -22,6 +22,8 @@ const EMPTY_ADDRESSES: IAddress[] = [];
 const CheckoutAddress = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { paymentMethod = 'cod' } = location.state || {};
 
   const { user } = useSelector((state: RootState) => state.auth);
   const { items: cartItems } = useSelector((state: RootState) => state.cart);
@@ -84,7 +86,7 @@ const CheckoutAddress = () => {
             unitPrice: item.product.price,
           })),
           address, // ✅ value, correctly typed
-          paymentMethod: 'cod',
+          paymentMethod,
         },
         navigate
       )
@@ -176,10 +178,9 @@ const CheckoutAddress = () => {
                     key={address._id}
                     onClick={() => setSelectedAddressId(address._id ?? null)}
                     className={`cursor-pointer rounded-xl border p-5 transition-all duration-300
-                      ${
-                        isSelected
-                          ? 'border-primary bg-primary/10 shadow-2xl'
-                          : 'border-transparent bg-white/60 hover:bg-white/80 shadow-lg hover:shadow-2xl'
+                      ${isSelected
+                        ? 'border-primary bg-primary/10 shadow-2xl'
+                        : 'border-transparent bg-white/60 hover:bg-white/80 shadow-lg hover:shadow-2xl'
                       }`}
                   >
                     <div className="flex justify-between items-start gap-4">
@@ -218,7 +219,9 @@ const CheckoutAddress = () => {
           <div className="space-y-3 text-sm text-gray-700">
             <div className="flex justify-between">
               <span>Payment Method</span>
-              <span className="font-medium">Cash on Delivery</span>
+              <span className="font-medium">
+                {paymentMethod === 'online' ? 'Online Payment' : 'Cash on Delivery'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Total Items</span>
@@ -231,11 +234,10 @@ const CheckoutAddress = () => {
               !selectedAddressId || cartItems.length === 0 || !isStockValid
             }
             onClick={handlePlaceOrder}
-            className={`mt-6 w-full py-3 rounded-xl font-medium transition active:scale-[0.98] shadow-lg ${
-              !selectedAddressId || cartItems.length === 0 || !isStockValid
+            className={`mt-6 w-full py-3 rounded-xl font-medium transition active:scale-[0.98] shadow-lg ${!selectedAddressId || cartItems.length === 0 || !isStockValid
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
                 : 'bg-primary text-white hover:bg-primary-dark shadow-primary/20 hover:shadow-primary/40 cursor-pointer'
-            }`}
+              }`}
           >
             {isStockValid ? 'Place Order' : 'Adjust Stock to Order'}
           </button>

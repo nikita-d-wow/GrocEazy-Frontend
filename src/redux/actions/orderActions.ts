@@ -19,6 +19,7 @@ import {
   type Address,
 } from '../types/orderTypes';
 
+import { load } from '@cashfreepayments/cashfree-js';
 import api from '../../services/api';
 import { clearCart } from './cartActions';
 
@@ -81,15 +82,36 @@ export const createOrder =
     dispatch({ type: CREATE_ORDER_REQUEST });
 
     try {
-      const { data } = await api.post<Order>('/api/orders', payload);
+      let data;
+      if (payload.paymentMethod === 'online') {
+        const response = await api.post('/api/payment/create-order', payload);
+        data = response.data;
+        
+        // Initiate Cashfree Payment
+        const cashfree = await load({
+            mode: import.meta.env.VITE_CASHFREE_MODE === 'PRODUCTION' ? 'production' : 'sandbox'
+        });
+
+        await cashfree.checkout({
+            paymentSessionId: data.payment_session_id,
+            returnUrl: data.payment_session_id ? undefined : `${window.location.origin}/checkout/success?order_id=${data.order_id}`,
+        });
+         // The redirection happens automatically or opens in same window depending on config
+         // If redirection happens, code below might not run immediately, but that is fine.
+      } else {
+        const response = await api.post<Order>('/api/orders', payload);
+        data = response.data;
+      }
 
       dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
 
       // ✅ clear frontend cart ONLY after successful order
       dispatch(clearCart());
 
-      toast.success('Order placed successfully!');
-      navigate('/');
+      if (payload.paymentMethod !== 'online') {
+        toast.success('Order placed successfully!');
+        navigate('/');
+      }
     } catch (error: any) {
       dispatch({
         type: CREATE_ORDER_FAILURE,

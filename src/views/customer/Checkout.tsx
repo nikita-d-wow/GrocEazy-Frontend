@@ -103,9 +103,8 @@ const Checkout = () => {
             return (
               <div
                 key={item.product._id}
-                className={`flex items-center gap-4 py-4 border-b border-gray-100 last:border-0 ${
-                  hasStockIssue ? 'bg-red-50/50 -mx-4 px-4 rounded-lg' : ''
-                }`}
+                className={`flex items-center gap-4 py-4 border-b border-gray-100 last:border-0 ${hasStockIssue ? 'bg-red-50/50 -mx-4 px-4 rounded-lg' : ''
+                  }`}
               >
                 <img
                   src={item.product.images?.[0]}
@@ -146,13 +145,21 @@ const Checkout = () => {
           <div className="space-y-3">
             <button
               onClick={() => setPaymentMethod('cod')}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all duration-300 ${
-                paymentMethod === 'cod'
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all duration-300 ${paymentMethod === 'cod'
                   ? 'border-primary bg-primary/10 text-primary-dark shadow-sm'
                   : 'border-transparent bg-gray-50 hover:bg-gray-100'
-              }`}
+                }`}
             >
               <Wallet size={18} /> Cash on Delivery
+            </button>
+            <button
+              onClick={() => setPaymentMethod('online')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all duration-300 ${paymentMethod === 'online'
+                  ? 'border-primary bg-primary/10 text-primary-dark shadow-sm'
+                  : 'border-transparent bg-gray-50 hover:bg-gray-100'
+                }`}
+            >
+              <Wallet size={18} /> Online Payment
             </button>
           </div>
 
@@ -178,11 +185,10 @@ const Checkout = () => {
               })
             }
             disabled={!isStockValid}
-            className={`mt-6 w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition shadow-lg transition-all active:scale-[0.98] ${
-              !isStockValid
+            className={`mt-6 w-full py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition shadow-lg transition-all active:scale-[0.98] ${!isStockValid
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
                 : 'bg-primary text-white hover:bg-primary-dark shadow-primary/20 hover:shadow-primary/40 cursor-pointer'
-            }`}
+              }`}
           >
             {isStockValid ? (
               <>

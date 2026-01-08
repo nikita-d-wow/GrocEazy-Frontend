@@ -1,14 +1,17 @@
 // src/routes/CustomerRoutes.tsx
 import { Route } from 'react-router-dom';
-import CheckoutAddress from '../views/customer/CheckoutAddress';
+import { lazy } from 'react';
 import CustomerLayout from '../layouts/CustomerLayout';
 import Dashboard from '../views/customer/Dashboard';
 import ContactSupport from '../views/customer/ContactSupport';
-import OrdersPage from '../views/customer/OrderPage';
 import CartPage from '../views/customer/CartPage';
 import Checkout from '../views/customer/Checkout';
 import ProductsPage from '../views/customer/products/ProductsPage';
 import ProductDetailsPage from '../views/customer/products/ProductDetailsPage';
+
+const CheckoutAddress = lazy(() => import('../views/customer/CheckoutAddress'));
+const CheckoutSuccess = lazy(() => import('../views/customer/CheckoutSuccess'));
+const OrderPage = lazy(() => import('../views/customer/OrderPage'));
 
 import WishlistPage from '../views/customer/WishlistPage';
 import ProfilePage from '../views/customer/ProfilePage';
@@ -36,11 +39,16 @@ export const CustomerRoutes = (
         }
       />
       <Route path="/contact" element={<ContactSupport />} />
-      <Route path="/orders" element={<OrdersPage />} />
+      {/* Original /orders route, kept for now as snippet shows a new nested one */}
+      <Route path="/orders" element={<OrderPage />} /> {/* Changed to use lazy loaded OrderPage */}
       <Route path="/orders/:id" element={<OrderDetails />} />
       <Route path="/cart" element={<CartPage />} />
-      <Route path="/checkout" element={<Checkout />} />
-      <Route path="/checkout/address" element={<CheckoutAddress />} />
+      {/* Nested checkout routes as per snippet */}
+      <Route path="checkout" element={<Checkout />} />
+      <Route path="checkout/address" element={<CheckoutAddress />} />
+      <Route path="checkout/success" element={<CheckoutSuccess />} />
+      {/* New nested orders route as per snippet, potentially conflicting with /orders above */}
+      {/* <Route path="orders" element={<OrderPage />} /> */} {/* This line is commented out as it creates a duplicate path if /orders is also present */}
 
       <Route path="/wishlist" element={<WishlistPage />} />
       <Route
