@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import Pagination from '../../../components/common/Pagination';
+import PageHeader from '../../../components/common/PageHeader';
 
 import ProductGrid from '../../../components/products/ProductGrid';
 import ProductFilters, {
@@ -164,23 +165,20 @@ const ProductsPage: FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 relative z-10 transition-all duration-300">
         <div className="bg-white">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-                Explore Products
-              </h1>
-              <p className="text-gray-500 mt-1">
-                Find the best fresh products and groceries.
-              </p>
-            </div>
-            <div className="mt-4 md:mt-0">
-              <span className="text-gray-600 font-medium">
+          <PageHeader
+            title="Explore Our Products"
+            highlightText="Explore"
+            subtitle="Hand-picked fresh groceries delivered straight to your doorstep with care and speed."
+          >
+            <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/50 shadow-sm">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-gray-700 font-bold text-sm">
                 {isSearching
-                  ? `${searchResults.length}  results found`
-                  : `${totalResults} results found`}
+                  ? `${searchResults.length} items found`
+                  : `${totalResults} fresh items`}
               </span>
             </div>
-          </div>
+          </PageHeader>
 
           <div className="flex flex-col lg:flex-row gap-8 relative items-start">
             {/* ---------------- MOBILE CATEGORY SIDEBAR ---------------- */}

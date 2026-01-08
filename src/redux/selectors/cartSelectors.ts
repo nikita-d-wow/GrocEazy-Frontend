@@ -25,3 +25,5 @@ export const selectCartTotal = (state: RootState) =>
     (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
     0
   );
+
+export const selectCartItemMap = (state: RootState) => state.cart.itemMap;

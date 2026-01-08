@@ -1,6 +1,6 @@
 import type { FC, ChangeEvent, FormEvent } from 'react';
 import { useState } from 'react';
-import { Upload } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
@@ -88,38 +88,65 @@ const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
     <Modal
       isOpen
       onClose={onClose}
-      title={category ? 'Edit Category' : 'Add New Category'}
+      title={category ? 'Edit Category' : 'Create New Category'}
       maxWidth="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Input
-          label="Name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="border-green-100 hover:border-green-200"
-          required
-        />
+      <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="space-y-4">
+          {/* Section Title */}
+          <div className="border-b border-gray-100 pb-2 mb-4">
+            <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wider">
+              Basic Information
+            </h4>
+          </div>
+
+          <Input
+            label="Category Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100 placeholder:text-gray-400 font-medium transition-all"
+            required
+            placeholder="e.g. Fresh Fruits"
+          />
+        </div>
 
         {/* Image Upload */}
-        <div className="space-y-1.5">
-          <label className="block text-sm font-medium text-gray-700 ml-1">
+        <div className="space-y-3">
+          <label className="block text-sm font-bold text-gray-700 ml-1">
             Category Image
           </label>
-          <div className="flex items-center gap-4">
-            {imagePreview && (
-              <img
-                src={imagePreview}
-                alt="Preview"
-                className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200"
-              />
-            )}
-            <label className="flex-1 cursor-pointer">
-              <div className="flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-green-100 rounded-xl hover:border-green-200 transition-colors bg-white">
-                <Upload className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-600">
-                  {imageFile ? imageFile.name : 'Choose image file'}
-                </span>
+
+          <div className="p-1 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 hover:bg-green-50/30 hover:border-green-200 transition-all duration-300 group">
+            <label className="cursor-pointer block relative">
+              <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+                {imagePreview ? (
+                  <div className="relative w-32 h-32 rounded-xl overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium text-xs">
+                      Change Image
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 rounded-full bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <ImageIcon className="w-8 h-8 text-green-500 opacity-60 group-hover:opacity-100" />
+                  </div>
+                )}
+
+                {!imagePreview && (
+                  <>
+                    <span className="text-sm font-bold text-gray-700 mt-2 block group-hover:text-green-700">
+                      Click to upload image
+                    </span>
+                    <span className="text-xs text-gray-400 mt-1 block">
+                      SVG, PNG, JPG (max. 2MB)
+                    </span>
+                  </>
+                )}
               </div>
               <input
                 type="file"
@@ -131,12 +158,21 @@ const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-6">
-          <Button type="button" variant="ghost" onClick={onClose}>
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+          >
             Cancel
           </Button>
-          <Button type="submit" isLoading={loading}>
-            {category ? 'Update Category' : 'Create Category'}
+          <Button
+            type="submit"
+            isLoading={loading}
+            className="bg-green-600 hover:bg-green-700 shadow-lg shadow-green-200 font-bold px-8"
+          >
+            {category ? 'Save Changes' : 'Create Category'}
           </Button>
         </div>
       </form>

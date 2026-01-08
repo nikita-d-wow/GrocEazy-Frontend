@@ -44,26 +44,31 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-fit sticky top-20">
-      <h3 className="font-bold text-gray-800 mb-6 text-lg">Filters</h3>
+    <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-fit sticky top-24">
+      <h3 className="font-bold text-gray-900 mb-6 text-lg tracking-tight">
+        Filters
+      </h3>
 
       <div className="mb-8">
-        <h4 className="font-semibold text-gray-700 mb-4 text-sm uppercase tracking-wide">
+        <h4 className="font-bold text-gray-900 mb-4 text-xs uppercase tracking-widest pl-1">
           Categories
         </h4>
         {loading ? (
           <div className="space-y-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-8 bg-gray-100 rounded animate-pulse" />
+              <div
+                key={i}
+                className="h-9 bg-gray-50 rounded-xl animate-pulse"
+              />
             ))}
           </div>
         ) : (
           <ul className="space-y-1">
             <li
-              className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${
+              className={`cursor-pointer text-sm py-2.5 px-4 rounded-xl transition-all duration-200 font-medium ${
                 !filters.selectedCategory
-                  ? 'bg-green-50 text-green-700 font-semibold shadow-sm'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-green-50 text-green-700 font-bold shadow-sm ring-1 ring-green-100'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
               }`}
               onClick={() =>
                 setFilters({
@@ -78,10 +83,10 @@ const ProductFilters: FC<Props> = ({ filters, setFilters }) => {
             {visibleCategories.map((category: Category) => (
               <li
                 key={category._id}
-                className={`cursor-pointer text-sm py-2 px-3 rounded-lg transition-all duration-200 ${
+                className={`cursor-pointer text-sm py-2.5 px-4 rounded-xl transition-all duration-200 font-medium ${
                   filters.selectedCategory === category._id
-                    ? 'bg-green-50 text-green-700 font-semibold shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-green-50 text-green-700 font-bold shadow-sm ring-1 ring-green-100'
+                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                 }`}
                 onClick={() => handleCategoryChange(category._id)}
               >
