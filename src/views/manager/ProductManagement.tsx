@@ -22,6 +22,8 @@ import {
   selectProductLoading,
   selectProductPagination,
 } from '../../redux/selectors/productSelectors';
+import { fetchCategories } from '../../redux/actions/categoryActions';
+import { selectCategories } from '../../redux/selectors/categorySelectors';
 import Pagination from '../../components/common/Pagination';
 import { optimizeCloudinaryUrl } from '../../utils/imageUtils';
 
@@ -34,6 +36,7 @@ import EmptyState from '../../components/common/EmptyState';
 import FilterSelect from '../../components/common/FilterSelect';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import PageHeader from '../../components/common/PageHeader';
+import FilterBar from '../../components/common/FilterBar';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -166,23 +169,20 @@ const ProductManagement: FC = () => {
   const loading = useSelector(selectProductLoading);
   const pagination = useSelector(selectProductPagination);
 
+  const categories = useSelector(selectCategories);
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [stockFilter, setStockFilter] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [page, setPage] = useState(1);
 
+  /* Fetch categories on mount */
   useEffect(() => {
-    const isActive =
-      statusFilter === 'all'
-        ? undefined
-        : statusFilter === 'active'
-          ? true
-          : false;
-
-    dispatch(fetchManagerProducts(page, 10, search, isActive, stockFilter));
-  }, [dispatch, page, search, statusFilter, stockFilter]);
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const displayProducts = products;
 
@@ -223,8 +223,38 @@ const ProductManagement: FC = () => {
           ? true
           : false;
 
-    dispatch(fetchManagerProducts(page, 10, search, isActive, stockFilter));
-  }, [dispatch, page, search, statusFilter, stockFilter]);
+    dispatch(
+      fetchManagerProducts(page, 10, search, isActive, stockFilter, categoryId)
+    );
+  }, [dispatch, page, search, statusFilter, stockFilter, categoryId]);
+
+  /* Update fetch effect */
+  useEffect(() => {
+    const isActive =
+      statusFilter === 'all'
+        ? undefined
+        : statusFilter === 'active'
+          ? true
+          : false;
+
+    dispatch(
+      fetchManagerProducts(page, 10, search, isActive, stockFilter, categoryId)
+    );
+  }, [dispatch, page, search, statusFilter, stockFilter, categoryId]);
+
+  const handleReset = useCallback(() => {
+    setSearch('');
+    setStatusFilter('all');
+    setStockFilter('');
+    setCategoryId('');
+    setPage(1);
+  }, []);
+
+  const showReset =
+    search !== '' ||
+    statusFilter !== 'all' ||
+    stockFilter !== '' ||
+    categoryId !== '';
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
@@ -243,50 +273,6 @@ const ProductManagement: FC = () => {
           Add Product
         </Button>
       </PageHeader>
-
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
-        <div className="p-4 border-b border-gray-100">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="w-full lg:max-w-md">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
-                Search
-              </span>
-              <DebouncedSearch
-                placeholder="Search products..."
-                initialValue={search}
-                onSearch={handleSearch}
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full lg:w-auto">
-              <FilterSelect
-                label="Stock Status"
-                options={[
-                  { value: '', label: 'All Items' },
-                  { value: 'inStock', label: 'In Stock' },
-                  { value: 'lowStock', label: 'Low Stock' },
-                  { value: 'outOfStock', label: 'Out of Stock' },
-                ]}
-                value={stockFilter}
-                onChange={(value: string) => {
-                  setStockFilter(value);
-                  setPage(1);
-                }}
-                className="w-full md:w-48"
-              />
-              <FilterSelect
-                label="Status"
-                options={STATUS_OPTIONS}
-                value={statusFilter}
-                onChange={(value: string) => {
-                  setStatusFilter(value);
-                  setPage(1);
-                }}
-                className="w-full md:w-48"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
 
       {loading && products.length === 0 ? (
         <TableSkeleton rows={5} cols={2} />
@@ -309,49 +295,101 @@ const ProductManagement: FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
-          {loading && (
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
-              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
-                <Loader size="sm" />
+        <>
+          <FilterBar
+            searchComponent={
+              <DebouncedSearch
+                placeholder="Search products..."
+                initialValue={search}
+                onSearch={handleSearch}
+              />
+            }
+            onReset={handleReset}
+            showReset={showReset}
+          >
+            <FilterSelect
+              label="Category"
+              options={[
+                { value: '', label: 'All Categories' },
+                ...categories.map((c) => ({ value: c._id, label: c.name })),
+              ]}
+              value={categoryId}
+              onChange={(val) => {
+                setCategoryId(val);
+                setPage(1);
+              }}
+            />
+
+            <FilterSelect
+              label="Stock Status"
+              options={[
+                { value: '', label: 'All Inventory' },
+                { value: 'inStock', label: 'In Stock' },
+                { value: 'lowStock', label: 'Low Stock' },
+                { value: 'outOfStock', label: 'Out of Stock' },
+              ]}
+              value={stockFilter}
+              onChange={(value: string) => {
+                setStockFilter(value);
+                setPage(1);
+              }}
+            />
+
+            <FilterSelect
+              label="Status"
+              options={STATUS_OPTIONS}
+              value={statusFilter}
+              onChange={(value: string) => {
+                setStatusFilter(value);
+                setPage(1);
+              }}
+            />
+          </FilterBar>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 relative">
+            {loading && (
+              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
+                <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+                  <Loader size="sm" />
+                </div>
               </div>
+            )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b-2 border-green-100">
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Product
+                    </th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Price
+                    </th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Stock
+                    </th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {displayProducts.map((product, index) => (
+                    <ProductRow
+                      key={product._id}
+                      product={product}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      index={index}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b-2 border-green-100">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Product
-                  </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Stock
-                  </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {displayProducts.map((product, index) => (
-                  <ProductRow
-                    key={product._id}
-                    product={product}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    index={index}
-                  />
-                ))}
-              </tbody>
-            </table>
           </div>
-        </div>
+        </>
       )}
 
       {/* Pagination - Outside of potential pointer-events-none container */}

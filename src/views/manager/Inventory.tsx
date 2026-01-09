@@ -20,6 +20,7 @@ import { selectCategories } from '../../redux/selectors/categorySelectors';
 import Pagination from '../../components/common/Pagination';
 import DebouncedSearch from '../../components/common/DebouncedSearch';
 import FilterSelect from '../../components/common/FilterSelect';
+import FilterBar from '../../components/common/FilterBar';
 import { optimizeCloudinaryUrl } from '../../utils/imageUtils';
 
 import Loader from '../../components/common/Loader';
@@ -188,6 +189,20 @@ export const Inventory: FC = () => {
     setPage(1);
   }, []);
 
+  const handleReset = useCallback(() => {
+    setSearch('');
+    setStockFilter('');
+    setCategoryId('');
+    setIsActive(undefined);
+    setPage(1);
+  }, []);
+
+  const showReset =
+    search !== '' ||
+    stockFilter !== '' ||
+    categoryId !== '' ||
+    isActive !== undefined;
+
   const getCategoryId = (p: Product) => {
     if (typeof p.categoryId === 'object' && p.categoryId !== null) {
       return (p.categoryId as { _id: string })._id;
@@ -256,99 +271,74 @@ export const Inventory: FC = () => {
         }}
       />
 
-      <div
+      <FilterBar
         id="inventory-table"
-        className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 scroll-mt-24"
+        searchComponent={
+          <DebouncedSearch
+            placeholder="Search inventory..."
+            initialValue={search}
+            onSearch={handleSearch}
+            delay={800}
+          />
+        }
+        onReset={handleReset}
+        showReset={showReset}
       >
-        <div className="p-4 border-b border-gray-100 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-          <div className="w-full lg:max-w-md">
-            <DebouncedSearch
-              placeholder="Search inventory..."
-              initialValue={search}
-              onSearch={handleSearch}
-              delay={800}
-            />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex xl:items-center gap-3 w-full lg:w-auto">
-            <FilterSelect
-              label="Category"
-              value={categoryId}
-              options={[
-                { value: '', label: 'All Categories' },
-                ...categories.map((c) => ({ value: c._id, label: c.name })),
-              ]}
-              onChange={(val) => {
-                setCategoryId(val);
-                setPage(1);
-              }}
-            />
-            <FilterSelect
-              label="Stock Status"
-              value={stockFilter}
-              options={[
-                { value: '', label: 'All Items' },
-                { value: 'lowStock', label: 'Low Stock' },
-                { value: 'outOfStock', label: 'Out of Stock' },
-                { value: 'inStock', label: 'In Stock' },
-              ]}
-              onChange={(val) => {
-                setStockFilter(val);
-                setPage(1);
-                // Manually scroll to table when filter changes
-                // This ensures we see the filtered results immediately
-                setTimeout(() => {
-                  const element = document.getElementById('inventory-table');
-                  if (element) {
-                    element.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
-                  }
-                }, 100);
-              }}
-            />
-            <FilterSelect
-              label="Status"
-              value={
-                isActive === undefined ? '' : isActive ? 'active' : 'inactive'
+        <FilterSelect
+          label="Category"
+          value={categoryId}
+          options={[
+            { value: '', label: 'All Categories' },
+            ...categories.map((c) => ({ value: c._id, label: c.name })),
+          ]}
+          onChange={(val) => {
+            setCategoryId(val);
+            setPage(1);
+          }}
+        />
+        <FilterSelect
+          label="Stock Status"
+          value={stockFilter}
+          options={[
+            { value: '', label: 'All Items' },
+            { value: 'lowStock', label: 'Low Stock' },
+            { value: 'outOfStock', label: 'Out of Stock' },
+            { value: 'inStock', label: 'In Stock' },
+          ]}
+          onChange={(val) => {
+            setStockFilter(val);
+            setPage(1);
+            setTimeout(() => {
+              const element = document.getElementById('inventory-table');
+              if (element) {
+                element.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
               }
-              options={[
-                { value: '', label: 'All' },
-                { value: 'active', label: 'Active' },
-                { value: 'inactive', label: 'Inactive' },
-              ]}
-              onChange={(val) => {
-                if (val === 'active') {
-                  setIsActive(true);
-                } else if (val === 'inactive') {
-                  setIsActive(false);
-                } else {
-                  setIsActive(undefined);
-                }
-                setPage(1);
-              }}
-            />
-            {/* Reset Filters Button */}
-            {(stockFilter ||
-              categoryId ||
-              isActive !== undefined ||
-              search) && (
-              <button
-                onClick={() => {
-                  setStockFilter('');
-                  setCategoryId('');
-                  setIsActive(undefined);
-                  setPage(1);
-                  setSearch('');
-                }}
-                className="text-sm text-red-600 hover:text-red-700 font-medium px-3 py-2 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap"
-              >
-                Reset Filters
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+            }, 100);
+          }}
+        />
+        <FilterSelect
+          label="Status"
+          value={isActive === undefined ? '' : isActive ? 'active' : 'inactive'}
+          options={[
+            { value: '', label: 'All' },
+            { value: 'active', label: 'Active' },
+            { value: 'inactive', label: 'Inactive' },
+          ]}
+          onChange={(val) => {
+            if (val === 'active') {
+              setIsActive(true);
+            } else if (val === 'inactive') {
+              setIsActive(false);
+            } else {
+              setIsActive(undefined);
+            }
+            setPage(1);
+          }}
+        />
+      </FilterBar>
 
       {loading && products.length === 0 ? (
         <InventorySkeleton />

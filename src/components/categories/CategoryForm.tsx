@@ -1,7 +1,10 @@
-import type { FC, ChangeEvent, FormEvent } from 'react';
+import type { FC, ChangeEvent } from 'react';
 import { useState } from 'react';
 import { Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
@@ -21,29 +24,29 @@ interface Props {
   onSuccess?: () => void;
 }
 
+const categorySchema = z.object({
+  name: z.string().min(1, 'Category name is required'),
+});
+
 const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
   const dispatch = useAppDispatch();
-
-  const [formData, setFormData] = useState<CategoryFormData>({
-    name: category?.name || '',
-    image: category?.image,
-  });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | undefined>(
     category?.image
   );
-  const [loading, setLoading] = useState(false);
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value || undefined,
-    }));
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: category?.name || '',
+      image: category?.image,
+    },
+  });
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,30 +60,28 @@ const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const onSubmit = async (data: CategoryFormData) => {
+    const toastId = toast.loading(
+      category ? 'Updating category...' : 'Creating category...'
+    );
     try {
       const submitData: CategoryFormData = {
-        ...formData,
-        image: imageFile || formData.image,
+        ...data,
+        image: imageFile || data.image,
       };
 
       if (category) {
         await dispatch(updateCategory(category._id, submitData));
-        toast.success('Category updated successfully');
+        toast.success('Category updated successfully', { id: toastId });
       } else {
         await dispatch(createCategory(submitData));
-        toast.success('Category created successfully');
+        toast.success('Category created successfully', { id: toastId });
       }
 
       onSuccess?.();
       onClose();
     } catch {
-      toast.error('Failed to save category');
-    } finally {
-      setLoading(false);
+      toast.error('Failed to save category', { id: toastId });
     }
   };
 
@@ -91,7 +92,7 @@ const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
       title={category ? 'Edit Category' : 'Create New Category'}
       maxWidth="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-4">
           {/* Section Title */}
           <div className="border-b border-gray-100 pb-2 mb-4">
@@ -102,12 +103,10 @@ const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
 
           <Input
             label="Category Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
+            {...register('name')}
             className="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100 placeholder:text-gray-400 font-medium transition-all"
-            required
             placeholder="e.g. Fresh Fruits"
+            error={errors.name?.message}
           />
         </div>
 
@@ -164,12 +163,13 @@ const CategoryForm: FC<Props> = ({ category, onClose, onSuccess }) => {
             variant="ghost"
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            isLoading={loading}
+            isLoading={isSubmitting}
             className="bg-green-600 hover:bg-green-700 shadow-lg shadow-green-200 font-bold px-8"
           >
             {category ? 'Save Changes' : 'Create Category'}

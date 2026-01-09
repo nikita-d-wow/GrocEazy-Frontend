@@ -181,9 +181,9 @@ const CategoryManagement: FC = () => {
 
       {/* Search & Sort Bar */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
-        <div className="p-4 border-b border-gray-100">
-          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-            <div className="w-full lg:max-w-md">
+        <div className="p-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div className="w-full sm:max-w-md">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
                 Search
               </span>
@@ -193,7 +193,7 @@ const CategoryManagement: FC = () => {
                 onSearch={handleSearch}
               />
             </div>
-            <div className="w-full lg:w-auto">
+            <div className="w-full sm:w-auto self-end">
               <FilterSelect
                 label="Sort By"
                 value={sortOrder}
@@ -207,7 +207,7 @@ const CategoryManagement: FC = () => {
                   { value: 'name_asc', label: 'Name (A-Z)' },
                   { value: 'name_desc', label: 'Name (Z-A)' },
                 ]}
-                className="w-full md:w-56"
+                className="w-full sm:w-48"
               />
             </div>
           </div>
@@ -271,17 +271,17 @@ const CategoryManagement: FC = () => {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
 
-          {pagination && pagination.pages > 1 && (
-            <div className="p-4 border-t border-gray-50">
-              <Pagination
-                currentPage={page}
-                totalPages={pagination.pages}
-                onPageChange={setPage}
-                isLoading={loading}
-              />
-            </div>
-          )}
+      {pagination && pagination.pages > 1 && (
+        <div className="mt-6 flex justify-center">
+          <Pagination
+            currentPage={page}
+            totalPages={pagination.pages}
+            onPageChange={setPage}
+            isLoading={loading}
+          />
         </div>
       )}
 
