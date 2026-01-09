@@ -50,12 +50,24 @@ export interface OrderPagination {
   pages: number;
 }
 
+/* ================= STATS ================= */
+
+export interface OrderStats {
+  total: number;
+  Pending: number;
+  Processing: number;
+  Shipped: number;
+  Delivered: number;
+  Cancelled: number;
+}
+
 /* ================= STATE ================= */
 
 export interface OrderState {
   orders: Order[];
   currentOrder: Order | null;
   pagination: OrderPagination | null;
+  stats: OrderStats | null;
   loading: boolean;
   error: string | null;
 }
@@ -93,6 +105,7 @@ interface FetchOrdersSuccessAction {
   payload: {
     orders: Order[];
     pagination: OrderPagination | null;
+    stats?: OrderStats;
   };
 }
 

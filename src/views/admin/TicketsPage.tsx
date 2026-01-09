@@ -22,6 +22,7 @@ import Loader from '../../components/common/Loader';
 import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
 import FilterSelect from '../../components/common/FilterSelect';
+import PageHeader from '../../components/common/PageHeader';
 import TicketAssignSelect from '../../components/admin/tickets/TicketAssignSelect';
 import ManagerTicketStats from '../../components/admin/analytics/ManagerTicketStats';
 
@@ -31,6 +32,11 @@ import type { SupportTicket } from '../../redux/types/support.types';
 import { STATUS_MAP } from '../../utils/ticketStatus';
 
 const PAGE_LIMIT = 10;
+
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'Newest First' },
+  { value: 'oldest', label: 'Oldest First' },
+];
 
 export default function AdminSupportTickets() {
   const navigate = useNavigate();
@@ -46,9 +52,18 @@ export default function AdminSupportTickets() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [managerFilter, setManagerFilter] = useState('all');
 
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+
   useEffect(() => {
     dispatch(
-      fetchAllSupportTickets(page, PAGE_LIMIT, statusFilter, managerFilter)
+      fetchAllSupportTickets(
+        page,
+        PAGE_LIMIT,
+        statusFilter,
+        managerFilter,
+        undefined,
+        sortOrder
+      )
     );
 
     if (managers.length === 0) {
@@ -56,7 +71,7 @@ export default function AdminSupportTickets() {
     }
 
     dispatch(fetchSupportStats());
-  }, [dispatch, page, managers.length, statusFilter, managerFilter]);
+  }, [dispatch, page, managers.length, statusFilter, managerFilter, sortOrder]);
 
   const filterOptions = useMemo(() => {
     const statusOptions = Object.keys(STATUS_MAP).map((status) => ({
@@ -75,7 +90,14 @@ export default function AdminSupportTickets() {
     return [{ value: 'all', label: 'All Managers' }, ...options];
   }, [managers]);
 
-  const filteredTickets = tickets;
+  const hasActiveFilters = statusFilter !== 'all' || managerFilter !== 'all';
+
+  const clearAllFilters = () => {
+    setStatusFilter('all');
+    setManagerFilter('all');
+
+    setSortOrder('newest');
+  };
 
   return (
     <div className="min-h-screen relative">
@@ -88,42 +110,38 @@ export default function AdminSupportTickets() {
 
       <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
         {/* HEADER */}
-        <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="text-primary" size={28} />
-            <h1 className="text-3xl font-semibold text-gray-800">
-              Support Tickets
-            </h1>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
+        <PageHeader
+          title="Support Tickets"
+          highlightText="Admin"
+          subtitle="Manage all customer support requests"
+          icon={ShieldCheck}
+        >
+          <div className="flex flex-wrap gap-3 items-center">
             <FilterSelect
-              label="Filter by Status"
+              label="Status"
               value={statusFilter}
               options={filterOptions}
-              onChange={(val) => {
-                setStatusFilter(val);
-                dispatch(
-                  fetchAllSupportTickets(1, PAGE_LIMIT, val, managerFilter)
-                );
-              }}
-              className="w-full sm:w-64"
+              onChange={setStatusFilter}
+              className="w-40"
             />
 
             <FilterSelect
-              label="Filter by Manager"
+              label="Manager"
               value={managerFilter}
               options={managerOptions}
-              onChange={(val) => {
-                setManagerFilter(val);
-                dispatch(
-                  fetchAllSupportTickets(1, PAGE_LIMIT, statusFilter, val)
-                );
-              }}
-              className="w-full sm:w-64"
+              onChange={setManagerFilter}
+              className="w-40"
+            />
+
+            <FilterSelect
+              label="Sort"
+              value={sortOrder}
+              options={SORT_OPTIONS}
+              onChange={(val) => setSortOrder(val as 'newest' | 'oldest')}
+              className="w-40"
             />
           </div>
-        </div>
+        </PageHeader>
 
         {/* STATS - ALWAYS VISIBLE IF MANAGERS LOADED */}
         <ManagerTicketStats
@@ -150,16 +168,16 @@ export default function AdminSupportTickets() {
         ) : (
           <>
             {/* LIST */}
-            {filteredTickets.length > 0 ? (
+            {tickets.length > 0 ? (
               <div className="space-y-8 mt-10">
-                {filteredTickets.map((ticket: SupportTicket, index: number) => {
+                {tickets.map((ticket: SupportTicket, index: number) => {
                   const statusUI = STATUS_MAP[ticket.status];
 
                   return (
                     <div
                       key={ticket._id}
                       style={{
-                        zIndex: filteredTickets.length - index,
+                        zIndex: tickets.length - index,
                         animationDelay: `${index * 50}ms`,
                       }}
                       onClick={(e) => {
@@ -263,30 +281,31 @@ export default function AdminSupportTickets() {
                 })}
               </div>
             ) : (
-              <div className="mt-10 h-[400px] flex flex-col items-center justify-center text-center space-y-4 bg-white/40 backdrop-blur-md border border-dashed border-gray-300 rounded-3xl animate-fadeIn">
-                <div className="p-4 bg-gray-100 rounded-full text-gray-400">
-                  <SearchX size={48} />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800">
-                    No matches found
-                  </h3>
-                  <p className="text-gray-500 max-w-xs mx-auto">
-                    No tickets currently match the selected filters across all{' '}
-                    {statsTickets.length > 0 ? statsTickets.length : total}{' '}
-                    tickets.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setStatusFilter('all');
-                      setManagerFilter('all');
-                    }}
-                    className="mt-4 text-indigo-600 font-semibold hover:underline cursor-pointer"
-                  >
-                    Clear all filters
-                  </button>
-                </div>
-              </div>
+              <EmptyState
+                title={
+                  hasActiveFilters ? 'No matches found' : 'No Support Tickets'
+                }
+                description={
+                  hasActiveFilters
+                    ? 'No tickets match your current filters. Try adjusting your filter criteria.'
+                    : 'Everything is running smoothly ✨'
+                }
+                icon={
+                  hasActiveFilters ? (
+                    <SearchX className="w-12 h-12" />
+                  ) : (
+                    <ShieldCheck className="w-12 h-12" />
+                  )
+                }
+                action={
+                  hasActiveFilters
+                    ? {
+                        label: 'Clear all filters',
+                        onClick: clearAllFilters,
+                      }
+                    : undefined
+                }
+              />
             )}
 
             {/* PAGINATION */}
@@ -295,16 +314,18 @@ export default function AdminSupportTickets() {
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
-                  onPageChange={(p) =>
+                  onPageChange={(p) => {
                     dispatch(
                       fetchAllSupportTickets(
                         p,
                         PAGE_LIMIT,
                         statusFilter,
-                        managerFilter
+                        managerFilter,
+                        undefined,
+                        sortOrder
                       )
-                    )
-                  }
+                    );
+                  }}
                   isLoading={loading}
                 />
               </div>

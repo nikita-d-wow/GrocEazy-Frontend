@@ -126,14 +126,23 @@ export const cancelOrder =
 /* ================= MANAGER ORDERS ================= */
 
 export const getAllOrders =
-  (page = 1, limit = 5, status?: string) =>
+  (
+    page = 1,
+    limit = 5,
+    status?: string,
+    dateFrom?: string,
+    sortOrder: 'newest' | 'oldest' = 'newest'
+  ) =>
   async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
 
     try {
-      let url = `/api/orders/all?page=${page}&limit=${limit}`;
+      let url = `/api/orders/all?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
       if (status && status !== 'all') {
         url += `&status=${status}`;
+      }
+      if (dateFrom) {
+        url += `&dateFrom=${dateFrom}`;
       }
       const { data } = await api.get(url);
 
@@ -142,6 +151,7 @@ export const getAllOrders =
         payload: {
           orders: data.orders,
           pagination: data.pagination,
+          stats: data.stats,
         },
       });
     } catch (error: any) {

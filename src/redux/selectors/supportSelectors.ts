@@ -18,5 +18,7 @@ export const selectSupportRefreshing = (state: RootState) =>
 export const selectSupportStatsTickets = (state: RootState) =>
   state.support.statsTickets;
 
+export const selectSupportStats = (state: RootState) => state.support.stats;
+
 export const selectSupportPagination = (state: RootState) =>
   state.support.pagination || { page: 1, limit: 10, total: 0, totalPages: 1 };

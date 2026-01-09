@@ -4,7 +4,6 @@ import {
   MapPin,
   Plus,
   CheckCircle,
-  ChevronLeft,
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
@@ -15,6 +14,7 @@ import type { IAddress } from '../../redux/types/authTypes';
 import { createOrder } from '../../redux/actions/orderActions';
 import type { AppDispatch } from '../../redux/store';
 import type { Address } from '../../redux/types/orderTypes';
+import PageHeader from '../../components/common/PageHeader';
 // import AddressManager from '../../components/customer/profile/AddressManager';
 
 const EMPTY_ADDRESSES: IAddress[] = [];
@@ -94,27 +94,13 @@ const CheckoutAddress = () => {
   /* ---------------- RENDER ---------------- */
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
-      {/* PAGE HEADER WITH BACK BUTTON */}
-      <div className="flex items-center gap-4 mb-8">
-        <button
-          onClick={() => navigate('/checkout')}
-          className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-600 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
-          title="Back to Order Summary"
-        >
-          <ChevronLeft
-            size={22}
-            className="group-hover:-translate-x-0.5 transition-transform"
-          />
-        </button>
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-            Delivery Address
-          </h1>
-          <p className="text-gray-500 text-sm">
-            Select the address where you want your order delivered.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Delivery Address"
+        highlightText="Delivery"
+        subtitle="Select the address where you want your order delivered"
+        icon={MapPin}
+        onBack={() => navigate('/checkout')}
+      />
 
       {!isStockValid && (
         <div className="mb-8 overflow-hidden relative group">

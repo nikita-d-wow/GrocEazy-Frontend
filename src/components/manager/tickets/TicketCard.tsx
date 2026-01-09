@@ -44,7 +44,7 @@ export default function TicketCard({
       <div
         className="
           absolute inset-0 opacity-0 group-hover:opacity-100
-          bg-gradient-to-r from-violet-100/50 via-fuchsia-100/50 to-pink-100/50
+          bg-gradient-to-r from-primary/5 via-emerald-50/50 to-primary/5
           transition duration-500 rounded-2xl
         "
       />

@@ -66,7 +66,7 @@ export default function TicketDetails() {
   };
 
   return (
-    <div className="min-h-screen py-10 px-6 sm:px-12 lg:px-20">
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-12">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* BACK BUTTON */}
         <button
@@ -80,10 +80,10 @@ export default function TicketDetails() {
         </button>
 
         {/* MAIN CARD */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl relative">
+        <div className="bg-white/70 backdrop-blur-xl border border-white/60 shadow-xl rounded-2xl overflow-hidden relative">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-emerald-400" />
 
-          <div className="p-8">
+          <div className="p-6 sm:p-10">
             {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-8">
               <div className="space-y-4">

@@ -184,14 +184,16 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
               />
             </div>
 
-            <Input
-              label="Dietary Info"
-              name="dietary"
-              value={formData.dietary || ''}
-              onChange={handleChange}
-              placeholder="e.g., Vegan, Gluten-Free"
-              className="w-full px-4 py-[10.5px] rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100"
-            />
+            <div className="-mt-2">
+              <Input
+                label="Dietary Info"
+                name="dietary"
+                value={formData.dietary || ''}
+                onChange={handleChange}
+                placeholder="e.g., Vegan, Gluten-Free"
+                className="w-full px-4 py-[10.5px] rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100"
+              />
+            </div>
           </div>
         </div>
 

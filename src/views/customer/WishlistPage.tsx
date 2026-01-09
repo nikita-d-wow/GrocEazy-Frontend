@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Sparkles, ChevronLeft } from 'lucide-react';
+import { Heart, ChevronLeft } from 'lucide-react';
+
+import PageHeader from '../../components/common/PageHeader';
 
 import { fetchWishlist } from '../../redux/actions/wishlistActions';
 import { fetchCart } from '../../redux/actions/cartActions';
@@ -94,22 +96,12 @@ export default function WishlistPage() {
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* HEADER SECTION */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 animate-fadeDown">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2.5 bg-red-50 rounded-2xl border border-red-100 shadow-sm">
-                <Heart size={24} className="text-red-500 fill-red-500" />
-              </div>
-              <h1 className="text-4xl font-black text-gray-900 tracking-tight">
-                My Wishlist
-              </h1>
-            </div>
-            <p className="text-gray-500 font-medium flex items-center gap-2">
-              <Sparkles size={14} className="text-yellow-500" />
-              Keep track of products you want to buy later
-            </p>
-          </div>
-
+        <PageHeader
+          title="Wishlist"
+          highlightText="My"
+          subtitle="Keep track of products you want to buy later"
+          icon={Heart}
+        >
           <button
             onClick={() => navigate('/products')}
             className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
@@ -120,7 +112,7 @@ export default function WishlistPage() {
             />
             Continue Shopping
           </button>
-        </div>
+        </PageHeader>
 
         <WishlistGrid items={items} />
 

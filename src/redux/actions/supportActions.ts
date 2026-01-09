@@ -60,14 +60,23 @@ export const createSupportTicket =
   };
 
 export const fetchMySupportTickets =
-  (page = 1, limit = DEFAULT_LIMIT, status?: string) =>
+  (
+    page = 1,
+    limit = DEFAULT_LIMIT,
+    status?: string,
+    dateFrom?: string,
+    sortOrder: 'newest' | 'oldest' = 'newest'
+  ) =>
   async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_FETCH_MY_REQUEST });
 
     try {
-      let url = `/api/support/my?page=${page}&limit=${limit}`;
+      let url = `/api/support/my?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
       if (status && status !== 'all') {
         url += `&status=${status}`;
+      }
+      if (dateFrom) {
+        url += `&dateFrom=${dateFrom}`;
       }
       const { data } = await api.get(url);
 
@@ -76,6 +85,7 @@ export const fetchMySupportTickets =
         payload: {
           tickets: data.tickets,
           pagination: data.pagination,
+          stats: data.stats,
         },
       });
     } catch (err: any) {
@@ -90,23 +100,34 @@ export const fetchMySupportTickets =
 /* ================= ADMIN / MANAGER ================= */
 
 export const fetchAllSupportTickets =
-  (page = 1, limit = DEFAULT_LIMIT, status?: string, managerId?: string) =>
+  (
+    page = 1,
+    limit = DEFAULT_LIMIT,
+    status?: string,
+    managerId?: string,
+    dateFrom?: string,
+    sortOrder: 'newest' | 'oldest' = 'newest'
+  ) =>
   async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_FETCH_ALL_REQUEST });
 
     try {
-      let url = `/api/support?page=${page}&limit=${limit}`;
+      let url = `/api/support?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
       if (status && status !== 'all') {
         url += `&status=${status}`;
       }
       if (managerId && managerId !== 'all') {
         url += `&assignedManager=${managerId}`;
       }
+      if (dateFrom) {
+        url += `&dateFrom=${dateFrom}`;
+      }
       const { data } = await api.get(url);
 
       const payload: SupportFetchAllPayload = {
         tickets: data.tickets,
         pagination: data.pagination,
+        stats: data.stats,
       };
 
       if (data.managers) {
