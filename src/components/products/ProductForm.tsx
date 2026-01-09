@@ -1,8 +1,11 @@
-import type { FC, ChangeEvent, FormEvent } from 'react';
+import type { FC, ChangeEvent } from 'react';
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Trash2, Upload, Box, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
 import { useAppDispatch } from '../../redux/actions/useDispatch';
 import {
@@ -25,53 +28,60 @@ interface Props {
   onSuccess?: () => void;
 }
 
+const productSchema = z.object({
+  name: z.string().min(1, 'Product name is required'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  size: z.string().optional(),
+  dietary: z.string().optional(),
+  stock: z.number().min(0, 'Stock cannot be negative'),
+  lowStockThreshold: z
+    .number()
+    .min(0, 'Threshold cannot be negative')
+    .optional(),
+  price: z.number().min(0.01, 'Price must be greater than 0'),
+  isActive: z.boolean().optional(),
+  categoryId: z.string().min(1, 'Category is required'),
+  images: z.array(z.union([z.instanceof(File), z.string()])).optional(),
+});
+
 const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
   const dispatch = useAppDispatch();
   const categories = useSelector(selectCategories);
-
-  // Fetch categories on mount
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
-
-  const [formData, setFormData] = useState<ProductFormData>({
-    name: product?.name || '',
-    description: product?.description || '',
-    size: product?.size,
-    dietary: product?.dietary,
-    stock: product?.stock || 0,
-    lowStockThreshold: product?.lowStockThreshold || 5,
-    price: product?.price || 0,
-    isActive: product?.isActive ?? true,
-    categoryId:
-      typeof product?.categoryId === 'object' && product?.categoryId !== null
-        ? (product.categoryId as { _id: string })._id
-        : (product?.categoryId as string) || '',
-    images: product?.images || [],
-  });
 
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>(
     product?.images || []
   );
 
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<ProductFormData>({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      name: product?.name || '',
+      description: product?.description || '',
+      size: product?.size || '',
+      dietary: product?.dietary || '',
+      stock: product?.stock || 0,
+      lowStockThreshold: product?.lowStockThreshold || 5,
+      price: product?.price || 0,
+      isActive: product?.isActive ?? true,
+      categoryId:
+        typeof product?.categoryId === 'object' && product?.categoryId !== null
+          ? (product.categoryId as { _id: string })._id
+          : (product?.categoryId as string) || '',
+      images: product?.images || [],
+    },
+  });
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        type === 'number'
-          ? value === ''
-            ? ''
-            : Number(value)
-          : type === 'checkbox'
-            ? (e.target as HTMLInputElement).checked
-            : value,
-    }));
-  };
+  // Fetch categories on mount
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const handleImageFilesChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -92,13 +102,11 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: ProductFormData) => {
     try {
       const submitData: ProductFormData = {
-        ...formData,
-        images: imageFiles.length > 0 ? imageFiles : formData.images,
+        ...data,
+        images: imageFiles.length > 0 ? imageFiles : data.images,
       };
 
       if (product) {
@@ -116,6 +124,8 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
     }
   };
 
+  const categoryId = watch('categoryId');
+
   return (
     <Modal
       isOpen
@@ -123,7 +133,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
       title={product ? 'Edit Product' : 'Add New Product'}
       maxWidth="3xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-8 px-1">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 px-1">
         {/* Core Info Section */}
         <div className="space-y-4">
           <div className="border-b border-gray-100 pb-2 flex items-center gap-2">
@@ -137,12 +147,11 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             <div className="md:col-span-2">
               <Input
                 label="Product Name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
+                {...register('name')}
+                defaultValue={watch('name')}
                 className="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100 placeholder:text-gray-400 font-bold text-lg"
-                required
                 placeholder="e.g. Organic Bananas"
+                error={errors.name?.message}
               />
             </div>
 
@@ -152,14 +161,16 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
                   Description
                 </label>
                 <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
+                  {...register('description')}
                   rows={3}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl hover:border-green-200 outline-none focus:border-green-500 focus:ring-4 focus:ring-green-50 bg-white transition-all font-medium text-gray-600"
                   placeholder="Describe your product..."
-                  required
                 />
+                {errors.description && (
+                  <p className="mt-1 text-sm text-red-500 font-medium">
+                    {errors.description.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -176,22 +187,24 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
                       label: cat.name,
                     })),
                 ]}
-                value={formData.categoryId}
-                onChange={(value: string) =>
-                  setFormData((prev) => ({ ...prev, categoryId: value }))
-                }
+                value={categoryId}
+                onChange={(value: string) => setValue('categoryId', value)}
                 className="w-full"
               />
+              {errors.categoryId && (
+                <p className="mt-1 text-sm text-red-500 font-medium">
+                  {errors.categoryId.message}
+                </p>
+              )}
             </div>
 
             <div className="-mt-2">
               <Input
                 label="Dietary Info"
-                name="dietary"
-                value={formData.dietary || ''}
-                onChange={handleChange}
+                {...register('dietary')}
                 placeholder="e.g., Vegan, Gluten-Free"
                 className="w-full px-4 py-[10.5px] rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100"
+                error={errors.dietary?.message}
               />
             </div>
           </div>
@@ -209,44 +222,38 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             <Input
               label="Price (₹)"
               type="number"
-              name="price"
-              value={formData.price ?? ''}
+              {...register('price', { valueAsNumber: true })}
               placeholder="0.00"
-              onChange={handleChange}
               min="0"
               step="0.01"
               className="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100 font-bold"
-              required
+              error={errors.price?.message}
             />
 
             <Input
               label="Size/Unit"
-              name="size"
-              value={formData.size || ''}
-              onChange={handleChange}
+              {...register('size')}
               placeholder="e.g. 1kg"
               className="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100"
+              error={errors.size?.message}
             />
 
             <Input
               label="Current Stock"
               type="number"
-              name="stock"
-              value={formData.stock}
-              onChange={handleChange}
+              {...register('stock', { valueAsNumber: true })}
               min="0"
               className="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100"
-              required
+              error={errors.stock?.message}
             />
 
             <Input
               label="Low Stock Alert"
               type="number"
-              name="lowStockThreshold"
-              value={formData.lowStockThreshold}
-              onChange={handleChange}
+              {...register('lowStockThreshold', { valueAsNumber: true })}
               min="0"
               className="w-full px-4 py-3 rounded-xl border-gray-200 focus:border-green-500 focus:ring-green-100"
+              error={errors.lowStockThreshold?.message}
             />
           </div>
         </div>
@@ -326,9 +333,7 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
             <input
               type="checkbox"
               id="isActive"
-              name="isActive"
-              checked={formData.isActive}
-              onChange={handleChange}
+              {...register('isActive')}
               className="w-5 h-5 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer"
             />
             <label
@@ -345,11 +350,13 @@ const ProductForm: FC<Props> = ({ product, onClose, onSuccess }) => {
               variant="ghost"
               onClick={onClose}
               className="hover:bg-gray-100 text-gray-600"
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
             <Button
               type="submit"
+              isLoading={isSubmitting}
               className="bg-green-600 hover:bg-green-700 shadow-lg shadow-green-200/50 font-bold px-8"
             >
               {product ? 'Update Details' : 'Publish Product'}
