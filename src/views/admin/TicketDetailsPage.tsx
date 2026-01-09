@@ -82,8 +82,8 @@ export default function AdminTicketDetailsPage() {
   const statusUI = STATUS_MAP[ticket.status];
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-10 px-6 sm:px-12 lg:px-20">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gray-50/50 py-10 px-4 sm:px-6 lg:px-12">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* BACK BUTTON */}
         <div className="flex items-center justify-between">
           <button
@@ -102,7 +102,7 @@ export default function AdminTicketDetailsPage() {
         </div>
 
         {/* MAIN HEADER CARD */}
-        <div className="bg-white border border-gray-200 shadow-sm rounded-3xl overflow-hidden relative p-8 sm:p-10">
+        <div className="bg-white border border-gray-200 shadow-sm rounded-2xl overflow-hidden relative p-6 sm:p-10">
           <div className="absolute top-0 left-0 w-full h-1 bg-primary" />
 
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">

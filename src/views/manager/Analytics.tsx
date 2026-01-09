@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../redux/store';
-
+import PageHeader from '../../components/common/PageHeader';
 import {
   fetchAnalyticsProducts,
   deleteProduct as deleteProductAction,
@@ -135,22 +135,12 @@ export default function Analytics() {
       {/* Decorative Background Elements Removed */}
 
       <div className="max-w-[1600px] mx-auto px-6 sm:px-10 lg:px-16 py-12 space-y-16">
-        {/* HEADER */}
-        <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-fadeIn">
-          <div className="flex items-center gap-4">
-            <div className="p-4 bg-white rounded-3xl shadow-sm text-primary border border-gray-100">
-              <Package size={32} />
-            </div>
-            <div>
-              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                Manager Analytics
-              </h1>
-              <p className="text-gray-500 font-medium">
-                Revenue, inventory & product insights
-              </p>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          title="Analytics"
+          highlightText="Manager"
+          subtitle="Review inventory and product insights"
+          icon={Package}
+        ></PageHeader>
 
         {/* METRIC CARDS */}
         <div className="relative z-20">

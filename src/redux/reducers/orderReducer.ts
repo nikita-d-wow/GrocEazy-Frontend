@@ -22,6 +22,7 @@ const initialState: OrderState = {
   orders: [],
   currentOrder: null,
   pagination: null,
+  stats: null,
   loading: false,
   error: null,
 };
@@ -41,6 +42,7 @@ export const orderReducer = (
         loading: false,
         orders: action.payload.orders,
         pagination: action.payload.pagination,
+        stats: action.payload.stats || null,
       };
 
     case FETCH_ORDERS_FAILURE:

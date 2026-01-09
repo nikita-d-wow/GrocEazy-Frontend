@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { Ticket } from 'lucide-react';
+import { Ticket, MessageCircleQuestion } from 'lucide-react';
 
-import SupportHeader from '../../components/customer/support/SupportHeader';
+import PageHeader from '../../components/common/PageHeader';
 import SupportContactCards from '../../components/customer/support/SupportContactCards';
 import SupportForm from '../../components/customer/support/SupportForm';
 import SupportFAQ from '../../components/customer/support/SupportFAQ';
@@ -15,9 +15,12 @@ export default function ContactSupport() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-14 relative z-10">
         {/* Header + My Tickets */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-10">
-          <SupportHeader />
-
+        <PageHeader
+          title="Contact Support"
+          highlightText="Help &"
+          subtitle="We're here to assist you. Choose a support option or submit a ticket."
+          icon={MessageCircleQuestion}
+        >
           <button
             onClick={() => navigate('/customer/tickets')}
             className="
@@ -37,7 +40,7 @@ export default function ContactSupport() {
             <Ticket size={18} />
             My Tickets
           </button>
-        </div>
+        </PageHeader>
 
         <SupportContactCards />
 

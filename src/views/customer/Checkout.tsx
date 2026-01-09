@@ -1,9 +1,16 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Wallet, ArrowRight, ChevronLeft, AlertCircle } from 'lucide-react';
+import {
+  Wallet,
+  ArrowRight,
+  ChevronLeft,
+  AlertCircle,
+  ShoppingBag,
+} from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
+import PageHeader from '../../components/common/PageHeader';
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -42,27 +49,13 @@ const Checkout = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
-      {/* HEADER WITH BACK BUTTON */}
-      <div className="flex items-center gap-4 mb-8">
-        <button
-          onClick={() => navigate('/cart')}
-          className="p-2.5 rounded-xl bg-white border border-gray-100 text-gray-600 hover:text-primary hover:border-primary/20 hover:shadow-lg transition-all active:scale-95 group cursor-pointer"
-          title="Back to Cart"
-        >
-          <ChevronLeft
-            size={22}
-            className="group-hover:-translate-x-0.5 transition-transform"
-          />
-        </button>
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-            Checkout
-          </h1>
-          <p className="text-gray-500 text-sm">
-            Review and confirm your order items
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Order Checkout"
+        highlightText="Order"
+        subtitle="Review and confirm your order items before payment"
+        icon={ShoppingBag}
+        onBack={() => navigate('/cart')}
+      />
 
       {!isStockValid && (
         <div className="mb-8 overflow-hidden relative group">

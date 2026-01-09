@@ -60,15 +60,26 @@ export interface SupportPagination {
   totalPages: number;
 }
 
+// ================= STATS =================
+export interface SupportStats {
+  total: number;
+  open: number;
+  in_progress: number;
+  resolved: number;
+  closed: number;
+}
+
 // ================= PAYLOADS =================
 export interface SupportFetchMyPayload {
   tickets: SupportTicket[];
+  stats?: SupportStats;
   pagination: SupportPagination;
 }
 
 export interface SupportFetchAllPayload {
   tickets: SupportTicket[];
   managers?: IUser[];
+  stats?: SupportStats;
   pagination: SupportPagination;
 }
 
@@ -79,6 +90,7 @@ export interface SupportState {
   myTickets: SupportTicket[];
   tickets: SupportTicket[];
   statsTickets: SupportTicket[];
+  stats: SupportStats | null;
   managers: IUser[];
   error: string | null;
   pagination: SupportPagination;

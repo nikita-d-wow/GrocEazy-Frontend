@@ -1,20 +1,22 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 import EmptyState from '../../components/common/EmptyState';
 import Loader from '../../components/common/Loader';
 import Pagination from '../../components/common/Pagination';
+import PageHeader from '../../components/common/PageHeader';
 
 import CartItem from '../../components/customer/cart/CartItem';
 import CartSummary from '../../components/customer/cart/CartSummary';
-import CartHeader from '../../components/customer/cart/CartHeader';
 
 import {
   fetchCart,
   updateCartQty,
   removeCartItem,
+  clearCart,
 } from '../../redux/actions/cartActions';
 
 import {
@@ -103,6 +105,17 @@ export default function CartPage() {
     dispatch(removeCartItem(cartId));
   };
 
+  const handleClearCart = () => {
+    if (cartItems.length === 0) {
+      return;
+    }
+
+    if (window.confirm('Are you sure you want to clear your cart?')) {
+      dispatch(clearCart());
+      toast.success('Cart cleared');
+    }
+  };
+
   /* ================= AUTH GUARD ================= */
   if (!user) {
     return (
@@ -138,11 +151,30 @@ export default function CartPage() {
     }));
 
   const formattedTotal = Number(total).toFixed(2);
+  const isEmpty = uiCartItems.length === 0;
 
   /* ================= RENDER ================= */
   return (
     <div className="min-h-screen px-4 sm:px-6 lg:px-20 py-8">
-      <CartHeader />
+      <PageHeader
+        title="Cart"
+        highlightText="My"
+        subtitle="Review items before checkout"
+        icon={ShoppingCart}
+      >
+        <button
+          onClick={handleClearCart}
+          disabled={isEmpty}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all w-fit border shadow-sm ${
+            isEmpty
+              ? 'bg-gray-50 text-gray-400 border-gray-100 cursor-not-allowed opacity-60'
+              : 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100 cursor-pointer active:scale-95'
+          }`}
+        >
+          <Trash2 size={16} />
+          Clear Cart
+        </button>
+      </PageHeader>
 
       {uiCartItems.length === 0 ? (
         <EmptyState

@@ -32,6 +32,7 @@ const initialState: SupportState = {
   myTickets: [],
   tickets: [],
   statsTickets: [],
+  stats: null,
   managers: [],
   error: null,
   pagination: {
@@ -84,6 +85,7 @@ export function supportReducer(
         loading: false,
         myTickets: action.payload.tickets,
         pagination: action.payload.pagination,
+        stats: action.payload.stats || null,
       };
 
     case SUPPORT_FETCH_ALL_SUCCESS:
@@ -94,6 +96,7 @@ export function supportReducer(
         tickets: action.payload.tickets,
         pagination: action.payload.pagination,
         ...(action.payload.managers && { managers: action.payload.managers }),
+        stats: action.payload.stats || null,
       };
 
     case SUPPORT_CREATE_FAILURE:
