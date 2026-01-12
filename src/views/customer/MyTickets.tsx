@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -7,6 +7,7 @@ import {
   Clock,
   CheckCircle2,
   SearchX,
+  XCircle,
 } from 'lucide-react';
 
 import Loader from '../../components/common/Loader';
@@ -14,15 +15,19 @@ import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
 import FilterSelect from '../../components/common/FilterSelect';
 import PageHeader from '../../components/common/PageHeader';
+import FilterBar from '../../components/common/FilterBar';
+import DebouncedSearch from '../../components/common/DebouncedSearch';
 
 import { fetchMySupportTickets } from '../../redux/actions/supportActions';
 import {
   selectSupportMyTickets,
   selectSupportLoading,
   selectSupportPagination,
+  selectSupportStats,
 } from '../../redux/selectors/supportSelectors';
 
 import type { AppDispatch } from '../../redux/store';
+import type { SupportStats } from '../../redux/types/support.types';
 
 const PAGE_LIMIT = 8;
 
@@ -50,6 +55,7 @@ export default function MyTickets() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [search, setSearch] = useState('');
 
   // Calculate dateFrom based on dateFilter
   const getDateFrom = (filter: string): string | undefined => {
@@ -85,11 +91,12 @@ export default function MyTickets() {
         PAGE_LIMIT,
         statusFilter,
         dateFrom,
-        sortOrder
+        sortOrder,
+        search
       )
     );
-    window.scrollTo(0, 0);
-  }, [dispatch, currentPage, statusFilter, dateFilter, sortOrder]);
+    // window.scrollTo(0, 0); // Optional: keep scrolling behavior if needed
+  }, [dispatch, currentPage, statusFilter, dateFilter, sortOrder, search]);
 
   const filterOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -110,12 +117,34 @@ export default function MyTickets() {
     },
   ];
 
-  const hasActiveFilters = statusFilter !== 'all' || dateFilter !== 'all';
+  const serverStats = useSelector(selectSupportStats) as SupportStats | null;
 
-  const clearAllFilters = () => {
+  // Stats calculation
+  const stats = useMemo(() => {
+    if (serverStats) {
+      return {
+        total: serverStats.total,
+        open: serverStats.open,
+        in_progress: serverStats.in_progress,
+        resolved: serverStats.resolved,
+        closed: serverStats.closed,
+      };
+    }
+    return { total: 0, open: 0, in_progress: 0, resolved: 0, closed: 0 };
+  }, [serverStats]);
+
+  const showReset =
+    statusFilter !== 'all' || dateFilter !== 'all' || search !== '';
+
+  const handleSearch = (val: string) => {
+    setSearch(val);
+  };
+
+  const handleReset = () => {
     setStatusFilter('all');
     setDateFilter('all');
     setSortOrder('newest');
+    setSearch('');
   };
 
   const hasTickets = myTickets && myTickets.length > 0;
@@ -127,8 +156,87 @@ export default function MyTickets() {
         highlightText="My"
         subtitle="View and track tickets raised by you"
         icon={Ticket}
-      >
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full sm:w-auto">
+      />
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 animate-slideUp mb-8">
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">
+                Open
+              </p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                {stats.open}
+              </p>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-amber-100 rounded-xl">
+              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-amber-700" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">
+                In Progress
+              </p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                {stats.in_progress}
+              </p>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-blue-100 rounded-xl">
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-700" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
+                Resolved
+              </p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                {stats.resolved}
+              </p>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-emerald-100 rounded-xl">
+              <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-700" />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-gray-50 to-slate-50/50 border border-gray-200 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
+                Closed
+              </p>
+              <p className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+                {stats.closed}
+              </p>
+            </div>
+            <div className="p-2.5 sm:p-3 bg-gray-100 rounded-xl">
+              <XCircle className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <FilterBar
+          searchComponent={
+            <DebouncedSearch
+              placeholder="Search tickets..."
+              initialValue={search}
+              onSearch={handleSearch}
+            />
+          }
+          onReset={handleReset}
+          showReset={showReset}
+        >
           <FilterSelect
             label="Status"
             value={statusFilter}
@@ -150,26 +258,8 @@ export default function MyTickets() {
             onChange={(val) => setSortOrder(val as 'newest' | 'oldest')}
             className="w-full sm:w-40"
           />
-        </div>
-      </PageHeader>
-
-      {hasActiveFilters && (
-        <div className="flex justify-end mb-6 -mt-4 px-2 animate-fadeIn">
-          <button
-            onClick={clearAllFilters}
-            className="
-              flex items-center justify-center gap-2 px-4 py-2
-              bg-red-50 border border-red-100
-              rounded-xl shadow-sm hover:shadow-md hover:border-red-200 hover:bg-red-100
-              transition-all duration-300 group cursor-pointer
-              text-sm font-bold text-red-600
-            "
-          >
-            <SearchX size={16} />
-            Clear Filters
-          </button>
-        </div>
-      )}
+        </FilterBar>
+      </div>
 
       {loading && !hasTickets ? (
         <div className="flex items-center justify-center py-20">
@@ -177,27 +267,22 @@ export default function MyTickets() {
         </div>
       ) : !hasTickets ? (
         <EmptyState
-          title={
-            hasActiveFilters ? 'No matches found' : 'No support tickets yet'
-          }
+          title={showReset ? 'No matches found' : 'No support tickets yet'}
           description={
-            hasActiveFilters
+            showReset
               ? 'No tickets match your current filters. Try adjusting your filter criteria.'
               : 'Create a new ticket to get help with your orders or account.'
           }
           icon={
-            hasActiveFilters ? (
+            showReset ? (
               <SearchX className="w-12 h-12" />
             ) : (
               <Ticket className="w-12 h-12 text-gray-400" />
             )
           }
           action={
-            hasActiveFilters
-              ? {
-                  label: 'Clear all filters',
-                  onClick: clearAllFilters,
-                }
+            showReset
+              ? undefined
               : {
                   label: 'Contact Support',
                   onClick: () => navigate('/support'),

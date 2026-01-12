@@ -36,7 +36,7 @@ export const getMyOrders =
     dispatch({ type: FETCH_ORDERS_REQUEST });
 
     try {
-      let url = `/api/orders?page=${page}&limit=${limit}`;
+      let url = `/orders?page=${page}&limit=${limit}`;
       if (status && status !== 'all') {
         url += `&status=${status}`;
       }
@@ -62,7 +62,7 @@ export const getOrderDetails =
     dispatch({ type: FETCH_ORDER_DETAILS_REQUEST });
 
     try {
-      const { data } = await api.get<Order>(`/api/orders/${id}`);
+      const { data } = await api.get<Order>(`/orders/${id}`);
       dispatch({ type: FETCH_ORDER_DETAILS_SUCCESS, payload: data });
     } catch (error: any) {
       dispatch({
@@ -81,7 +81,7 @@ export const createOrder =
     dispatch({ type: CREATE_ORDER_REQUEST });
 
     try {
-      const { data } = await api.post<Order>('/api/orders', payload);
+      const { data } = await api.post<Order>('/orders', payload);
 
       dispatch({ type: CREATE_ORDER_SUCCESS, payload: data });
 
@@ -108,7 +108,7 @@ export const cancelOrder =
     dispatch({ type: CANCEL_ORDER_SUCCESS, payload: id });
 
     try {
-      await api.patch(`/api/orders/${id}/cancel`);
+      await api.patch(`/orders/${id}/cancel`);
       // Success already dispatched. Maybe toast?
       toast.success('Order cancelled');
     } catch (error: any) {
@@ -131,18 +131,22 @@ export const getAllOrders =
     limit = 5,
     status?: string,
     dateFrom?: string,
-    sortOrder: 'newest' | 'oldest' = 'newest'
+    sortOrder: 'newest' | 'oldest' = 'newest',
+    search?: string
   ) =>
   async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
 
     try {
-      let url = `/api/orders/all?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
+      let url = `/orders/all?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
       if (status && status !== 'all') {
         url += `&status=${status}`;
       }
       if (dateFrom) {
         url += `&dateFrom=${dateFrom}`;
+      }
+      if (search) {
+        url += `&search=${search}`;
       }
       const { data } = await api.get(url);
 
@@ -172,7 +176,7 @@ export const changeOrderStatus =
     });
 
     try {
-      const { data } = await api.patch(`/api/orders/${id}/status`, { status });
+      const { data } = await api.patch(`/orders/${id}/status`, { status });
       // Final confirmation from server
       dispatch({
         type: UPDATE_ORDER_STATUS_SUCCESS,

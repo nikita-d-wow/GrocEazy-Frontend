@@ -23,7 +23,7 @@ export const fetchCart =
     dispatch({ type: CART_FETCH_REQUEST });
 
     try {
-      const { data } = await api.get(`/api/cart?page=${page}&limit=${limit}`);
+      const { data } = await api.get(`/cart?page=${page}&limit=${limit}`);
 
       dispatch({
         type: CART_FETCH_SUCCESS,
@@ -57,7 +57,7 @@ export const updateCartQty = (cartId: string, quantity: number) => {
         return;
       }
 
-      await api.put(`/api/cart/${cartId}`, { quantity });
+      await api.put(`/cart/${cartId}`, { quantity });
 
       // Background sync
       const { page, limit } = getState().cart.pagination;
@@ -81,7 +81,7 @@ export const removeCartItem = (cartId: string) => {
     });
 
     try {
-      await api.delete(`/api/cart/${cartId}`);
+      await api.delete(`/cart/${cartId}`);
 
       const { page, limit } = getState().cart.pagination;
       dispatch(fetchCart(page, limit));
@@ -100,7 +100,7 @@ export const removeCartItem = (cartId: string) => {
 export const clearCart = () => {
   return async (dispatch: AppDispatch) => {
     try {
-      await api.delete('/api/cart');
+      await api.delete('/cart');
       dispatch({ type: CART_CLEAR });
       toast.success('Cart cleared');
     } catch (err: unknown) {
@@ -155,7 +155,7 @@ export const addToCart = (
     }
 
     try {
-      const { data } = await api.post('/api/cart', { productId, quantity });
+      const { data } = await api.post('/cart', { productId, quantity });
 
       if (data.success && data.item) {
         dispatch({

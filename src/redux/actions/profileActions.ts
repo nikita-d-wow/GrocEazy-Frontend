@@ -12,7 +12,7 @@ import type { IAddress } from '../types/authTypes';
 export const fetchUserProfile = () => {
   return async (dispatch: Dispatch) => {
     try {
-      const { data } = await api.get<any>('/api/users/profile');
+      const { data } = await api.get<any>('/users/profile');
       const user = data.user || data;
 
       dispatch({
@@ -33,10 +33,7 @@ export const fetchUserProfile = () => {
 export const updateProfile = (data: { name: string; phone: string }) => {
   return async (dispatch: Dispatch) => {
     try {
-      const { data: responseData } = await api.put<any>(
-        '/api/users/profile',
-        data
-      );
+      const { data: responseData } = await api.put<any>('/users/profile', data);
 
       const updatedUser = responseData.user || responseData;
 
@@ -69,8 +66,8 @@ export const updateProfile = (data: { name: string; phone: string }) => {
 export const addAddress = (address: Partial<IAddress>) => {
   return async (dispatch: Dispatch<any>) => {
     try {
-      // Guide: POST /api/users/address
-      const { data } = await api.post<any>('/api/users/address', address);
+      // Guide: POST /users/address
+      const { data } = await api.post<any>('/users/address', address);
 
       // Robust handling: Backend might return { address: ... } or { newAddress: ... } or just the address
       const newAddress = data.address || data.newAddress || data;
@@ -100,9 +97,9 @@ export const updateAddress = (
 ) => {
   return async (dispatch: Dispatch<any>) => {
     try {
-      // Guide: PUT /api/users/address/:addressId
+      // Guide: PUT /users/address/:addressId
       const { data } = await api.put<any>(
-        `/api/users/address/${addressId}`,
+        `/users/address/${addressId}`,
         addressData
       );
 
@@ -130,8 +127,8 @@ export const updateAddress = (
 export const deleteAddress = (addressId: string) => {
   return async (dispatch: Dispatch<any>) => {
     try {
-      // Guide: DELETE /api/users/address/:addressId
-      await api.delete(`/api/users/address/${addressId}`);
+      // Guide: DELETE /users/address/:addressId
+      await api.delete(`/users/address/${addressId}`);
 
       dispatch({
         type: DELETE_ADDRESS_SUCCESS,

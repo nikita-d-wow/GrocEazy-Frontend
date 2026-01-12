@@ -20,7 +20,7 @@ export const getPagedCategories = async (
     total: number;
     page: number;
     pages: number;
-  }>('/api/categories', {
+  }>('/categories', {
     params: { page, limit, search, sortBy },
   });
   return response.data;
@@ -31,7 +31,7 @@ export const getPagedCategories = async (
  */
 export const getCategories = async (): Promise<Category[]> => {
   const response = await api.get<Category[] | { categories: Category[] }>(
-    '/api/categories?limit=100' // High limit for legacy one-time fetch
+    '/categories?limit=100' // High limit for legacy one-time fetch
   );
   return Array.isArray(response.data)
     ? response.data
@@ -43,7 +43,7 @@ export const getCategories = async (): Promise<Category[]> => {
  */
 export const getCategoryById = async (id: string): Promise<Category> => {
   const response = await api.get<Category | { category: Category }>(
-    `/api/categories/${id}`
+    `/categories/${id}`
   );
   // Backend might return { category: {...} } or just the category object
   return 'category' in response.data ? response.data.category : response.data;
@@ -67,7 +67,7 @@ export const createCategory = async (
   }
 
   const response = await api.post<Category | { category: Category }>(
-    '/api/categories',
+    '/categories',
     formData,
     {
       headers: {
@@ -98,7 +98,7 @@ export const updateCategory = async (
   }
 
   const response = await api.put<Category | { category: Category }>(
-    `/api/categories/${id}`,
+    `/categories/${id}`,
     formData,
     {
       headers: {
@@ -114,5 +114,5 @@ export const updateCategory = async (
  * Delete a category (soft delete, requires auth)
  */
 export const deleteCategory = async (id: string): Promise<void> => {
-  await api.delete(`/api/categories/${id}`);
+  await api.delete(`/categories/${id}`);
 };

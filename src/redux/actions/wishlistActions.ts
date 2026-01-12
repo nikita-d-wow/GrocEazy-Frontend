@@ -21,9 +21,7 @@ export const fetchWishlist =
       dispatch({ type: WISHLIST_FETCH_REQUEST });
     }
     try {
-      const { data } = await api.get(
-        `/api/wishlist?page=${page}&limit=${limit}`
-      );
+      const { data } = await api.get(`/wishlist?page=${page}&limit=${limit}`);
 
       dispatch({
         type: WISHLIST_FETCH_SUCCESS,
@@ -50,7 +48,7 @@ export const removeWishlistItem =
     });
 
     try {
-      await api.delete(`/api/wishlist/${wishlistId}`);
+      await api.delete(`/wishlist/${wishlistId}`);
 
       // Background re-fetch to sync pagination / data
       const { page, limit } = getState().wishlist.pagination;
@@ -100,7 +98,7 @@ export const moveWishlistToCart =
     }
 
     try {
-      await api.post(`/api/wishlist/${wishlistId}/move-to-cart`);
+      await api.post(`/wishlist/${wishlistId}/move-to-cart`);
 
       const { page, limit } = getState().wishlist.pagination;
       dispatch(fetchWishlist(page, limit, true));
@@ -131,7 +129,7 @@ export const addToWishlist =
     }
 
     try {
-      const { data } = await api.post('/api/wishlist', { productId });
+      const { data } = await api.post('/wishlist', { productId });
 
       if (data.success && data.item) {
         dispatch({

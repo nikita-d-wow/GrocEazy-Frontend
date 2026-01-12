@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from '../../redux/rootReducer';
+import type { RootState, AppDispatch } from '../../redux/store';
 import {
   getAllOrders,
   changeOrderStatus,
@@ -22,8 +22,10 @@ import {
 import { ORDER_STATUS_META } from '../../utils/orderStatus';
 import PageHeader from '../../components/common/PageHeader';
 import EmptyState from '../../components/common/EmptyState';
+import FilterBar from '../../components/common/FilterBar';
+import DebouncedSearch from '../../components/common/DebouncedSearch';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 const DATE_FILTER_OPTIONS = [
   { value: 'all', label: 'All Time' },
@@ -38,7 +40,7 @@ const SORT_OPTIONS = [
 ];
 
 const OrdersManagement = () => {
-  const dispatch = useDispatch<any>();
+  const dispatch = useDispatch<AppDispatch>();
   const {
     orders,
     loading,
@@ -50,6 +52,7 @@ const OrdersManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [search, setSearch] = useState('');
 
   // Calculate dateFrom based on dateFilter
   const getDateFrom = (filter: string): string | undefined => {
@@ -78,9 +81,17 @@ const OrdersManagement = () => {
   };
 
   useEffect(() => {
-    const dateFrom = getDateFrom(dateFilter);
-    dispatch(getAllOrders(page, PAGE_SIZE, statusFilter, dateFrom, sortOrder));
-  }, [dispatch, page, statusFilter, dateFilter, sortOrder]);
+    dispatch(
+      getAllOrders(
+        page,
+        PAGE_SIZE,
+        statusFilter,
+        getDateFrom(dateFilter),
+        sortOrder,
+        search
+      )
+    );
+  }, [dispatch, page, statusFilter, dateFilter, sortOrder, search]);
 
   // Filter options for status
   const filterOptions = useMemo(() => {
@@ -117,12 +128,19 @@ const OrdersManagement = () => {
   }, [serverStats]);
 
   // Check if any filter is active
-  const hasActiveFilters = statusFilter !== 'all' || dateFilter !== 'all';
+  const showReset =
+    statusFilter !== 'all' || dateFilter !== 'all' || search !== '';
 
-  const clearAllFilters = () => {
+  const handleSearch = (val: string) => {
+    setSearch(val);
+    setPage(1);
+  };
+
+  const handleReset = () => {
     setStatusFilter('all');
     setDateFilter('all');
     setSortOrder('newest');
+    setSearch('');
     setPage(1);
   };
 
@@ -135,135 +153,145 @@ const OrdersManagement = () => {
           highlightText="Order"
           subtitle="Review and update customer orders efficiently"
           icon={Package}
-        >
-          <div className="flex flex-wrap gap-3">
-            <FilterSelect
-              label="Status"
-              value={statusFilter}
-              options={filterOptions}
-              onChange={(val) => {
-                setStatusFilter(val);
-                setPage(1);
-              }}
-              className="w-40"
-            />
-            <FilterSelect
-              label="Date"
-              value={dateFilter}
-              options={DATE_FILTER_OPTIONS}
-              onChange={setDateFilter}
-              className="w-40"
-            />
-            <FilterSelect
-              label="Sort"
-              value={sortOrder}
-              options={SORT_OPTIONS}
-              onChange={(val) => setSortOrder(val as 'newest' | 'oldest')}
-              className="w-40"
-            />
-          </div>
-        </PageHeader>
+        />
 
         {/* Stats Cards */}
-        {!loading && orders.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 animate-slideUp">
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex flex-col justify-between h-full gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold text-green-600 uppercase tracking-wider">
-                    Total
-                  </p>
-                  <div className="p-1.5 bg-green-100 rounded-lg">
-                    <Package className="w-4 h-4 text-green-700" />
-                  </div>
-                </div>
-                <p className="text-2xl font-extrabold text-gray-900">
-                  {stats.total}
+        {/* {!loading && orders.length > 0 && ( */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 animate-slideUp">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col justify-between h-full gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-green-600 uppercase tracking-wider">
+                  Total
                 </p>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex flex-col justify-between h-full gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
-                    Pending
-                  </p>
-                  <div className="p-1.5 bg-amber-100 rounded-lg">
-                    <AlertCircle className="w-4 h-4 text-amber-700" />
-                  </div>
+                <div className="p-1.5 bg-green-100 rounded-lg">
+                  <Package className="w-4 h-4 text-green-700" />
                 </div>
-                <p className="text-2xl font-extrabold text-gray-900">
-                  {stats.pending}
-                </p>
               </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex flex-col justify-between h-full gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
-                    Processing
-                  </p>
-                  <div className="p-1.5 bg-blue-100 rounded-lg">
-                    <Truck className="w-4 h-4 text-blue-700" />
-                  </div>
-                </div>
-                <p className="text-2xl font-extrabold text-gray-900">
-                  {stats.processing}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-indigo-50 to-purple-50/50 border border-indigo-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex flex-col justify-between h-full gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
-                    Shipped
-                  </p>
-                  <div className="p-1.5 bg-indigo-100 rounded-lg">
-                    <Send className="w-4 h-4 text-indigo-700" />
-                  </div>
-                </div>
-                <p className="text-2xl font-extrabold text-gray-900">
-                  {stats.shipped}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex flex-col justify-between h-full gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
-                    Delivered
-                  </p>
-                  <div className="p-1.5 bg-emerald-100 rounded-lg">
-                    <CheckCircle className="w-4 h-4 text-emerald-700" />
-                  </div>
-                </div>
-                <p className="text-2xl font-extrabold text-gray-900">
-                  {stats.delivered}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-br from-red-50 to-rose-50/50 border border-red-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="flex flex-col justify-between h-full gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
-                    Cancelled
-                  </p>
-                  <div className="p-1.5 bg-red-100 rounded-lg">
-                    <XCircle className="w-4 h-4 text-red-700" />
-                  </div>
-                </div>
-                <p className="text-2xl font-extrabold text-gray-900">
-                  {stats.cancelled}
-                </p>
-              </div>
+              <p className="text-2xl font-extrabold text-gray-900">
+                {stats.total}
+              </p>
             </div>
           </div>
-        )}
+
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col justify-between h-full gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
+                  Pending
+                </p>
+                <div className="p-1.5 bg-amber-100 rounded-lg">
+                  <AlertCircle className="w-4 h-4 text-amber-700" />
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-gray-900">
+                {stats.pending}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col justify-between h-full gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
+                  Processing
+                </p>
+                <div className="p-1.5 bg-blue-100 rounded-lg">
+                  <Truck className="w-4 h-4 text-blue-700" />
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-gray-900">
+                {stats.processing}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-indigo-50 to-purple-50/50 border border-indigo-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col justify-between h-full gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
+                  Shipped
+                </p>
+                <div className="p-1.5 bg-indigo-100 rounded-lg">
+                  <Send className="w-4 h-4 text-indigo-700" />
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-gray-900">
+                {stats.shipped}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col justify-between h-full gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+                  Delivered
+                </p>
+                <div className="p-1.5 bg-emerald-100 rounded-lg">
+                  <CheckCircle className="w-4 h-4 text-emerald-700" />
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-gray-900">
+                {stats.delivered}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-red-50 to-rose-50/50 border border-red-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+            <div className="flex flex-col justify-between h-full gap-2">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
+                  Cancelled
+                </p>
+                <div className="p-1.5 bg-red-100 rounded-lg">
+                  <XCircle className="w-4 h-4 text-red-700" />
+                </div>
+              </div>
+              <p className="text-2xl font-extrabold text-gray-900">
+                {stats.cancelled}
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* )} */}
+
+        <FilterBar
+          searchComponent={
+            <DebouncedSearch
+              placeholder="Search orders..."
+              initialValue={search}
+              onSearch={handleSearch}
+            />
+          }
+          onReset={handleReset}
+          showReset={showReset}
+        >
+          <FilterSelect
+            label="Status"
+            value={statusFilter}
+            options={filterOptions}
+            onChange={(val) => {
+              setStatusFilter(val);
+              setPage(1);
+            }}
+            className="w-40"
+          />
+          <FilterSelect
+            label="Date"
+            value={dateFilter}
+            options={DATE_FILTER_OPTIONS}
+            onChange={setDateFilter}
+            className="w-40"
+          />
+          <FilterSelect
+            label="Sort"
+            value={sortOrder}
+            options={SORT_OPTIONS}
+            onChange={(val) => setSortOrder(val as 'newest' | 'oldest')}
+            className="w-40"
+          />
+        </FilterBar>
 
         {/* Content Area */}
         <div className="min-h-[500px]">
@@ -284,18 +312,10 @@ const OrdersManagement = () => {
                     {filteredOrders.length}
                   </span>{' '}
                   orders
-                  {hasActiveFilters && (
+                  {showReset && (
                     <span className="text-gray-400"> (filtered)</span>
                   )}
                 </p>
-                {hasActiveFilters && (
-                  <button
-                    onClick={clearAllFilters}
-                    className="text-sm text-green-600 hover:text-green-700 font-semibold hover:underline"
-                  >
-                    Clear all filters
-                  </button>
-                )}
               </div>
 
               <div className="grid grid-cols-1 gap-6">
@@ -329,26 +349,18 @@ const OrdersManagement = () => {
             </>
           ) : (
             <EmptyState
-              title={hasActiveFilters ? 'No matches found' : 'No orders found'}
+              title={showReset ? 'No matches found' : 'No orders found'}
               description={
-                hasActiveFilters
+                showReset
                   ? 'No orders match your current filters. Try adjusting your filter criteria.'
                   : 'When customers place orders, they will appear here for you to manage.'
               }
               icon={
-                hasActiveFilters ? (
+                showReset ? (
                   <SearchX className="w-12 h-12" />
                 ) : (
                   <Package className="w-12 h-12" />
                 )
-              }
-              action={
-                hasActiveFilters
-                  ? {
-                      label: 'Clear all filters',
-                      onClick: clearAllFilters,
-                    }
-                  : undefined
               }
             />
           )}

@@ -40,7 +40,7 @@ export const createSupportTicket =
     dispatch({ type: SUPPORT_CREATE_REQUEST });
 
     try {
-      const { data } = await api.post('/api/support', {
+      const { data } = await api.post('/support', {
         subject,
         description,
       });
@@ -65,18 +65,22 @@ export const fetchMySupportTickets =
     limit = DEFAULT_LIMIT,
     status?: string,
     dateFrom?: string,
-    sortOrder: 'newest' | 'oldest' = 'newest'
+    sortOrder: 'newest' | 'oldest' = 'newest',
+    search?: string
   ) =>
   async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_FETCH_MY_REQUEST });
 
     try {
-      let url = `/api/support/my?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
+      let url = `/support/my?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
       if (status && status !== 'all') {
         url += `&status=${status}`;
       }
       if (dateFrom) {
         url += `&dateFrom=${dateFrom}`;
+      }
+      if (search) {
+        url += `&search=${search}`;
       }
       const { data } = await api.get(url);
 
@@ -106,13 +110,14 @@ export const fetchAllSupportTickets =
     status?: string,
     managerId?: string,
     dateFrom?: string,
-    sortOrder: 'newest' | 'oldest' = 'newest'
+    sortOrder: 'newest' | 'oldest' = 'newest',
+    search?: string
   ) =>
   async (dispatch: AppDispatch) => {
     dispatch({ type: SUPPORT_FETCH_ALL_REQUEST });
 
     try {
-      let url = `/api/support?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
+      let url = `/support?page=${page}&limit=${limit}&sortOrder=${sortOrder}`;
       if (status && status !== 'all') {
         url += `&status=${status}`;
       }
@@ -121,6 +126,9 @@ export const fetchAllSupportTickets =
       }
       if (dateFrom) {
         url += `&dateFrom=${dateFrom}`;
+      }
+      if (search) {
+        url += `&search=${search}`;
       }
       const { data } = await api.get(url);
 
@@ -155,7 +163,7 @@ export const updateSupportTicketStatus =
     });
 
     try {
-      const { data } = await api.patch(`/api/support/${ticketId}/status`, {
+      const { data } = await api.patch(`/support/${ticketId}/status`, {
         status,
       });
       // Confirm with real data
@@ -193,7 +201,7 @@ export const deleteSupportTicket =
     dispatch({ type: SUPPORT_DELETE_REQUEST }); // Sets refreshing: true
 
     try {
-      await api.delete(`/api/support/${ticketId}`);
+      await api.delete(`/support/${ticketId}`);
       dispatch(fetchAllSupportTickets());
     } catch {
       dispatch({
@@ -212,7 +220,7 @@ export const assignSupportTicket =
     });
 
     try {
-      const { data } = await api.patch(`/api/support/${ticketId}/assign`, {
+      const { data } = await api.patch(`/support/${ticketId}/assign`, {
         managerId,
       });
       // Final confirmation
@@ -235,7 +243,7 @@ export const assignSupportTicket =
 export const fetchManagersForSupport = () => async (dispatch: AppDispatch) => {
   dispatch({ type: SUPPORT_FETCH_MANAGERS_REQUEST });
   try {
-    const { data } = await api.get('/api/users?role=manager');
+    const { data } = await api.get('/users?role=manager');
     dispatch({
       type: SUPPORT_FETCH_MANAGERS_SUCCESS,
       payload: data.users || [],
@@ -252,7 +260,7 @@ export const fetchSupportStats = () => async (dispatch: AppDispatch) => {
   dispatch({ type: SUPPORT_FETCH_STATS_REQUEST });
   try {
     // Fetch a large number of tickets to get a global picture for distribution
-    const { data } = await api.get('/api/support?limit=1000');
+    const { data } = await api.get('/support?limit=1000');
     dispatch({
       type: SUPPORT_FETCH_STATS_SUCCESS,
       payload: data.tickets || [],

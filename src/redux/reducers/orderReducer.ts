@@ -14,6 +14,9 @@ import {
   UPDATE_ORDER_STATUS_REQUEST,
   UPDATE_ORDER_STATUS_SUCCESS,
   UPDATE_ORDER_STATUS_FAILURE,
+  FETCH_ORDER_STATS_REQUEST,
+  FETCH_ORDER_STATS_SUCCESS,
+  FETCH_ORDER_STATS_FAILURE,
   type OrderState,
   type OrderActionTypes,
 } from '../types/orderTypes';
@@ -42,7 +45,7 @@ export const orderReducer = (
         loading: false,
         orders: action.payload.orders,
         pagination: action.payload.pagination,
-        stats: action.payload.stats || null,
+        stats: action.payload.stats || state.stats || null, // Keep existing stats if not provided (though getMyOrders might not provide it anymore if we separated it)
       };
 
     case FETCH_ORDERS_FAILURE:
@@ -136,6 +139,19 @@ export const orderReducer = (
 
     case UPDATE_ORDER_STATUS_FAILURE:
       return { ...state, error: action.payload.error };
+
+    // ================= ORDER STATS =================
+    case FETCH_ORDER_STATS_REQUEST:
+      return { ...state }; // No global loading for stats
+
+    case FETCH_ORDER_STATS_SUCCESS:
+      return {
+        ...state,
+        stats: action.payload,
+      };
+
+    case FETCH_ORDER_STATS_FAILURE:
+      return { ...state }; // Silently fail stats
 
     default:
       return state;

@@ -6,7 +6,7 @@ import type { CartItemProps } from '../../../types/Cart';
 
 interface ExtraProps {
   isInWishlist?: boolean;
-  moveToWishlist: (_cartId: string, _productId: string) => void;
+  moveToWishlist: (cartId: string, productId: string) => void;
 }
 
 export default function CartItem({
@@ -19,14 +19,20 @@ export default function CartItem({
   const navigate = useNavigate();
   const [loading, setLoading] = useState<'inc' | 'dec' | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [isMovingToWishlist, setIsMovingToWishlist] = useState(false);
 
-  const handleMoveToWishlist = (e: React.MouseEvent) => {
+  const handleMoveToWishlist = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (loading || isInWishlist) {
+    if (loading || isInWishlist || isMovingToWishlist) {
       return;
     }
-    moveToWishlist(item._id, item.productId);
-    toast.success('Moved to wishlist ❤️');
+    setIsMovingToWishlist(true);
+    try {
+      await moveToWishlist(item._id, item.productId);
+      toast.success('Moved to wishlist ❤️');
+    } finally {
+      setIsMovingToWishlist(false);
+    }
   };
 
   const isIncrementDisabled = item.quantity >= item.stock || loading !== null;
@@ -200,7 +206,7 @@ export default function CartItem({
       >
         <button
           onClick={handleMoveToWishlist}
-          disabled={isInWishlist}
+          disabled={isInWishlist || isMovingToWishlist}
           className={`
             inline-flex items-center gap-2
             px-3 py-1.5 rounded-xl
@@ -212,16 +218,24 @@ export default function CartItem({
             }
           `}
         >
-          <Heart
-            size={14}
-            fill={isInWishlist ? 'currentColor' : 'none'}
-            className={
-              isInWishlist
-                ? 'animate-bounce'
-                : 'group-hover:scale-110 transition-transform'
-            }
-          />
-          {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+          {isMovingToWishlist ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Heart
+              size={14}
+              fill={isInWishlist ? 'currentColor' : 'none'}
+              className={
+                isInWishlist
+                  ? 'animate-bounce'
+                  : 'group-hover:scale-110 transition-transform'
+              }
+            />
+          )}
+          {isMovingToWishlist
+            ? 'Moving...'
+            : isInWishlist
+              ? 'In Wishlist'
+              : 'Add to Wishlist'}
         </button>
 
         <div className="flex items-center gap-3">

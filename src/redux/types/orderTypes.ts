@@ -94,6 +94,10 @@ export const UPDATE_ORDER_STATUS_REQUEST = 'UPDATE_ORDER_STATUS_REQUEST';
 export const UPDATE_ORDER_STATUS_SUCCESS = 'UPDATE_ORDER_STATUS_SUCCESS';
 export const UPDATE_ORDER_STATUS_FAILURE = 'UPDATE_ORDER_STATUS_FAILURE';
 
+export const FETCH_ORDER_STATS_REQUEST = 'FETCH_ORDER_STATS_REQUEST';
+export const FETCH_ORDER_STATS_SUCCESS = 'FETCH_ORDER_STATS_SUCCESS';
+export const FETCH_ORDER_STATS_FAILURE = 'FETCH_ORDER_STATS_FAILURE';
+
 /* ================= ACTION INTERFACES ================= */
 
 interface FetchOrdersRequestAction {
@@ -171,6 +175,20 @@ interface UpdateOrderStatusFailureAction {
   payload: { id: string; error: string };
 }
 
+interface FetchOrderStatsRequestAction {
+  type: typeof FETCH_ORDER_STATS_REQUEST;
+}
+
+interface FetchOrderStatsSuccessAction {
+  type: typeof FETCH_ORDER_STATS_SUCCESS;
+  payload: OrderStats;
+}
+
+interface FetchOrderStatsFailureAction {
+  type: typeof FETCH_ORDER_STATS_FAILURE;
+  payload: string;
+}
+
 /* ================= UNION ================= */
 
 export type OrderActionTypes =
@@ -188,4 +206,7 @@ export type OrderActionTypes =
   | CancelOrderFailureAction
   | UpdateOrderStatusRequestAction
   | UpdateOrderStatusSuccessAction
-  | UpdateOrderStatusFailureAction;
+  | UpdateOrderStatusFailureAction
+  | FetchOrderStatsRequestAction
+  | FetchOrderStatsSuccessAction
+  | FetchOrderStatsFailureAction;
