@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 
 interface MobileCategorySidebarProps {
   selectedCategory: string | null;
-  onSelectCategory: (id: string | null) => void;
+  onSelectCategory: (categoryId: string | null) => void;
 }
 
 export default function MobileCategorySidebar({
@@ -18,7 +18,7 @@ export default function MobileCategorySidebar({
     let isMounted = true;
 
     api
-      .get('/api/categories')
+      .get('/categories')
       .then((res) => {
         if (!isMounted) {
           return;

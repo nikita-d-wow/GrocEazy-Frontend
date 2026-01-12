@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ShoppingCart, Trash2 } from 'lucide-react';
+import { ShoppingCart, Trash2, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -61,6 +61,8 @@ export default function CartPage() {
   const total = useSelector(selectCartTotal);
   const { page, totalPages } = useSelector(selectCartPagination);
 
+  const [isClearing, setIsClearing] = useState(false);
+
   /* ================= FETCH CART ================= */
   useEffect(() => {
     if (user) {
@@ -105,14 +107,19 @@ export default function CartPage() {
     dispatch(removeCartItem(cartId));
   };
 
-  const handleClearCart = () => {
-    if (cartItems.length === 0) {
+  const handleClearCart = async () => {
+    if (cartItems.length === 0 || isClearing) {
       return;
     }
 
     if (window.confirm('Are you sure you want to clear your cart?')) {
-      dispatch(clearCart());
-      toast.success('Cart cleared');
+      setIsClearing(true);
+      try {
+        await dispatch(clearCart());
+        toast.success('Cart cleared');
+      } finally {
+        setIsClearing(false);
+      }
     }
   };
 
@@ -164,15 +171,19 @@ export default function CartPage() {
       >
         <button
           onClick={handleClearCart}
-          disabled={isEmpty}
+          disabled={isEmpty || isClearing}
           className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all w-fit border shadow-sm ${
-            isEmpty
+            isEmpty || isClearing
               ? 'bg-gray-50 text-gray-400 border-gray-100 cursor-not-allowed opacity-60'
               : 'text-red-600 bg-red-50 border-red-100 hover:bg-red-100 cursor-pointer active:scale-95'
           }`}
         >
-          <Trash2 size={16} />
-          Clear Cart
+          {isClearing ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Trash2 size={16} />
+          )}
+          {isClearing ? 'Clearing...' : 'Clear Cart'}
         </button>
       </PageHeader>
 

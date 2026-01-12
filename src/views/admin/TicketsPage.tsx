@@ -23,6 +23,8 @@ import EmptyState from '../../components/common/EmptyState';
 import Pagination from '../../components/common/Pagination';
 import FilterSelect from '../../components/common/FilterSelect';
 import PageHeader from '../../components/common/PageHeader';
+import FilterBar from '../../components/common/FilterBar';
+import DebouncedSearch from '../../components/common/DebouncedSearch';
 import TicketAssignSelect from '../../components/admin/tickets/TicketAssignSelect';
 import ManagerTicketStats from '../../components/admin/analytics/ManagerTicketStats';
 
@@ -53,6 +55,7 @@ export default function AdminSupportTickets() {
   const [managerFilter, setManagerFilter] = useState('all');
 
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     dispatch(
@@ -62,7 +65,8 @@ export default function AdminSupportTickets() {
         statusFilter,
         managerFilter,
         undefined,
-        sortOrder
+        sortOrder,
+        search
       )
     );
 
@@ -71,7 +75,15 @@ export default function AdminSupportTickets() {
     }
 
     dispatch(fetchSupportStats());
-  }, [dispatch, page, managers.length, statusFilter, managerFilter, sortOrder]);
+  }, [
+    dispatch,
+    page,
+    managers.length,
+    statusFilter,
+    managerFilter,
+    sortOrder,
+    search,
+  ]);
 
   const filterOptions = useMemo(() => {
     const statusOptions = Object.keys(STATUS_MAP).map((status) => ({
@@ -90,13 +102,18 @@ export default function AdminSupportTickets() {
     return [{ value: 'all', label: 'All Managers' }, ...options];
   }, [managers]);
 
-  const hasActiveFilters = statusFilter !== 'all' || managerFilter !== 'all';
+  const showReset =
+    statusFilter !== 'all' || managerFilter !== 'all' || search !== '';
 
-  const clearAllFilters = () => {
+  const handleSearch = (val: string) => {
+    setSearch(val);
+  };
+
+  const handleReset = () => {
     setStatusFilter('all');
     setManagerFilter('all');
-
     setSortOrder('newest');
+    setSearch('');
   };
 
   return (
@@ -115,33 +132,7 @@ export default function AdminSupportTickets() {
           highlightText="Admin"
           subtitle="Manage all customer support requests"
           icon={ShieldCheck}
-        >
-          <div className="flex flex-wrap gap-3 items-center">
-            <FilterSelect
-              label="Status"
-              value={statusFilter}
-              options={filterOptions}
-              onChange={setStatusFilter}
-              className="w-40"
-            />
-
-            <FilterSelect
-              label="Manager"
-              value={managerFilter}
-              options={managerOptions}
-              onChange={setManagerFilter}
-              className="w-40"
-            />
-
-            <FilterSelect
-              label="Sort"
-              value={sortOrder}
-              options={SORT_OPTIONS}
-              onChange={(val) => setSortOrder(val as 'newest' | 'oldest')}
-              className="w-40"
-            />
-          </div>
-        </PageHeader>
+        />
 
         {/* STATS - ALWAYS VISIBLE IF MANAGERS LOADED */}
         <ManagerTicketStats
@@ -149,6 +140,40 @@ export default function AdminSupportTickets() {
           managers={managers}
           totalCount={statsTickets.length > 0 ? statsTickets.length : total}
         />
+
+        <FilterBar
+          searchComponent={
+            <DebouncedSearch
+              placeholder="Search tickets..."
+              initialValue={search}
+              onSearch={handleSearch}
+            />
+          }
+          onReset={handleReset}
+          showReset={showReset}
+        >
+          <FilterSelect
+            label="Status"
+            value={statusFilter}
+            options={filterOptions}
+            onChange={setStatusFilter}
+            className="w-40"
+          />
+          <FilterSelect
+            label="Manager"
+            value={managerFilter}
+            options={managerOptions}
+            onChange={setManagerFilter}
+            className="w-40"
+          />
+          <FilterSelect
+            label="Sort"
+            value={sortOrder}
+            options={SORT_OPTIONS}
+            onChange={(val) => setSortOrder(val as 'newest' | 'oldest')}
+            className="w-40"
+          />
+        </FilterBar>
 
         {loading && tickets.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[400px]">
@@ -160,9 +185,19 @@ export default function AdminSupportTickets() {
         ) : tickets.length === 0 ? (
           <div className="animate-fadeIn">
             <EmptyState
-              title="No Support Tickets"
-              description="Everything is running smoothly ✨"
-              icon={<ShieldCheck size={48} className="text-indigo-200" />}
+              title={showReset ? 'No matches found' : 'No Support Tickets'}
+              description={
+                showReset
+                  ? 'No tickets match your current filters. Try adjusting your filter criteria.'
+                  : 'Everything is running smoothly ✨'
+              }
+              icon={
+                showReset ? (
+                  <SearchX size={48} />
+                ) : (
+                  <ShieldCheck size={48} className="text-indigo-200" />
+                )
+              }
             />
           </div>
         ) : (
@@ -282,26 +317,24 @@ export default function AdminSupportTickets() {
               </div>
             ) : (
               <EmptyState
-                title={
-                  hasActiveFilters ? 'No matches found' : 'No Support Tickets'
-                }
+                title={showReset ? 'No matches found' : 'No Support Tickets'}
                 description={
-                  hasActiveFilters
+                  showReset
                     ? 'No tickets match your current filters. Try adjusting your filter criteria.'
                     : 'Everything is running smoothly ✨'
                 }
                 icon={
-                  hasActiveFilters ? (
+                  showReset ? (
                     <SearchX className="w-12 h-12" />
                   ) : (
                     <ShieldCheck className="w-12 h-12" />
                   )
                 }
                 action={
-                  hasActiveFilters
+                  showReset
                     ? {
                         label: 'Clear all filters',
-                        onClick: clearAllFilters,
+                        onClick: handleReset,
                       }
                     : undefined
                 }

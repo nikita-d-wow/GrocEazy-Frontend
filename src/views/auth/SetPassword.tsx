@@ -49,7 +49,7 @@ export default function SetPassword() {
   const onSubmit = async (data: PasswordFormInputs) => {
     setLoading(true);
     try {
-      await api.post('/api/auth/set-password', { password: data.password });
+      await api.post('/auth/set-password', { password: data.password });
 
       // Manually update local state to ensure hasPassword is true immediately
       dispatch({

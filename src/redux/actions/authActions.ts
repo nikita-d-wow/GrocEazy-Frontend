@@ -31,10 +31,7 @@ export const login = (payload: LoginPayload) => {
     dispatch({ type: AUTH_LOGIN_REQUEST });
     try {
       // API call using the axios instance
-      const { data } = await api.post<ILoginResponse>(
-        '/api/auth/login',
-        payload
-      );
+      const { data } = await api.post<ILoginResponse>('/auth/login', payload);
 
       // store accessToken in localStorage settings
       localStorage.setItem(AUTH_KEYS.ACCESS_TOKEN, data.accessToken);
@@ -46,7 +43,6 @@ export const login = (payload: LoginPayload) => {
         payload: { accessToken: data.accessToken, user: data.user as IUser },
       });
     } catch (err: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Login failed';
       dispatch({
@@ -61,13 +57,12 @@ export const register = (payload: RegisterPayload) => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
     dispatch({ type: AUTH_REGISTER_REQUEST });
     try {
-      await api.post('/api/auth/register', payload);
+      await api.post('/auth/register', payload);
 
       dispatch({ type: AUTH_REGISTER_SUCCESS });
       // Note: Registration doesn't auto-login per spec, so no token setting here.
       // The UI should redirect to Login.
     } catch (err: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Registration failed';
       dispatch({
@@ -96,7 +91,7 @@ export const logout = () => {
       // Attempt server-side logout (blacklist refresh token)
       if (refreshToken) {
         // Access token is automatically attached by interceptor if present
-        await api.post('/api/auth/logout', { refreshToken });
+        await api.post('/auth/logout', { refreshToken });
       }
     } catch (error) {
       console.error('Logout backend call failed', error); // eslint-disable-line no-console
@@ -112,7 +107,7 @@ export const googleLogin = (token: string) => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
     dispatch({ type: AUTH_LOGIN_REQUEST });
     try {
-      const { data } = await api.post<ILoginResponse>('/api/auth/google', {
+      const { data } = await api.post<ILoginResponse>('/auth/google', {
         token,
       });
 
@@ -125,7 +120,6 @@ export const googleLogin = (token: string) => {
         payload: { accessToken: data.accessToken, user: data.user as IUser },
       });
     } catch (err: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Google login failed';
       dispatch({
@@ -140,7 +134,7 @@ export const forgotPassword = (email: string) => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
     dispatch({ type: AUTH_FORGOT_PASSWORD_REQUEST });
     try {
-      await api.post('/api/auth/forgot-password', { email });
+      await api.post('/auth/forgot-password', { email });
       dispatch({ type: AUTH_FORGOT_PASSWORD_SUCCESS });
     } catch {
       // Error handled by reducer/toast
@@ -152,10 +146,9 @@ export const resetPassword = (token: string, password: string) => {
   return async (dispatch: Dispatch<AuthActionTypes>) => {
     dispatch({ type: AUTH_RESET_PASSWORD_REQUEST });
     try {
-      await api.post('/api/auth/reset-password', { token, password });
+      await api.post('/auth/reset-password', { token, password });
       dispatch({ type: AUTH_RESET_PASSWORD_SUCCESS });
     } catch (err: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'Reset password failed';
       dispatch({
@@ -183,7 +176,6 @@ export const verifyOtpAction = (email: string, otp: string) => {
       });
       return data;
     } catch (err: any) {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMessage =
         err.response?.data?.message || err.message || 'OTP Verification failed';
       dispatch({

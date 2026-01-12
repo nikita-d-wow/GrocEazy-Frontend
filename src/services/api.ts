@@ -43,20 +43,21 @@ api.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem(AUTH_KEYS.REFRESH_TOKEN);
         if (!refreshToken) {
-          throw new Error("No refresh token available");
+          throw new Error('No refresh token available');
         }
 
         // Call Refresh Endpoint
         // Pass the OLD Access Token in the header (if available) for blacklisting
         const oldAccess = localStorage.getItem(AUTH_KEYS.ACCESS_TOKEN);
 
-        const res = await axios.post(`${API_BASE}/api/auth/refresh`,
+        const res = await axios.post(
+          `${API_BASE}/auth/refresh`,
           { refreshToken },
           {
             headers: {
               Authorization: oldAccess ? `Bearer ${oldAccess}` : undefined,
-              'Content-Type': 'application/json'
-            }
+              'Content-Type': 'application/json',
+            },
           }
         );
 
@@ -71,10 +72,8 @@ api.interceptors.response.use(
         // Retry Original Request with new token
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
-
       } catch (refreshError) {
         // Refresh Failed (Expired or Invalid) -> Logout User
-        console.error("Session expired:", refreshError);
 
         // Clear Storage
         localStorage.removeItem(AUTH_KEYS.ACCESS_TOKEN);

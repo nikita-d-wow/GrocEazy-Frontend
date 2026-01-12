@@ -14,7 +14,7 @@ export const getProducts = async (
   maxPrice?: number,
   sortBy?: string
 ): Promise<any> => {
-  const url = `/api/products?`;
+  const url = `/products?`;
   const params = new URLSearchParams();
   if (page) {
     params.append('page', page.toString());
@@ -53,7 +53,7 @@ export const getManagerProducts = async (
   stockStatus?: string,
   categoryId?: string
 ): Promise<any> => {
-  let url = `/api/products/manager/all?page=${page}&limit=${limit}`;
+  let url = `/products/manager/all?page=${page}&limit=${limit}`;
   if (search) {
     url += `&search=${encodeURIComponent(search)}`;
   }
@@ -75,7 +75,7 @@ export const getManagerProducts = async (
  * Get all products for analytics (unpaginated, includes inactive)
  */
 export const getAnalyticsProducts = async (): Promise<Product[]> => {
-  const response = await api.get<Product[]>('/api/products/analytics');
+  const response = await api.get<Product[]>('/products/analytics');
   return response.data;
 };
 
@@ -86,7 +86,7 @@ export const getProductsByCategory = async (
   categoryId: string
 ): Promise<Product[]> => {
   const response = await api.get<Product[] | { products: Product[] }>(
-    `/api/products?categoryId=${categoryId}`
+    `/products?categoryId=${categoryId}`
   );
   // Backend might return { products: [...] } or just the array
   return Array.isArray(response.data) ? response.data : response.data.products;
@@ -97,7 +97,7 @@ export const getProductsByCategory = async (
  */
 export const getProductById = async (id: string): Promise<Product> => {
   const response = await api.get<Product | { product: Product }>(
-    `/api/products/${id}`
+    `/products/${id}`
   );
   // Backend might return { product: {...} } or just the product object
   return 'product' in response.data ? response.data.product : response.data;
@@ -144,7 +144,7 @@ export const createProduct = async (
   }
 
   const response = await api.post<Product | { product: Product }>(
-    '/api/products',
+    '/products',
     formData,
     {
       headers: {
@@ -198,7 +198,7 @@ export const updateProduct = async (
   }
 
   const response = await api.put<Product | { product: Product }>(
-    `/api/products/${id}`,
+    `/products/${id}`,
     formData,
     {
       headers: {
@@ -214,7 +214,7 @@ export const updateProduct = async (
  * Delete a product (soft delete, requires auth)
  */
 export const deleteProduct = async (id: string): Promise<void> => {
-  await api.delete(`/api/products/${id}`);
+  await api.delete(`/products/${id}`);
 };
 
 /**
@@ -225,7 +225,7 @@ export const getSimilarProducts = async (
   limit: number = 6
 ): Promise<Product[]> => {
   const response = await api.get<Product[] | { products: Product[] }>(
-    `/api/products/${id}/similar?limit=${limit}`
+    `/products/${id}/similar?limit=${limit}`
   );
   return Array.isArray(response.data)
     ? response.data
@@ -240,7 +240,7 @@ export const getTopProducts = async (
 ): Promise<Product[]> => {
   try {
     const response = await api.get<any>(
-      `/api/products/recommendations/top-10?limit=${limit}`
+      `/products/recommendations/top-10?limit=${limit}`
     );
 
     // Support various backend response formats
@@ -261,7 +261,7 @@ export const getTopProducts = async (
     }
 
     return [];
-  } catch (error) {
+  } catch (_error) {
     toast.error('Failed to fetch top products');
     return [];
   }

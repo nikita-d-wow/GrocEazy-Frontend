@@ -21,7 +21,7 @@ export const getUsers = (page = 1, role = '', search = '') => {
     dispatch({ type: FETCH_USERS_REQUEST });
     try {
       // Build query string
-      let queryString = `/api/users?page=${page}&limit=10`;
+      let queryString = `/users?page=${page}&limit=10`;
       if (role) {
         queryString += `&role=${role}`;
       }
@@ -46,7 +46,7 @@ export const getUserDetails = (id: string) => {
   return async (dispatch: Dispatch<UserActionTypes>) => {
     dispatch({ type: FETCH_USER_DETAILS_REQUEST });
     try {
-      const { data } = await api.get<User>(`/api/users/${id}`);
+      const { data } = await api.get<User>(`/users/${id}`);
       dispatch({ type: FETCH_USER_DETAILS_SUCCESS, payload: data });
     } catch (error: any) {
       const errorMessage =
@@ -64,10 +64,7 @@ export const updateUserStatus = (
   return async (dispatch: Dispatch<UserActionTypes>) => {
     dispatch({ type: UPDATE_USER_STATUS_REQUEST });
     try {
-      const { data } = await api.patch<User>(
-        `/api/users/${id}/status`,
-        updates
-      );
+      const { data } = await api.patch<User>(`/users/${id}/status`, updates);
       dispatch({ type: UPDATE_USER_STATUS_SUCCESS, payload: data });
     } catch (error: any) {
       const errorMessage =
