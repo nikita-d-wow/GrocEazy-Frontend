@@ -49,7 +49,9 @@ export default function AdminSupportTickets() {
   const loading = useSelector(selectSupportLoading);
   const refreshing = useSelector(selectSupportRefreshing);
   const statsTickets = useSelector(selectSupportStatsTickets);
-  const { page, totalPages, total } = useSelector(selectSupportPagination);
+  const { totalPages, total } = useSelector(selectSupportPagination);
+
+  const [page, setPage] = useState(1);
 
   const [statusFilter, setStatusFilter] = useState('all');
   const [managerFilter, setManagerFilter] = useState('all');
@@ -139,6 +141,16 @@ export default function AdminSupportTickets() {
           tickets={statsTickets.length > 0 ? statsTickets : tickets}
           managers={managers}
           totalCount={statsTickets.length > 0 ? statsTickets.length : total}
+          currentStatus={statusFilter}
+          currentManagerId={managerFilter}
+          onStatusSelect={(status) => {
+            setStatusFilter(status);
+            setPage(1);
+          }}
+          onManagerSelect={(mgrId) => {
+            setManagerFilter(mgrId);
+            setPage(1);
+          }}
         />
 
         <FilterBar
@@ -156,14 +168,20 @@ export default function AdminSupportTickets() {
             label="Status"
             value={statusFilter}
             options={filterOptions}
-            onChange={setStatusFilter}
+            onChange={(val) => {
+              setStatusFilter(val);
+              setPage(1);
+            }}
             className="w-40"
           />
           <FilterSelect
             label="Manager"
             value={managerFilter}
             options={managerOptions}
-            onChange={setManagerFilter}
+            onChange={(val) => {
+              setManagerFilter(val);
+              setPage(1);
+            }}
             className="w-40"
           />
           <FilterSelect
@@ -347,18 +365,7 @@ export default function AdminSupportTickets() {
                 <Pagination
                   currentPage={page}
                   totalPages={totalPages}
-                  onPageChange={(p) => {
-                    dispatch(
-                      fetchAllSupportTickets(
-                        p,
-                        PAGE_LIMIT,
-                        statusFilter,
-                        managerFilter,
-                        undefined,
-                        sortOrder
-                      )
-                    );
-                  }}
+                  onPageChange={setPage}
                   isLoading={loading}
                 />
               </div>

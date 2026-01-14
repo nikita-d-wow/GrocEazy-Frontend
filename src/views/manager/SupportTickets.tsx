@@ -55,7 +55,9 @@ export default function ManagerSupportTickets() {
   const dispatch = useDispatch<AppDispatch>();
   const tickets = useSelector(selectSupportTickets);
   const loading = useSelector(selectSupportLoading);
-  const { page, totalPages } = useSelector(selectSupportPagination);
+  const { totalPages } = useSelector(selectSupportPagination);
+
+  const [page, setPage] = useState(1);
 
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -167,7 +169,17 @@ export default function ManagerSupportTickets() {
         {/* Stats Cards */}
         {/* {!loading && tickets.length > 0 && ( */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 animate-slideUp">
-          <div className="bg-gradient-to-br from-violet-50 to-purple-50/50 border border-violet-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('all');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-violet-50 to-purple-50/50 border rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'all'
+                ? 'border-violet-500 ring-2 ring-violet-100 shadow-md'
+                : 'border-violet-100'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] sm:text-xs font-bold text-violet-600 uppercase tracking-wider mb-1">
@@ -183,7 +195,17 @@ export default function ManagerSupportTickets() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('open');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-amber-50 to-orange-50/50 border rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'open'
+                ? 'border-amber-500 ring-2 ring-amber-100 shadow-md'
+                : 'border-amber-100'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] sm:text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">
@@ -199,7 +221,17 @@ export default function ManagerSupportTickets() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('in_progress');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-blue-50 to-indigo-50/50 border rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'in_progress'
+                ? 'border-blue-500 ring-2 ring-blue-100 shadow-md'
+                : 'border-blue-100'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">
@@ -215,7 +247,17 @@ export default function ManagerSupportTickets() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('resolved');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-emerald-50 to-teal-50/50 border rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'resolved'
+                ? 'border-emerald-500 ring-2 ring-emerald-100 shadow-md'
+                : 'border-emerald-100'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
@@ -231,7 +273,17 @@ export default function ManagerSupportTickets() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-gray-50 to-slate-50/50 border border-gray-200 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('closed');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-gray-50 to-slate-50/50 border rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'closed'
+                ? 'border-gray-500 ring-2 ring-gray-200 shadow-md'
+                : 'border-gray-200'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
@@ -266,6 +318,7 @@ export default function ManagerSupportTickets() {
             options={filterOptions}
             onChange={(val) => {
               setStatusFilter(val);
+              setPage(1);
             }}
             className="w-40"
           />
@@ -349,19 +402,7 @@ export default function ManagerSupportTickets() {
                   <Pagination
                     currentPage={page}
                     totalPages={totalPages}
-                    onPageChange={(p) => {
-                      const dateFrom = getDateFrom(dateFilter);
-                      dispatch(
-                        fetchAllSupportTickets(
-                          p,
-                          PAGE_LIMIT,
-                          statusFilter,
-                          undefined,
-                          dateFrom,
-                          sortOrder
-                        )
-                      );
-                    }}
+                    onPageChange={setPage}
                     isLoading={loading}
                   />
                 </div>
