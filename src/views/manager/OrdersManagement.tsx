@@ -145,8 +145,8 @@ const OrdersManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent px-6 sm:px-12 lg:px-20 py-10 animate-fadeIn">
-      <div className="max-w-[1400px] mx-auto space-y-8">
+    <div className="min-h-screen bg-transparent px-6 sm:px-12 lg:px-20 py-10 animate-fadeIn space-y-8">
+      <div className="w-full space-y-8">
         {/* Header Section */}
         <PageHeader
           title="Order Management"
@@ -158,7 +158,17 @@ const OrdersManagement = () => {
         {/* Stats Cards */}
         {/* {!loading && orders.length > 0 && ( */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 animate-slideUp">
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('all');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-green-50 to-emerald-50/50 border rounded-2xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'all'
+                ? 'border-green-500 ring-2 ring-green-100 shadow-md'
+                : 'border-green-100'
+            }`}
+          >
             <div className="flex flex-col justify-between h-full gap-2">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-bold text-green-600 uppercase tracking-wider">
@@ -174,7 +184,17 @@ const OrdersManagement = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('Pending');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-amber-50 to-orange-50/50 border rounded-2xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'Pending'
+                ? 'border-amber-500 ring-2 ring-amber-100 shadow-md'
+                : 'border-amber-100'
+            }`}
+          >
             <div className="flex flex-col justify-between h-full gap-2">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
@@ -190,7 +210,17 @@ const OrdersManagement = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('Processing');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-blue-50 to-indigo-50/50 border rounded-2xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'Processing'
+                ? 'border-blue-500 ring-2 ring-blue-100 shadow-md'
+                : 'border-blue-100'
+            }`}
+          >
             <div className="flex flex-col justify-between h-full gap-2">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">
@@ -206,7 +236,17 @@ const OrdersManagement = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-indigo-50 to-purple-50/50 border border-indigo-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('Shipped');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-indigo-50 to-purple-50/50 border rounded-2xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'Shipped'
+                ? 'border-indigo-500 ring-2 ring-indigo-100 shadow-md'
+                : 'border-indigo-100'
+            }`}
+          >
             <div className="flex flex-col justify-between h-full gap-2">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">
@@ -222,7 +262,17 @@ const OrdersManagement = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('Delivered');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-emerald-50 to-teal-50/50 border rounded-2xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'Delivered'
+                ? 'border-emerald-500 ring-2 ring-emerald-100 shadow-md'
+                : 'border-emerald-100'
+            }`}
+          >
             <div className="flex flex-col justify-between h-full gap-2">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
@@ -238,7 +288,17 @@ const OrdersManagement = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-red-50 to-rose-50/50 border border-red-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-300">
+          <div
+            onClick={() => {
+              setStatusFilter('Cancelled');
+              setPage(1);
+            }}
+            className={`cursor-pointer transition-all duration-300 bg-gradient-to-br from-red-50 to-rose-50/50 border rounded-2xl p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 ${
+              statusFilter === 'Cancelled'
+                ? 'border-red-500 ring-2 ring-red-100 shadow-md'
+                : 'border-red-100'
+            }`}
+          >
             <div className="flex flex-col justify-between h-full gap-2">
               <div className="flex items-center justify-between">
                 <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">

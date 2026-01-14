@@ -7,7 +7,7 @@ export default function ManagerLayout() {
     <>
       <Header />
       <main className="min-h-screen">
-        <div className="max-w-[1400px] mx-auto">
+        <div className="max-w-[1400px] mx-auto w-full">
           <Outlet />
         </div>
       </main>

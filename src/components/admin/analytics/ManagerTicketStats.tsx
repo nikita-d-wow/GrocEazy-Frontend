@@ -6,12 +6,20 @@ interface ManagerTicketStatsProps {
   tickets: SupportTicket[];
   managers: IUser[];
   totalCount?: number;
+  onStatusSelect?: (status: string) => void;
+  onManagerSelect?: (managerId: string) => void;
+  currentStatus?: string;
+  currentManagerId?: string;
 }
 
 const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
   tickets,
   managers,
   totalCount,
+  onStatusSelect,
+  onManagerSelect,
+  currentStatus,
+  currentManagerId,
 }) => {
   const stats = useMemo(() => {
     const counts: Record<
@@ -68,7 +76,14 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
           </div>
         </div>
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
+          <div
+            onClick={() => onStatusSelect?.('all')}
+            className={`flex justify-between items-center p-2 rounded-xl transition-all duration-200 cursor-pointer hover:bg-gray-50 active:scale-95 ${
+              currentStatus === 'all' && currentManagerId === 'all'
+                ? 'bg-primary/5 ring-1 ring-primary/20'
+                : ''
+            }`}
+          >
             <span className="text-sm text-gray-500">Total Tickets</span>
             <div className="flex flex-col items-end">
               <span className="text-lg font-bold text-gray-800">
@@ -76,13 +91,27 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
               </span>
             </div>
           </div>
-          <div className="flex justify-between items-center border-t border-gray-50 pt-3">
+          <div
+            onClick={() => onManagerSelect?.('assigned')}
+            className={`flex justify-between items-center border-t border-gray-50 pt-3 p-2 rounded-xl transition-all duration-200 cursor-pointer hover:bg-gray-50 active:scale-95 ${
+              currentManagerId === 'assigned'
+                ? 'bg-primary/5 ring-1 ring-primary/20'
+                : ''
+            }`}
+          >
             <span className="text-sm text-gray-500">Assigned</span>
             <span className="text-lg font-bold text-primary">
               {assignedCount}
             </span>
           </div>
-          <div className="flex justify-between items-center border-t border-gray-50 pt-3">
+          <div
+            onClick={() => onManagerSelect?.('unassigned')}
+            className={`flex justify-between items-center border-t border-gray-50 pt-3 p-2 rounded-xl transition-all duration-200 cursor-pointer hover:bg-gray-50 active:scale-95 ${
+              currentManagerId === 'unassigned'
+                ? 'bg-amber-50 ring-1 ring-amber-200'
+                : ''
+            }`}
+          >
             <div className="flex flex-col">
               <span className="text-sm text-gray-500">Unassigned</span>
             </div>
@@ -125,11 +154,22 @@ const ManagerTicketStats: React.FC<ManagerTicketStatsProps> = ({
             {stats.map((manager) => (
               <div
                 key={manager._id}
-                className="flex flex-col p-4 rounded-2xl bg-gray-50/50 border border-gray-100 hover:border-primary/20 hover:bg-white transition-all shadow-sm group"
+                onClick={() => onManagerSelect?.(manager._id)}
+                className={`flex flex-col p-4 rounded-2xl transition-all shadow-sm group cursor-pointer hover:scale-[1.02] active:scale-95 ${
+                  currentManagerId === manager._id
+                    ? 'bg-white border-primary ring-2 ring-primary/10 shadow-md scale-[1.02]'
+                    : 'bg-gray-50/50 border-gray-100 hover:border-primary/20 hover:bg-white'
+                } border`}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${
+                        currentManagerId === manager._id
+                          ? 'bg-primary text-white'
+                          : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'
+                      }`}
+                    >
                       {(manager.name || manager.email || '?')
                         .charAt(0)
                         .toUpperCase()}

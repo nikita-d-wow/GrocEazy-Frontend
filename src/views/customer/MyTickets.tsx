@@ -51,7 +51,7 @@ export default function MyTickets() {
   const loading = useSelector(selectSupportLoading);
   const pagination = useSelector(selectSupportPagination);
 
-  const currentPage = pagination?.page || 1;
+  const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
@@ -87,7 +87,7 @@ export default function MyTickets() {
     const dateFrom = getDateFrom(dateFilter);
     dispatch(
       fetchMySupportTickets(
-        currentPage,
+        page,
         PAGE_LIMIT,
         statusFilter,
         dateFrom,
@@ -96,7 +96,7 @@ export default function MyTickets() {
       )
     );
     // window.scrollTo(0, 0); // Optional: keep scrolling behavior if needed
-  }, [dispatch, currentPage, statusFilter, dateFilter, sortOrder, search]);
+  }, [dispatch, page, statusFilter, dateFilter, sortOrder, search]);
 
   const filterOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -138,6 +138,7 @@ export default function MyTickets() {
 
   const handleSearch = (val: string) => {
     setSearch(val);
+    setPage(1);
   };
 
   const handleReset = () => {
@@ -145,6 +146,7 @@ export default function MyTickets() {
     setDateFilter('all');
     setSortOrder('newest');
     setSearch('');
+    setPage(1);
   };
 
   const hasTickets = myTickets && myTickets.length > 0;
@@ -160,7 +162,13 @@ export default function MyTickets() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 animate-slideUp mb-8">
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div
+          onClick={() => {
+            setStatusFilter('open');
+            setPage(1);
+          }}
+          className={`cursor-pointer bg-gradient-to-br from-amber-50 to-orange-50/50 border ${statusFilter === 'open' ? 'border-amber-500 ring-2 ring-amber-100 shadow-md' : 'border-amber-100'} rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-300`}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">
@@ -176,7 +184,13 @@ export default function MyTickets() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div
+          onClick={() => {
+            setStatusFilter('in_progress');
+            setPage(1);
+          }}
+          className={`cursor-pointer bg-gradient-to-br from-blue-50 to-indigo-50/50 border ${statusFilter === 'in_progress' ? 'border-blue-500 ring-2 ring-blue-100 shadow-md' : 'border-blue-100'} rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-300`}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">
@@ -192,7 +206,13 @@ export default function MyTickets() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-100 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div
+          onClick={() => {
+            setStatusFilter('resolved');
+            setPage(1);
+          }}
+          className={`cursor-pointer bg-gradient-to-br from-emerald-50 to-teal-50/50 border ${statusFilter === 'resolved' ? 'border-emerald-500 ring-2 ring-emerald-100 shadow-md' : 'border-emerald-100'} rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-300`}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
@@ -208,7 +228,13 @@ export default function MyTickets() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-gray-50 to-slate-50/50 border border-gray-200 rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
+        <div
+          onClick={() => {
+            setStatusFilter('closed');
+            setPage(1);
+          }}
+          className={`cursor-pointer bg-gradient-to-br from-gray-50 to-slate-50/50 border ${statusFilter === 'closed' ? 'border-gray-500 ring-2 ring-gray-100 shadow-md' : 'border-gray-200'} rounded-2xl p-4 sm:p-5 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all duration-300`}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-[10px] sm:text-xs font-bold text-gray-600 uppercase tracking-wider mb-1">
@@ -241,7 +267,10 @@ export default function MyTickets() {
             label="Status"
             value={statusFilter}
             options={filterOptions}
-            onChange={setStatusFilter}
+            onChange={(val) => {
+              setStatusFilter(val);
+              setPage(1);
+            }}
             className="w-full sm:w-40"
           />
           <FilterSelect
@@ -378,19 +407,9 @@ export default function MyTickets() {
       {pagination && pagination.totalPages > 1 && (
         <div className="mt-8 flex justify-center">
           <Pagination
-            currentPage={currentPage}
+            currentPage={page}
             totalPages={pagination.totalPages}
-            onPageChange={(p) =>
-              dispatch(
-                fetchMySupportTickets(
-                  p,
-                  PAGE_LIMIT,
-                  statusFilter,
-                  getDateFrom(dateFilter),
-                  sortOrder
-                )
-              )
-            }
+            onPageChange={(p) => setPage(p)}
             isLoading={loading}
           />
         </div>
