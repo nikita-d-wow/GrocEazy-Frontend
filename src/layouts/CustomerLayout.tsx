@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Header from '../components/customer/Header';
 import Footer from '../components/customer/Footer';
 import FloatingCartBar from '../components/customer/cart/FloatingCartBar';
+import ChatWidget from '../components/customer/chat/ChatWidget';
 import type { RootState } from '../redux/rootReducer';
 import type { AppDispatch } from '../redux/store';
 import { fetchCart } from '../redux/actions/cartActions';
@@ -41,6 +42,7 @@ export default function CustomerLayout() {
 
       <Footer />
       <FloatingCartBar />
+      <ChatWidget />
     </>
   );
 }
