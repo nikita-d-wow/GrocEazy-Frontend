@@ -29,16 +29,18 @@ export default function CategoriesSection() {
     .slice(0, 8); // Show max 8 categories
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16 animate-fadeIn">
-      <div className="mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-          Shop By Category
-        </h2>
-        <p className="text-gray-500 mt-1">Explore our collection</p>
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-16">
+      <div className="mb-6 sm:mb-8">
+        <div>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
+            Shop By Category
+          </h2>
+          <p className="text-sm text-gray-500 mt-0.5">Explore our collection</p>
+        </div>
       </div>
 
       {visibleCategories.length === 0 ? (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-6">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="flex flex-col items-center">
               <Skeleton
@@ -52,7 +54,7 @@ export default function CategoriesSection() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 sm:gap-6">
           {visibleCategories.map((cat, index) => {
             const bgClass =
               categoryBgVariants[index % categoryBgVariants.length];

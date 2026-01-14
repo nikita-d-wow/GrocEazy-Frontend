@@ -58,13 +58,15 @@ export default function ProductsSection() {
   }
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16">
-      <div className="flex items-center justify-between mb-8">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-16">
+      <div className="flex items-center justify-between mb-6 sm:mb-8">
         <div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
             Our Products
           </h2>
-          <p className="text-gray-500 mt-1">Fresh selections for you</p>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Fresh selections for you
+          </p>
         </div>
         <Button
           onClick={() => navigate('/products')}

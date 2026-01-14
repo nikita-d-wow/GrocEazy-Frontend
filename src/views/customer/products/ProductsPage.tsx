@@ -162,7 +162,7 @@ const ProductsPage: FC = () => {
 
   return (
     <div className="relative bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 relative z-10 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 py-4 sm:py-8 relative z-10 transition-all duration-300">
         <div className="bg-white">
           {/* Header */}
           <PageHeader
@@ -180,9 +180,76 @@ const ProductsPage: FC = () => {
             </div>
           </PageHeader>
 
-          <div className="flex flex-col lg:flex-row gap-8 relative items-start">
+          {/* Active Filter Chips */}
+          <div className="flex flex-wrap gap-2 mb-6">
+            {(selectedCategory ||
+              searchQuery ||
+              localFilters.priceRange[0] !== 0 ||
+              localFilters.priceRange[1] !== 1000) && (
+              <button
+                onClick={() => {
+                  const params = new URLSearchParams(location.search);
+                  params.delete('category');
+                  params.set('page', '1');
+                  navigate(`${location.pathname}?${params.toString()}`);
+                  dispatch(setSearchQuery(''));
+                  setLocalFilters({ priceRange: [0, 1000], sortBy: 'newest' });
+                }}
+                className="px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-100 hover:bg-red-100 transition-colors"
+              >
+                Clear All
+              </button>
+            )}
+
+            {searchQuery && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
+                Search: {searchQuery}
+                <button
+                  onClick={() => dispatch(setSearchQuery(''))}
+                  className="hover:text-blue-900 transition-colors text-lg leading-none"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+
+            {selectedCategory && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold border border-green-100">
+                Category: Selected
+                <button
+                  onClick={() =>
+                    handleUpdateFilters({ selectedCategory: null })
+                  }
+                  className="hover:text-green-900 transition-colors text-lg leading-none"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+
+            {(localFilters.priceRange[0] !== 0 ||
+              localFilters.priceRange[1] !== 1000) && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-100">
+                Price: ₹{localFilters.priceRange[0]} - ₹
+                {localFilters.priceRange[1]}
+                <button
+                  onClick={() =>
+                    setLocalFilters((prev) => ({
+                      ...prev,
+                      priceRange: [0, 1000],
+                    }))
+                  }
+                  className="hover:text-amber-900 transition-colors text-lg leading-none"
+                >
+                  &times;
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-4 sm:gap-8 relative items-start">
             {/* ---------------- MOBILE CATEGORY SIDEBAR ---------------- */}
-            <div className="lg:hidden w-full overflow-x-auto overflow-y-visible py-2 bg-white sticky top-[65px] z-30 border-b border-gray-100 no-scrollbar">
+            <div className="lg:hidden w-full overflow-x-auto overflow-y-visible py-1 sm:py-2 bg-white sticky top-[58px] xs:top-[65px] z-30 border-b border-gray-100 no-scrollbar">
               <MobileCategorySidebar
                 selectedCategory={selectedCategory}
                 onSelectCategory={(id) =>

@@ -89,7 +89,7 @@ export default function ProductCard({
       className="bg-white rounded-[20px] p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_24px_rgba(0,0,0,0.08)] transition-all duration-300 cursor-pointer group h-full flex flex-col border border-gray-100/50 hover:border-green-100"
     >
       <div
-        className={`relative bg-gray-50/50 group-hover:bg-gradient-to-tr group-hover:from-green-50/50 group-hover:to-emerald-50/50 rounded-2xl p-4 mb-3 overflow-hidden h-44 flex items-center justify-center transition-colors duration-500`}
+        className={`relative bg-gray-50/50 group-hover:bg-gradient-to-tr group-hover:from-green-50/50 group-hover:to-emerald-50/50 rounded-2xl p-4 mb-2 sm:mb-3 overflow-hidden h-36 xs:h-40 sm:h-44 flex items-center justify-center transition-colors duration-500`}
       >
         <img
           src={getOptimizedImage(image, 400)} // Request 400px for card
@@ -110,7 +110,7 @@ export default function ProductCard({
         )}
         <button
           onClick={handleWishlistFn}
-          className={`absolute top-2 left-2 p-2 rounded-full transition-all duration-300 cursor-pointer z-20 ${
+          className={`absolute top-2 left-2 p-2 rounded-full transition-all duration-300 cursor-pointer z-20 active:scale-90 ${
             isInWishlist
               ? 'bg-red-50 text-red-500 shadow-sm'
               : 'bg-white/60 hover:bg-white text-gray-400 hover:text-red-500 hover:shadow-sm'
@@ -125,11 +125,13 @@ export default function ProductCard({
       </div>
 
       <div className="flex flex-col flex-grow text-left px-1">
-        <p className="text-gray-900 font-bold text-[15px] mb-1 line-clamp-2 leading-tight group-hover:text-green-800 transition-colors">
+        <p className="text-gray-900 font-bold text-sm sm:text-[15px] mb-1 line-clamp-2 leading-tight group-hover:text-green-800 transition-colors">
           {name}
         </p>
-        <div className="mt-auto pt-3 flex items-center justify-between gap-2">
-          <p className="text-gray-900 font-bold text-lg">₹{price}</p>
+        <div className="mt-auto pt-2 flex items-center justify-between gap-2">
+          <p className="text-gray-900 font-bold text-base sm:text-lg">
+            ₹{price}
+          </p>
           {quantity === 0 ? (
             <button
               onClick={(e) => {
@@ -147,17 +149,17 @@ export default function ProductCard({
                 }
               }}
               disabled={stock === 0}
-              className={`px-3 sm:px-4 py-1.5 rounded-lg border font-bold text-[10px] sm:text-xs uppercase transition-all whitespace-nowrap flex items-center justify-center ${
+              className={`px-3 sm:px-4 py-2 sm:py-1.5 rounded-lg border font-bold text-[11px] sm:text-xs uppercase transition-all whitespace-nowrap flex items-center justify-center active:scale-95 ${
                 stock === 0
                   ? 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-50'
-                  : 'border-green-600 text-green-600 hover:bg-green-50 cursor-pointer min-w-[80px]'
+                  : 'border-green-600 text-green-600 hover:bg-green-50 cursor-pointer min-w-[70px] sm:min-w-[80px] shadow-sm active:shadow-none'
               }`}
             >
               {stock === 0 ? 'SOLD OUT' : 'ADD'}
             </button>
           ) : (
             <div
-              className="flex items-center gap-2 bg-green-50 rounded-lg px-2 py-1 border border-green-200"
+              className="flex items-center gap-1 sm:gap-2 bg-green-50 rounded-lg px-1.5 sm:px-2 py-1 sm:py-1 border border-green-200"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -171,11 +173,11 @@ export default function ProductCard({
                     }
                   }
                 }}
-                className="w-6 h-6 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50 cursor-pointer"
+                className="w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center bg-white rounded text-green-700 shadow-sm hover:bg-gray-50 cursor-pointer"
               >
                 <Minus size={14} strokeWidth={3} />
               </button>
-              <span className="text-sm font-bold text-green-700 min-w-[20px] text-center">
+              <span className="text-xs sm:text-sm font-bold text-green-700 min-w-[18px] sm:min-w-[20px] text-center">
                 {quantity}
               </span>
               <button
@@ -190,7 +192,7 @@ export default function ProductCard({
                   }
                 }}
                 disabled={stock !== undefined && quantity >= stock}
-                className={`w-6 h-6 flex items-center justify-center rounded text-white shadow-sm transition-colors ${
+                className={`w-7 h-7 sm:w-6 sm:h-6 flex items-center justify-center rounded text-white shadow-sm transition-colors ${
                   stock !== undefined && quantity >= stock
                     ? 'bg-gray-300 cursor-not-allowed'
                     : 'bg-green-700 hover:bg-green-800 cursor-pointer'
