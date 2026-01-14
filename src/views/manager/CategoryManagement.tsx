@@ -111,6 +111,8 @@ const CategoryRow = React.memo(
 
 CategoryRow.displayName = 'CategoryRow';
 
+import CategoryMobileCard from '../../components/categories/CategoryMobileCard';
+
 const CategoryManagement: FC = () => {
   const dispatch = useAppDispatch();
   const categories = useSelector(selectCategories);
@@ -161,7 +163,7 @@ const CategoryManagement: FC = () => {
   }, [dispatch, page, search, sortOrder]);
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-12 lg:px-20 py-6 sm:py-10">
       {/* Decorative Header */}
       <PageHeader
         title="Category Management"
@@ -232,55 +234,76 @@ const CategoryManagement: FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
+        <div className="relative">
           {loading && (
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
-              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+            <div className="absolute inset-x-0 -top-2 z-20 flex justify-center">
+              <div className="bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2">
                 <Loader size="sm" />
+                <span className="text-xs font-bold text-gray-500">
+                  Updating...
+                </span>
               </div>
             </div>
           )}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead className="bg-gray-50/50">
-                <tr>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Category
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Products
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Created Date
-                  </th>
-                  <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {categories.map((category, index) => (
-                  <CategoryRow
-                    key={category._id}
-                    category={category}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    index={index}
-                  />
-                ))}
-              </tbody>
-            </table>
+
+          {/* Mobile View: Card List */}
+          <div className="block md:hidden">
+            {categories.map((category, index) => (
+              <CategoryMobileCard
+                key={category._id}
+                category={category}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                index={index}
+              />
+            ))}
+          </div>
+
+          {/* Desktop View: Table */}
+          <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-gray-50/50">
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Products
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      Created Date
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {categories.map((category, index) => (
+                    <CategoryRow
+                      key={category._id}
+                      category={category}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      index={index}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
 
       {pagination && pagination.pages > 1 && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <Pagination
             currentPage={page}
             totalPages={pagination.pages}
             onPageChange={setPage}
             isLoading={loading}
+            showPageNumbersOnMobile={true}
           />
         </div>
       )}

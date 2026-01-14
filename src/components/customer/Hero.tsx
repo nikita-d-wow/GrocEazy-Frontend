@@ -51,8 +51,8 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="py-4 px-3 sm:py-6 sm:px-6 lg:px-12">
-      <div className="relative max-w-7xl mx-auto h-[180px] xs:h-[220px] sm:h-[300px] md:h-[380px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-md sm:shadow-xl group">
+    <section className="py-2 px-3 sm:py-6 sm:px-6 lg:px-12">
+      <div className="relative max-w-7xl mx-auto h-[160px] xs:h-[200px] sm:h-[300px] md:h-[380px] rounded-xl sm:rounded-3xl overflow-hidden shadow-md sm:shadow-xl group">
         {/* Slides */}
         {SLIDES.map((slide, index) => (
           <div
@@ -84,11 +84,11 @@ export default function Hero() {
                 {slide.tag}
               </div>
 
-              <h1 className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight drop-shadow-lg mb-1 sm:mb-3">
+              <h1 className="text-lg xs:text-xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight drop-shadow-lg mb-0.5 sm:mb-3">
                 {slide.title}
               </h1>
 
-              <p className="text-gray-200 text-[10px] xs:text-[11px] sm:text-base md:text-lg mb-3 sm:mb-6 max-w-sm sm:max-w-md font-medium line-clamp-2 sm:line-clamp-none">
+              <p className="text-gray-200 text-[9px] xs:text-[10px] sm:text-base md:text-lg mb-2 sm:mb-6 max-w-[180px] xs:max-w-sm sm:max-w-md font-medium line-clamp-2 sm:line-clamp-none">
                 {slide.subtitle}
               </p>
 
@@ -97,9 +97,9 @@ export default function Hero() {
                 className="
                   w-fit
                   !rounded-full
-                  !px-6 sm:!px-10
-                  !py-2 sm:!py-3.5
-                  text-xs sm:text-lg
+                  !px-4 sm:!px-10
+                  !py-1.5 sm:!py-3.5
+                  text-[10px] sm:text-lg
                   font-bold
                   text-white
                   bg-emerald-600

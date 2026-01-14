@@ -163,6 +163,8 @@ const ProductRow = React.memo(
 
 ProductRow.displayName = 'ProductRow';
 
+import ProductMobileCard from '../../components/products/ProductMobileCard';
+
 const ProductManagement: FC = () => {
   const dispatch = useAppDispatch();
   const products = useSelector(selectProducts);
@@ -257,7 +259,7 @@ const ProductManagement: FC = () => {
     categoryId !== '';
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 sm:px-12 lg:px-20 py-10">
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-12 lg:px-20 py-6 sm:py-10">
       {/* Decorative Header */}
       <PageHeader
         title="Product Management"
@@ -346,60 +348,81 @@ const ProductManagement: FC = () => {
             />
           </FilterBar>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 relative">
+          <div className="relative">
             {loading && (
-              <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] z-10 flex items-center justify-center transition-opacity duration-300">
-                <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+              <div className="absolute inset-x-0 -top-2 z-20 flex justify-center">
+                <div className="bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2">
                   <Loader size="sm" />
+                  <span className="text-xs font-bold text-gray-500">
+                    Updating...
+                  </span>
                 </div>
               </div>
             )}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b-2 border-green-100">
-                  <tr>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Product
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Price
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Stock
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {displayProducts.map((product, index) => (
-                    <ProductRow
-                      key={product._id}
-                      product={product}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      index={index}
-                    />
-                  ))}
-                </tbody>
-              </table>
+
+            {/* Mobile View: Card List */}
+            <div className="block md:hidden">
+              {displayProducts.map((product, index) => (
+                <ProductMobileCard
+                  key={product._id}
+                  product={product}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  index={index}
+                />
+              ))}
+            </div>
+
+            {/* Desktop View: Table */}
+            <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b-2 border-green-100">
+                    <tr>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Product
+                      </th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Price
+                      </th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Stock
+                      </th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {displayProducts.map((product, index) => (
+                      <ProductRow
+                        key={product._id}
+                        product={product}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        index={index}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </>
       )}
 
-      {/* Pagination - Outside of potential pointer-events-none container */}
+      {/* Pagination */}
       {pagination && pagination.pages > 1 && (
-        <div className="mt-6 flex justify-center">
+        <div className="mt-8 flex justify-center">
           <Pagination
             currentPage={page}
             totalPages={pagination.pages}
             onPageChange={setPage}
             isLoading={loading}
+            showPageNumbersOnMobile={true}
           />
         </div>
       )}

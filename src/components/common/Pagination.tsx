@@ -8,6 +8,7 @@ interface PaginationProps {
   className?: string;
   isLoading?: boolean;
   scrollTargetId?: string;
+  showPageNumbersOnMobile?: boolean;
 }
 
 const Pagination: FC<PaginationProps> = ({
@@ -17,6 +18,7 @@ const Pagination: FC<PaginationProps> = ({
   className = '',
   isLoading = false,
   scrollTargetId,
+  showPageNumbersOnMobile = false,
 }) => {
   const isFirstRender = React.useRef(true);
 
@@ -100,8 +102,10 @@ const Pagination: FC<PaginationProps> = ({
         <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
 
-      {/* Page Numbers - Desktop Only */}
-      <div className="hidden sm:flex items-center gap-2">
+      {/* Page Numbers */}
+      <div
+        className={`${showPageNumbersOnMobile ? 'flex' : 'hidden sm:flex'} items-center gap-2`}
+      >
         {pageNumbers.map((page, idx) =>
           page === '...' ? (
             <span
@@ -132,9 +136,11 @@ const Pagination: FC<PaginationProps> = ({
       </div>
 
       {/* Mobile Indicator */}
-      <div className="flex sm:hidden items-center px-2 text-sm font-bold text-gray-500">
-        Page {currentPage} of {totalPages}
-      </div>
+      {!showPageNumbersOnMobile && (
+        <div className="flex sm:hidden items-center px-2 text-sm font-bold text-gray-500">
+          Page {currentPage} of {totalPages}
+        </div>
+      )}
 
       {/* Next */}
       <button

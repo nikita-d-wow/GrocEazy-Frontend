@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Category } from '../../types/Category';
+import { Tag, Sparkles } from 'lucide-react';
 import api from '../../services/api';
 import toast from 'react-hot-toast';
 
@@ -55,7 +56,9 @@ export default function MobileCategorySidebar({
             : 'bg-gray-50 text-gray-500 border-transparent'
         }`}
       >
-        <div className="text-2xl mb-1">🏷️</div>
+        <div className="text-xl mb-1 text-green-600">
+          <Tag size={20} />
+        </div>
         <span className="text-xs font-medium truncate w-full text-center">
           All
         </span>
@@ -79,8 +82,8 @@ export default function MobileCategorySidebar({
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              <span className="flex items-center justify-center h-full text-lg">
-                🥗
+              <span className="flex items-center justify-center h-full text-green-600 bg-green-50">
+                <Sparkles size={20} />
               </span>
             )}
           </div>

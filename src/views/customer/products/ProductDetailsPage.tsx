@@ -4,7 +4,20 @@ import { useEffect, useState } from 'react';
 import type { CartItem } from '../../../redux/types/cartTypes';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { ChevronRight, Minus, Plus, Clock, Heart } from 'lucide-react';
+import {
+  ChevronRight,
+  Minus,
+  Plus,
+  Clock,
+  Heart,
+  Zap,
+  Tag,
+  Sparkles,
+  Share2,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { useAppDispatch } from '../../../redux/actions/useDispatch';
@@ -179,7 +192,7 @@ const ProductDetailsPage: FC = () => {
             {categoryName}
           </Link>
           <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
-          <span className="text-gray-900 font-medium truncate">
+          <span className="text-gray-900 font-bold truncate">
             {product.name}
           </span>
         </div>
@@ -188,7 +201,7 @@ const ProductDetailsPage: FC = () => {
       <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-12 items-start">
           {/* LEFT: Image Gallery */}
-          <div className="bg-white rounded-3xl p-6 border-b md:border border-gray-100 shadow-sm md:sticky md:top-32">
+          <div className="bg-white rounded-3xl p-6 border-b md:border border-gray-100 shadow-sm">
             <div className="relative mb-6 flex justify-center h-[350px] md:h-[450px]">
               <img
                 src={getOptimizedImage(
@@ -234,7 +247,7 @@ const ProductDetailsPage: FC = () => {
               >
                 View all by {categoryName}
               </Link>
-              <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
+              <h1 className="text-2xl xs:text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
                 {product.name}
               </h1>
 
@@ -246,29 +259,49 @@ const ProductDetailsPage: FC = () => {
                   </span>
                 </div>
 
-                <button
-                  onClick={handleWishlistToggle}
-                  className={`p-2.5 rounded-xl transition-all shadow-sm ${
-                    isInWishlist
-                      ? 'bg-red-50 text-red-500 border border-red-100'
-                      : 'bg-white text-gray-400 border border-gray-100 hover:text-red-500'
-                  }`}
-                >
-                  <Heart
-                    size={22}
-                    fill={isInWishlist ? 'currentColor' : 'none'}
-                  />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: product.name,
+                          url: window.location.href,
+                        });
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success('Link copied to clipboard');
+                      }
+                    }}
+                    className="p-2.5 rounded-xl bg-white text-gray-400 border border-gray-100 hover:text-blue-500 transition-all shadow-sm cursor-pointer"
+                    title="Share product"
+                  >
+                    <Share2 size={20} />
+                  </button>
+
+                  <button
+                    onClick={handleWishlistToggle}
+                    className={`p-2.5 rounded-xl transition-all shadow-sm cursor-pointer ${
+                      isInWishlist
+                        ? 'bg-red-50 text-red-500 border border-red-100'
+                        : 'bg-white text-gray-400 border border-gray-100 hover:text-red-500'
+                    }`}
+                  >
+                    <Heart
+                      size={22}
+                      fill={isInWishlist ? 'currentColor' : 'none'}
+                    />
+                  </button>
+                </div>
               </div>
 
-              <div className="text-lg font-medium text-gray-500 mb-6">
+              <div className="text-base sm:text-lg font-medium text-gray-500 mb-6 font-bold">
                 {product.size}
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8 border-b pb-8 border-gray-100">
-                <div className="text-3xl font-bold text-gray-900">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8 pb-8">
+                <div className="text-2xl sm:text-3xl font-bold text-gray-900">
                   ₹{product.price}
-                  <span className="text-sm font-normal text-gray-400 ml-2 block sm:inline">
+                  <span className="text-[10px] sm:text-sm font-normal text-gray-400 ml-2 block sm:inline">
                     (Inclusive of all taxes)
                   </span>
                 </div>
@@ -303,8 +336,24 @@ const ProductDetailsPage: FC = () => {
                 </div>
               </div>
 
+              {/* Feature Badges */}
+              <div className="flex flex-wrap gap-3 mb-8">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-100 shadow-sm">
+                  <Truck size={12} strokeWidth={3} />
+                  FLASH DELIVERY
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold border border-emerald-100 shadow-sm">
+                  <ShieldCheck size={12} strokeWidth={3} />
+                  100% QUALITY
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-orange-50 text-orange-700 text-[10px] font-bold border border-orange-100 shadow-sm">
+                  <RotateCcw size={12} strokeWidth={3} />
+                  EASY RETURNS
+                </div>
+              </div>
+
               {product.description && (
-                <div className="mb-8 border-b pb-8 border-gray-100">
+                <div className="mb-8 pb-8">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
                     Product Details
                   </h3>
@@ -318,10 +367,10 @@ const ProductDetailsPage: FC = () => {
                 <h3 className="text-sm font-bold text-gray-900 mb-2 uppercase tracking-wider">
                   Why shop from GrocEazy?
                 </h3>
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-emerald-100/50">
-                      ⚡
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 shadow-sm border border-emerald-100/50">
+                      <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 text-sm md:text-base">
@@ -334,9 +383,9 @@ const ProductDetailsPage: FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-amber-100/50">
-                      🏷️
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0 shadow-sm border border-amber-100/50">
+                      <Tag className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 text-sm md:text-base">
@@ -349,9 +398,9 @@ const ProductDetailsPage: FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl shrink-0 shadow-sm border border-purple-100/50">
-                      ✨
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0 shadow-sm border border-purple-100/50">
+                      <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 text-sm md:text-base">
