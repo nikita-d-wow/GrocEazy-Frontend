@@ -9,12 +9,16 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import toast from 'react-hot-toast';
+
 import type { RootState } from '../../redux/rootReducer';
 import type { IAddress } from '../../redux/types/authTypes';
 import { createOrder } from '../../redux/actions/orderActions';
 import type { AppDispatch } from '../../redux/store';
 import type { Address } from '../../redux/types/orderTypes';
 import PageHeader from '../../components/common/PageHeader';
+import AddressModal from '../../components/customer/profile/AddressModal';
+import { addAddress } from '../../redux/actions/profileActions';
 // import AddressManager from '../../components/customer/profile/AddressManager';
 
 const EMPTY_ADDRESSES: IAddress[] = [];
@@ -37,6 +41,7 @@ const CheckoutAddress = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     defaultAddressId
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const selectedAddress = addresses.find((a) => a._id === selectedAddressId);
 
@@ -52,7 +57,12 @@ const CheckoutAddress = () => {
   }
 
   const handlePlaceOrder = () => {
-    if (!selectedAddress || !user) {
+    if (!selectedAddress) {
+      toast.error('Please select a delivery address to continue');
+      // Visual feedback: scroll to address section or shake?
+      return;
+    }
+    if (!user) {
       return;
     }
 
@@ -89,6 +99,17 @@ const CheckoutAddress = () => {
         navigate
       )
     );
+  };
+
+  const handleSaveAddress = async (addressData: Partial<IAddress>) => {
+    try {
+      const newAddress = await dispatch(addAddress(addressData));
+      if (newAddress && newAddress._id) {
+        setSelectedAddressId(newAddress._id);
+      }
+    } catch (error) {
+      // Failed to save address
+    }
   };
 
   /* ---------------- RENDER ---------------- */
@@ -133,7 +154,7 @@ const CheckoutAddress = () => {
         <section className="lg:col-span-2 space-y-6">
           <div className="flex justify-end">
             <button
-              onClick={() => navigate('/profile?tab=address')}
+              onClick={() => setIsModalOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2
                          bg-primary text-white text-sm font-medium
                          rounded-xl hover:bg-primary-dark transition shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-[0.98] cursor-pointer"
@@ -213,20 +234,28 @@ const CheckoutAddress = () => {
           </div>
 
           <button
-            disabled={
-              !selectedAddressId || cartItems.length === 0 || !isStockValid
-            }
+            disabled={cartItems.length === 0 || !isStockValid}
             onClick={handlePlaceOrder}
             className={`mt-6 w-full py-3 rounded-xl font-medium transition active:scale-[0.98] shadow-lg ${
-              !selectedAddressId || cartItems.length === 0 || !isStockValid
+              cartItems.length === 0 || !isStockValid
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
                 : 'bg-primary text-white hover:bg-primary-dark shadow-primary/20 hover:shadow-primary/40 cursor-pointer'
             }`}
           >
-            {isStockValid ? 'Place Order' : 'Adjust Stock to Order'}
+            {!selectedAddressId && cartItems.length > 0 && isStockValid
+              ? 'Select Address to Place Order'
+              : isStockValid
+                ? 'Place Order'
+                : 'Adjust Stock to Order'}
           </button>
         </aside>
       </div>
+
+      <AddressModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveAddress}
+      />
     </div>
   );
 };

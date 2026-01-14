@@ -69,6 +69,39 @@ body {
     animation: progress 2s ease-in-out infinite;
   }
 
+  .animate-shake {
+    animation: shake 0.3s ease-in-out infinite;
+    animation-iteration-count: 2;
+  }
+
+  .animate-fadeDown {
+    animation: fadeDown 0.5s ease-out forwards;
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-4px);
+    }
+    75% {
+      transform: translateX(4px);
+    }
+  }
+
+  @keyframes fadeDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   @keyframes progress {
     0% {
       transform: translateX(-100%) scaleX(0);

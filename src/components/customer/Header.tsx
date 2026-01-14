@@ -8,6 +8,7 @@ import type { RootState } from '../../redux/store';
 import { logout } from '../../redux/actions/authActions';
 import { setSearchQuery } from '../../redux/reducers/productReducer';
 import UserProfileDropdown from './UserProfileDropdown';
+import VoiceSearch from '../common/VoiceSearch';
 import { adminNav, managerNav, customerNav } from '../../utils/navitems';
 import { selectCartItems } from '../../redux/selectors/cartSelectors';
 import {
@@ -38,6 +39,14 @@ export default function Header() {
       }
       setOpen(false);
     }
+  };
+
+  const handleVoiceTranscript = (transcript: string) => {
+    dispatch(setSearchQuery(transcript));
+    if (!location.pathname.startsWith('/products')) {
+      navigate('/products');
+    }
+    setOpen(false);
   };
 
   const handleLogout = async () => {
@@ -121,9 +130,12 @@ export default function Header() {
                 onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                 onKeyDown={handleSearch}
                 placeholder="Search available products..."
-                className="w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
+                className="w-64 pl-10 pr-12 py-2.5 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-sm transition-all outline-none"
               />
               <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400 group-focus-within:text-green-500 transition-colors" />
+              <div className="absolute right-1.5 top-1">
+                <VoiceSearch onTranscript={handleVoiceTranscript} />
+              </div>
             </div>
           )}
 
@@ -193,9 +205,15 @@ export default function Header() {
                   onChange={(e) => dispatch(setSearchQuery(e.target.value))}
                   onKeyDown={handleSearch}
                   placeholder="Search..."
-                  className="w-full pl-9 pr-3 py-2 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-xs transition-all outline-none"
+                  className="w-full pl-9 pr-10 py-2 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-green-200 rounded-xl text-xs transition-all outline-none"
                 />
                 <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-gray-400" />
+                <div className="absolute right-1 top-0.5">
+                  <VoiceSearch
+                    onTranscript={handleVoiceTranscript}
+                    className="!p-1.5"
+                  />
+                </div>
               </div>
 
               <Link

@@ -112,7 +112,7 @@ const productSlice = createSlice({
       state.topProducts = action.payload;
     },
     setSearchQuery(state, action: PayloadAction<string>) {
-      state.searchQuery = action.payload;
+      state.searchQuery = action.payload.trim();
     },
     setSearchResults(state, action: PayloadAction<Product[]>) {
       state.searchResults = action.payload;
