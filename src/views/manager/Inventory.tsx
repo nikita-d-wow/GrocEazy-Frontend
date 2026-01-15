@@ -29,6 +29,7 @@ import { InventorySkeleton } from '../../components/common/Skeleton';
 
 import { InventoryCharts } from './InventoryCharts';
 import { InventoryAlertsModal } from './InventoryAlertsModal';
+import PageHeader from '../../components/common/PageHeader';
 import type { Product } from '../../types/Product';
 
 const InventoryRow = React.memo(
@@ -224,21 +225,21 @@ export const Inventory: FC = () => {
         onClose={() => setIsAlertsOpen(false)}
       />
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Inventory</h1>
-          <p className="text-gray-500">
-            Track and monitor product stock levels
-          </p>
-        </div>
-        <button
-          onClick={() => setIsAlertsOpen(true)}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm"
-        >
-          <AlertTriangle size={18} className="text-orange-500" />
-          Stock Alerts
-        </button>
-      </div>
+      <PageHeader
+        title="Inventory Analytics"
+        highlightText="Inventory"
+        subtitle="Track and monitor product stock levels"
+        icon={Package}
+        actions={
+          <button
+            onClick={() => setIsAlertsOpen(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-white border border-green-200 rounded-xl text-green-700 font-medium hover:bg-green-50 transition-all shadow-sm"
+          >
+            <AlertTriangle size={18} />
+            Stock Alerts
+          </button>
+        }
+      />
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
