@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
+import { Link } from 'react-router-dom';
 import {
   Ticket,
   SearchX,
@@ -8,6 +9,7 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  MessageSquare,
 } from 'lucide-react';
 
 import {
@@ -164,7 +166,15 @@ export default function ManagerSupportTickets() {
           highlightText="Assigned"
           subtitle="Manage and resolve your customer support requests"
           icon={Ticket}
-        />
+        >
+          <Link
+            to="/manager/live-chat"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-emerald-500 text-emerald-600 font-bold text-sm hover:bg-emerald-500 hover:text-white transition-all active:scale-95 shadow-sm hover:shadow-md"
+          >
+            <MessageSquare size={18} />
+            Live Chat
+          </Link>
+        </PageHeader>
 
         {/* Stats Cards */}
         {/* {!loading && tickets.length > 0 && ( */}

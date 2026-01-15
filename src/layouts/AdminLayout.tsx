@@ -6,7 +6,7 @@ export default function AdminLayout() {
   return (
     <>
       <Header />
-      <main className="min-h-screen">
+      <main className="min-h-screen pt-20">
         <div className="max-w-[1400px] mx-auto">
           <Outlet />
         </div>

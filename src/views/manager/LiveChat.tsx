@@ -12,12 +12,15 @@ import {
 } from 'lucide-react';
 import socketClient from '../../services/socket';
 import api from '../../services/api';
+import { useAppDispatch } from '../../redux/actions/useDispatch';
+import { markMessagesRead } from '../../redux/actions/chatActions';
 import type { RootState } from '../../redux/rootReducer';
 import PageHeader from '../../components/common/PageHeader';
 import type { IChatMessage, ChatRoom } from '../../redux/types/chat.types';
 
 const ManagerLiveChat: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [activeRoom, setActiveRoom] = useState<string | null>(null);
   const [messages, setMessages] = useState<IChatMessage[]>([]);
@@ -26,7 +29,7 @@ const ManagerLiveChat: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [otherTyping, setOtherTyping] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'chat'>('list');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const socket = socketClient.getSocket();
 
   const user = useSelector((state: RootState) => state.auth.user);
@@ -51,15 +54,29 @@ const ManagerLiveChat: React.FC = () => {
     }
   }, []);
 
-  const scrollToBottom = React.useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+  const scrollToBottom = React.useCallback(
+    (behavior: 'auto' | 'smooth' = 'smooth') => {
+      if (messagesContainerRef.current) {
+        const { scrollHeight, clientHeight } = messagesContainerRef.current;
+        messagesContainerRef.current.scrollTo({
+          top: scrollHeight - clientHeight,
+          behavior,
+        });
+      }
+    },
+    []
+  );
 
   const handleRoomSelect = (roomId: string) => {
     setActiveRoom(roomId);
     setViewMode('chat');
     fetchMessages(roomId);
     socket.emit('join_room', roomId);
+    // Mark as read in backend and update global state
+    dispatch(markMessagesRead(roomId));
+    socket.emit('mark_messages_read', roomId);
+    // Use 'auto' for initial load to avoid jumping
+    setTimeout(() => scrollToBottom('auto'), 100);
   };
 
   const handleBackToList = () => {
@@ -100,7 +117,7 @@ const ManagerLiveChat: React.FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [messages, otherTyping, scrollToBottom]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -157,8 +174,7 @@ const ManagerLiveChat: React.FC = () => {
   const activeRoomData = rooms.find((r) => r._id === activeRoom);
 
   return (
-    <div className="min-h-screen bg-transparent px-6 sm:px-12 lg:px-20 py-10 animate-fadeIn space-y-8">
-      {/* Universal Page Header */}
+    <div className="min-h-screen bg-transparent px-4 sm:px-8 lg:px-12 py-6 animate-fadeIn space-y-6">
       <PageHeader
         title="Live Support"
         highlightText="Chat"
@@ -166,16 +182,15 @@ const ManagerLiveChat: React.FC = () => {
         icon={MessageSquare}
       />
 
-      {/* Main Container - Explicit height to prevent shrinking and cropping */}
-      <div className="flex gap-6 h-[750px] bg-white/40 backdrop-blur-xl border border-gray-100 rounded-[2.5rem] shadow-xl overflow-hidden">
+      <div className="h-[calc(100vh-220px)] min-h-[600px] flex bg-white/40 backdrop-blur-xl border border-white/50 rounded-[2.5rem] shadow-2xl shadow-gray-200/40 overflow-hidden relative">
         {/* Sidebar */}
         <div
           className={`
-          flex flex-col border-r border-gray-100 w-full md:w-80 lg:w-96 shrink-0
+          flex flex-col border-r border-gray-100 w-full md:w-80 lg:w-96 shrink-0 bg-white/30 backdrop-blur-sm
           ${viewMode === 'chat' ? 'hidden md:flex' : 'flex'}
         `}
         >
-          <div className="p-6">
+          <div className="p-4 border-b border-gray-100/50">
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-emerald-500 transition-colors" />
               <input
@@ -183,40 +198,40 @@ const ManagerLiveChat: React.FC = () => {
                 placeholder="Search interactions..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-white/60 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-400/20 transition-all text-sm"
+                className="w-full pl-11 pr-4 py-3 bg-white/60 border border-gray-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-400 transition-all text-sm font-medium"
               />
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-3 space-y-1.5 custom-scrollbar">
             {filteredRooms.length > 0 ? (
               filteredRooms.map((room) => (
                 <button
                   key={room._id}
                   onClick={() => handleRoomSelect(room._id)}
                   className={`
-                    w-full p-4 rounded-3xl flex items-center gap-4 transition-all duration-300
+                    w-full p-3.5 rounded-2xl flex items-center gap-3 transition-all duration-300 group
                     ${
                       activeRoom === room._id
-                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-100'
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100'
                         : 'hover:bg-white text-gray-700'
                     }
                   `}
                 >
                   <div
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0
+                    className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105
                     ${activeRoom === room._id ? 'bg-white/20' : 'bg-emerald-50 text-emerald-600'}`}
                   >
-                    <UserIcon className="w-6 h-6" />
+                    <UserIcon className="w-5 h-5" />
                   </div>
                   <div className="flex-1 text-left min-w-0">
                     <div className="flex justify-between items-center mb-0.5">
-                      <span className="font-bold text-sm truncate">
+                      <span className="font-bold text-xs truncate">
                         {room.userName ||
                           `User: ${room._id.slice(-4).toUpperCase()}`}
                       </span>
                       <span
-                        className={`text-[10px] whitespace-nowrap ${activeRoom === room._id ? 'text-emerald-50' : 'text-gray-400'}`}
+                        className={`text-[9px] font-bold whitespace-nowrap ${activeRoom === room._id ? 'text-emerald-50' : 'text-gray-400'}`}
                       >
                         {new Date(room.lastTimestamp).toLocaleTimeString([], {
                           hour: '2-digit',
@@ -225,7 +240,7 @@ const ManagerLiveChat: React.FC = () => {
                       </span>
                     </div>
                     <p
-                      className={`text-xs truncate ${activeRoom === room._id ? 'text-emerald-50' : 'text-gray-500'}`}
+                      className={`text-[11px] truncate font-medium ${activeRoom === room._id ? 'text-emerald-50/80' : 'text-gray-500'}`}
                     >
                       {room.lastMessage}
                     </p>
@@ -233,8 +248,11 @@ const ManagerLiveChat: React.FC = () => {
                 </button>
               ))
             ) : (
-              <div className="flex items-center justify-center py-10 text-gray-400 text-xs italic">
-                No active conversations
+              <div className="flex flex-col items-center justify-center py-20 text-gray-400 space-y-3 opacity-50">
+                <MessageSquare className="w-8 h-8 opacity-20" />
+                <p className="text-[10px] font-black uppercase tracking-widest">
+                  No Active Sessions
+                </p>
               </div>
             )}
           </div>
@@ -243,26 +261,26 @@ const ManagerLiveChat: React.FC = () => {
         {/* Chat Area */}
         <div
           className={`
-          flex-1 flex flex-col bg-white/30
+          flex-1 flex flex-col bg-white/10 relative
           ${viewMode === 'list' && !activeRoom ? 'hidden md:flex' : 'flex'}
         `}
         >
           {activeRoom ? (
             <>
-              {/* Header */}
-              <div className="px-8 py-5 border-b border-gray-100 bg-white/60 flex items-center justify-between">
+              {/* Header - Strongly Fixed with Glassmorphism */}
+              <div className="sticky top-0 z-20 px-6 py-4 border-b border-gray-100/50 bg-white/80 backdrop-blur-xl flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-4">
                   <button
                     onClick={handleBackToList}
-                    className="p-2 -ml-2 hover:bg-gray-100 rounded-xl transition md:hidden"
+                    className="p-2 -ml-2 hover:bg-emerald-50 text-emerald-600 rounded-xl transition md:hidden"
                   >
-                    <ChevronLeft className="w-5 h-5 text-gray-600" />
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
                   <div
                     onClick={() =>
                       navigate(`/manager/customer-details/${activeRoom}`)
                     }
-                    className="w-12 h-12 bg-white text-emerald-600 rounded-2xl flex items-center justify-center shadow-sm border border-gray-50 cursor-pointer hover:shadow-md transition-all"
+                    className="w-12 h-12 bg-white text-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-gray-200/40 border border-white cursor-pointer hover:scale-105 active:scale-95 transition-all"
                   >
                     <UserIcon className="w-6 h-6" />
                   </div>
@@ -273,54 +291,57 @@ const ManagerLiveChat: React.FC = () => {
                         navigate(`/manager/customer-details/${activeRoom}`)
                       }
                     >
-                      <h3 className="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">
+                      <h3 className="font-extrabold text-sm text-gray-900 group-hover:text-emerald-600 transition-colors">
                         {activeRoomData?.userName || 'Customer Inquiry'}
                       </h3>
-                      <ExternalLink className="w-3 h-3 text-gray-300 group-hover:text-emerald-500 transition-colors" />
+                      <ExternalLink className="w-3.5 h-3.5 text-gray-300 group-hover:text-emerald-500 transition-colors translate-y-[1px]" />
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 mt-0.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                        <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">
-                          Active
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-sm shadow-emerald-200" />
+                        <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">
+                          Active Chat
                         </span>
                       </div>
-                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tight hidden sm:inline">
-                        REF: {activeRoom.slice(-8).toUpperCase()}
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter px-2 py-0.5 bg-gray-50 rounded-md hidden sm:inline">
+                        ID: {activeRoom.slice(-8).toUpperCase()}
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-8 py-8 space-y-6 custom-scrollbar">
+              {/* Messages - Controlled Container for Scroll */}
+              <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto px-6 py-6 space-y-6 custom-scrollbar scroll-smooth"
+              >
                 {messages.length > 0 ? (
                   messages.map((msg, idx) => {
                     const isManager = msg.isAdmin;
                     return (
                       <div
                         key={idx}
-                        className={`flex ${isManager ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                        className={`flex ${isManager ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-400`}
                       >
                         <div
-                          className={`flex flex-col ${isManager ? 'items-end' : 'items-start'} max-w-[80%]`}
+                          className={`flex flex-col ${isManager ? 'items-end' : 'items-start'} max-w-[85%]`}
                         >
                           <div
                             className={`
-                               px-6 py-3.5 rounded-[2rem] shadow-sm relative
+                               px-5 py-3 rounded-[2rem] shadow-lg relative transition-all duration-300
                                ${
                                  isManager
-                                   ? 'bg-emerald-600 text-white rounded-tr-none shadow-emerald-100'
-                                   : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+                                   ? 'bg-emerald-600 text-white rounded-tr-none shadow-emerald-100 flex-row-reverse'
+                                   : 'bg-white text-gray-800 rounded-tl-none border border-white shadow-gray-200/30'
                                }
                              `}
                           >
-                            <p className="text-sm font-medium leading-relaxed">
+                            <p className="text-[13px] font-semibold leading-relaxed">
                               {msg.message}
                             </p>
                           </div>
-                          <p className="mt-1.5 px-3 text-[10px] font-bold text-gray-400 tracking-wider">
+                          <p className="mt-1.5 px-3 text-[9px] font-black text-gray-400 tracking-widest uppercase">
                             {new Date(msg.createdAt).toLocaleTimeString([], {
                               hour: '2-digit',
                               minute: '2-digit',
@@ -331,34 +352,33 @@ const ManagerLiveChat: React.FC = () => {
                     );
                   })
                 ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-50">
-                    <Clock className="w-10 h-10 mb-2 animate-pulse" />
-                    <p className="text-xs font-bold uppercase tracking-widest">
-                      Waking Up History
+                  <div className="h-full flex flex-col items-center justify-center text-gray-300 opacity-60">
+                    <Clock className="w-12 h-12 mb-3 animate-pulse text-emerald-200" />
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-800">
+                      Loading History
                     </p>
                   </div>
                 )}
 
                 {otherTyping && (
-                  <div className="flex justify-start animate-in fade-in duration-300">
-                    <div className="bg-emerald-50/50 px-5 py-2.5 rounded-full rounded-tl-none border border-emerald-100 text-[11px] font-black text-emerald-600 flex items-center gap-2 italic">
-                      <span className="flex gap-1">
-                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" />
+                  <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
+                    <div className="bg-emerald-50/70 backdrop-blur-md px-5 py-2.5 rounded-full rounded-tl-none border border-emerald-100 text-[10px] font-black text-emerald-600 flex items-center gap-3 shadow-sm italic">
+                      <div className="flex gap-1">
+                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce [animation-delay:0s]" />
                         <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce [animation-delay:0.2s]" />
                         <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-bounce [animation-delay:0.4s]" />
-                      </span>
-                      Typing...
+                      </div>
+                      <span className="mb-0.5">Customer is typing...</span>
                     </div>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Input Area */}
-              <div className="p-8 bg-white/60 border-t border-gray-100">
+              <div className="p-4 sm:p-6 bg-white/80 backdrop-blur-xl border-t border-gray-100/50">
                 <form
                   onSubmit={handleSend}
-                  className="max-w-4xl mx-auto flex gap-4"
+                  className="max-w-4xl mx-auto flex gap-3"
                 >
                   <div className="flex-1 relative">
                     <input
@@ -366,29 +386,36 @@ const ManagerLiveChat: React.FC = () => {
                       value={input}
                       onChange={handleTyping}
                       placeholder="Type your message..."
-                      className="w-full bg-white border border-gray-200 rounded-[1.5rem] px-8 py-5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-400 transition-all shadow-inner"
+                      className="w-full bg-white/60 border border-gray-100 rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-gray-400 focus:outline-none focus:ring-8 focus:ring-emerald-500/5 focus:border-emerald-400 transition-all shadow-inner"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={!input.trim()}
-                    className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white px-10 rounded-[1.5rem] flex items-center gap-2 font-black text-sm uppercase transition-all shadow-lg shadow-emerald-100 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                    className="bg-emerald-600 hover:bg-emerald-700 active:scale-90 text-white px-8 rounded-2xl flex items-center gap-3 font-black text-[10px] uppercase tracking-widest transition-all shadow-xl shadow-emerald-100 disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed group cursor-pointer"
                   >
-                    <span>Send</span>
-                    <Send className="w-4 h-4" />
+                    <span className="hidden sm:inline">Send Message</span>
+                    <Send className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                   </button>
                 </form>
               </div>
             </>
           ) : (
-            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center text-gray-300">
-              <MessageSquare className="w-16 h-16 mb-4 opacity-20" />
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+            <div className="flex-1 flex flex-col items-center justify-center p-20 text-center animate-in fade-in duration-700">
+              <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-inner shadow-emerald-100/50 rotate-3">
+                <MessageSquare className="w-10 h-10 opacity-40 -rotate-3" />
+              </div>
+              <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">
                 Support Dashboard
               </h3>
-              <p className="text-sm text-gray-500">
-                Pick a customer session from the list to start responding.
+              <p className="text-sm text-gray-500 max-w-xs font-medium leading-relaxed">
+                Select a conversation from the list to start responding.
               </p>
+              <div className="mt-8 flex gap-2">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping [animation-delay:0.3s]" />
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping [animation-delay:0.6s]" />
+              </div>
             </div>
           )}
         </div>

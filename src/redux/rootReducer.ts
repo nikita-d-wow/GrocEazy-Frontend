@@ -8,6 +8,7 @@ import { wishlistReducer } from './reducers/wishlistReducer';
 import { supportReducer } from './reducers/supportReducer';
 import { orderReducer } from './reducers/orderReducer';
 import { userReducer } from './reducers/userReducer';
+import { chatReducer } from './reducers/chatReducer';
 
 const rootReducer = combineReducers({
   category: categoryReducer,
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   support: supportReducer,
   order: orderReducer,
   user: userReducer,
+  chat: chatReducer,
 });
 
 export default rootReducer;
