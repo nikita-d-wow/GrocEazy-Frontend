@@ -1,5 +1,6 @@
 import toast from 'react-hot-toast';
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useParams, Link } from 'react-router-dom';
@@ -19,6 +20,8 @@ import {
   Banknote,
 } from 'lucide-react';
 import DeliveryMap from '../../components/common/DeliveryMap';
+import OrderRecipes from '../../components/orders/OrderRecipes';
+
 import { getOrderDetails, cancelOrder } from '../../redux/actions/orderActions';
 import type { RootState } from '../../redux/rootReducer';
 import type { OrderActionTypes } from '../../redux/types/orderTypes';
@@ -588,6 +591,9 @@ export default function OrderDetails() {
               })}
             </div>
           </div>
+
+          {/* Recipes Component - Fills the gap */}
+          <OrderRecipes order={currentOrder} />
         </div>
 
         {/* Right Col: Address & Actions */}
@@ -679,37 +685,39 @@ export default function OrderDetails() {
       </div>
 
       {/* CANCEL MODAL */}
-      {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-scaleIn border border-gray-100">
-            <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mb-6 mx-auto border-4 border-red-100">
-              <AlertTriangle size={32} />
-            </div>
-            <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
-              Cancel Order?
-            </h3>
-            <p className="text-center text-gray-500 text-sm mb-8 leading-relaxed">
-              Are you sure you want to cancel this order? This action cannot be
-              undone.
-            </p>
+      {showCancelModal &&
+        createPortal(
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fadeIn">
+            <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-scaleIn border border-gray-100">
+              <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mb-6 mx-auto border-4 border-red-100">
+                <AlertTriangle size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
+                Cancel Order?
+              </h3>
+              <p className="text-center text-gray-500 text-sm mb-8 leading-relaxed">
+                Are you sure you want to cancel this order? This action cannot
+                be undone.
+              </p>
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowCancelModal(false)}
-                className="flex-1 py-3 rounded-xl border border-gray-200 font-semibold hover:bg-gray-50 transition-colors cursor-pointer text-gray-700"
-              >
-                Go Back
-              </button>
-              <button
-                onClick={handleCancelOrder}
-                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors shadow-lg shadow-red-200 cursor-pointer"
-              >
-                Yes, Cancel
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCancelModal(false)}
+                  className="flex-1 py-3 rounded-xl border border-gray-200 font-semibold hover:bg-gray-50 transition-colors cursor-pointer text-gray-700"
+                >
+                  Go Back
+                </button>
+                <button
+                  onClick={handleCancelOrder}
+                  className="flex-1 py-3 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors shadow-lg shadow-red-200 cursor-pointer"
+                >
+                  Yes, Cancel
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
