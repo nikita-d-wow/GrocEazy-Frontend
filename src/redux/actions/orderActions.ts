@@ -64,11 +64,13 @@ export const getOrderDetails =
     try {
       const { data } = await api.get<Order>(`/orders/${id}`);
       dispatch({ type: FETCH_ORDER_DETAILS_SUCCESS, payload: data });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as any)?.response?.data?.message ||
+        'Failed to fetch order details';
       dispatch({
         type: FETCH_ORDER_DETAILS_FAILURE,
-        payload:
-          error.response?.data?.message || 'Failed to fetch order details',
+        payload: errorMessage,
       });
     }
   };
@@ -76,7 +78,7 @@ export const getOrderDetails =
 /* ================= CREATE ORDER ================= */
 
 export const createOrder =
-  (payload: CreateOrderPayload, navigate: any) =>
+  (payload: CreateOrderPayload, navigate: (path: string) => void) =>
   async (dispatch: Dispatch<any>) => {
     dispatch({ type: CREATE_ORDER_REQUEST });
 
@@ -90,13 +92,15 @@ export const createOrder =
 
       toast.success('Order placed successfully!');
       navigate('/');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as any)?.response?.data?.message || 'Failed to create order';
       dispatch({
         type: CREATE_ORDER_FAILURE,
-        payload: error.response?.data?.message || 'Failed to create order',
+        payload: errorMessage,
       });
 
-      toast.error(error.response?.data?.message || 'Order failed, try again');
+      toast.error(errorMessage || 'Order failed, try again');
     }
   };
 
@@ -111,11 +115,13 @@ export const cancelOrder =
       await api.patch(`/orders/${id}/cancel`);
       // Success already dispatched. Maybe toast?
       toast.success('Order cancelled');
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Revert needs a reload
+      const errorMessage =
+        (error as any)?.response?.data?.message || 'Failed to cancel order';
       dispatch({
         type: CANCEL_ORDER_FAILURE,
-        payload: error.response?.data?.message || 'Failed to cancel order',
+        payload: errorMessage,
       });
       // Force reload to get back original status
       dispatch(getAllOrders() as any);
@@ -132,7 +138,8 @@ export const getAllOrders =
     status?: string,
     dateFrom?: string,
     sortOrder: 'newest' | 'oldest' = 'newest',
-    search?: string
+    search?: string,
+    userId?: string
   ) =>
   async (dispatch: Dispatch<OrderActionTypes>) => {
     dispatch({ type: FETCH_ORDERS_REQUEST });
@@ -147,6 +154,9 @@ export const getAllOrders =
       }
       if (search) {
         url += `&search=${search}`;
+      }
+      if (userId) {
+        url += `&userId=${userId}`;
       }
       const { data } = await api.get(url);
 
@@ -182,14 +192,16 @@ export const changeOrderStatus =
         type: UPDATE_ORDER_STATUS_SUCCESS,
         payload: data.order,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Revert/Error will be tricky without old status, but typical error handling:
+      const errorMessage =
+        (error as any)?.response?.data?.message ||
+        'Failed to update order status';
       dispatch({
         type: UPDATE_ORDER_STATUS_FAILURE,
         payload: {
           id,
-          error:
-            error.response?.data?.message || 'Failed to update order status',
+          error: errorMessage,
         },
       });
       // Force refresh to ensure valid state

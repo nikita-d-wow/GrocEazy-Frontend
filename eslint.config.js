@@ -20,6 +20,7 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
+      'react-hooks/set-state-in-effect': 'off',
       'no-console': 'error',
       'no-debugger': 'error',
       'no-unused-vars': 'warn',

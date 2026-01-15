@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Header from '../components/customer/Header';
 import Footer from '../components/customer/Footer';
 import FloatingCartBar from '../components/customer/cart/FloatingCartBar';
+import ChatWidget from '../components/customer/chat/ChatWidget';
 import type { RootState } from '../redux/rootReducer';
 import type { AppDispatch } from '../redux/store';
 import { fetchCart } from '../redux/actions/cartActions';
@@ -33,7 +34,7 @@ export default function CustomerLayout() {
       <Header />
 
       {/* PAGE CONTAINER */}
-      <main className="min-h-screen pt-6">
+      <main className="min-h-screen pt-20">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12">
           <Outlet />
         </div>
@@ -41,6 +42,7 @@ export default function CustomerLayout() {
 
       <Footer />
       <FloatingCartBar />
+      <ChatWidget />
     </>
   );
 }

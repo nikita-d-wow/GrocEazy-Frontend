@@ -1,6 +1,14 @@
-import { Phone, Mail, ClipboardList } from 'lucide-react';
+import { Phone, Mail, ClipboardList, MessageSquare } from 'lucide-react';
 
 const cards = [
+  {
+    icon: <MessageSquare className="text-primary" size={26} />,
+    title: 'Live Chat',
+    text: 'Chat with our experts 24/7',
+    colors: 'from-blue-100 to-blue-50 border-blue-200',
+    to: '/contact', // This page is used to trigger chat activation usually or goes to main support
+    isChat: true,
+  },
   {
     icon: <Phone className="text-primary" size={26} />,
     title: 'Call Us',
