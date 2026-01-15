@@ -18,6 +18,7 @@ import {
   Receipt,
   Banknote,
 } from 'lucide-react';
+import DeliveryMap from '../../components/common/DeliveryMap';
 import { getOrderDetails, cancelOrder } from '../../redux/actions/orderActions';
 import type { RootState } from '../../redux/rootReducer';
 import type { OrderActionTypes } from '../../redux/types/orderTypes';
@@ -653,6 +654,9 @@ export default function OrderDetails() {
                 {currentOrder.address?.phone || 'N/A'}
               </div>
             </address>
+            {currentOrder.address && (
+              <DeliveryMap address={currentOrder.address} />
+            )}
           </div>
 
           {/* ACTION ACTIONS */}

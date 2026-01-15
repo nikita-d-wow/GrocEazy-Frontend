@@ -22,6 +22,7 @@ export default function AddressModal({
     zipCode: '',
     country: '',
     isDefault: false,
+    coordinates: undefined,
   });
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -38,6 +39,7 @@ export default function AddressModal({
         zipCode: initialData.zipCode || '',
         country: initialData.country || '',
         isDefault: initialData.isDefault || false,
+        coordinates: initialData.coordinates,
       });
     } else {
       setFormData({
@@ -47,6 +49,7 @@ export default function AddressModal({
         zipCode: '',
         country: '',
         isDefault: false,
+        coordinates: undefined,
       });
     }
     setErrors({});
@@ -112,6 +115,10 @@ export default function AddressModal({
               state: stateName,
               zipCode: address.postcode || '',
               country: address.country || '',
+              coordinates: {
+                lat: latitude,
+                lng: longitude,
+              },
             }));
             setErrors({});
           }
