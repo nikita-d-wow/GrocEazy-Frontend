@@ -2,10 +2,11 @@ import * as React from 'react';
 import { type LucideIcon, ChevronLeft } from 'lucide-react';
 
 interface PageHeaderProps {
-  title: string;
+  title: string | React.ReactNode;
   highlightText?: string;
-  subtitle: string;
+  subtitle?: string;
   icon?: LucideIcon;
+  actions?: React.ReactNode;
   children?: React.ReactNode;
   onBack?: () => void;
 }
@@ -15,21 +16,23 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   highlightText,
   subtitle,
   icon: Icon,
+  actions,
   children,
   onBack,
 }) => {
-  // Construct title with optional highlight
-  const titleContent = highlightText ? (
-    <>
-      <span className="text-green-700">{highlightText}</span>
-      {title.replace(highlightText, '')}
-    </>
-  ) : (
-    title
-  );
+  // Construct title with optional highlight (only if title is string)
+  const titleContent =
+    typeof title === 'string' && highlightText ? (
+      <>
+        <span className="text-green-700">{highlightText}</span>
+        {title.replace(highlightText, '')}
+      </>
+    ) : (
+      title
+    );
 
   return (
-    <div className="relative rounded-2xl sm:rounded-3xl bg-green-50/50 p-4 sm:p-6 md:p-10 mb-6 sm:mb-10 border border-green-100/50 overflow-hidden">
+    <div className="relative rounded-2xl sm:rounded-3xl bg-green-50/50 p-4 sm:p-6 md:p-10 mb-6 sm:mb-10 border border-green-100/50">
       {/* Decorative Background Elements */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-green-200/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 -z-10" />
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-200/20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4 -z-10" />
@@ -56,7 +59,9 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           </p>
         </div>
 
-        {children && <div className="w-full md:w-auto">{children}</div>}
+        {(actions || children) && (
+          <div className="w-full md:w-auto">{actions || children}</div>
+        )}
       </div>
     </div>
   );
