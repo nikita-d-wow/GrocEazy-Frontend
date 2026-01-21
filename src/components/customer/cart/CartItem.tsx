@@ -240,7 +240,9 @@ export default function CartItem({
 
         <div className="flex items-center gap-3">
           <p className="font-bold text-gray-900">
-            ₹{item.unitPrice * item.quantity}
+            ₹
+            {item.lineTotal?.toFixed(2) ??
+              (item.unitPrice * item.quantity).toFixed(2)}
           </p>
 
           <button

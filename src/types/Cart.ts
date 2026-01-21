@@ -6,6 +6,9 @@ export interface CartItemType {
   unitPrice: number;
   quantity: number;
   stock: number; // ✅ REQUIRED for disabling logic
+  hasBogo?: boolean;
+  bogoDetails?: { buyQuantity: number; getQuantity: number };
+  lineTotal?: number;
 }
 
 export interface CartItemProps {

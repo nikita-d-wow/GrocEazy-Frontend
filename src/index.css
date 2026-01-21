@@ -83,9 +83,11 @@ body {
     100% {
       transform: translateX(0);
     }
+
     25% {
       transform: translateX(-4px);
     }
+
     75% {
       transform: translateX(4px);
     }
@@ -96,6 +98,7 @@ body {
       opacity: 0;
       transform: translateY(-20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -165,6 +168,20 @@ body {
     }
   }
 
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+
   .btn-shimmer {
     position: absolute;
     inset: 0;
@@ -210,5 +227,9 @@ body {
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
+  }
+
+  .bg-gradient-radial {
+    background-image: radial-gradient(var(--tw-gradient-stops));
   }
 }

@@ -18,6 +18,9 @@ export interface CartProduct {
   price: number;
   images: string[];
   stock: number;
+  categoryId: string;
+  onSale?: boolean;
+  discountPrice?: number;
 }
 
 export interface CartItem {

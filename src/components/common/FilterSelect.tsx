@@ -17,6 +17,7 @@ interface FilterSelectProps {
   className?: string;
   align?: 'left' | 'right';
   searchable?: boolean;
+  openDirection?: 'up' | 'down';
 }
 
 const FilterSelect = ({
@@ -27,6 +28,7 @@ const FilterSelect = ({
   className = '',
   align = 'left',
   searchable = false,
+  openDirection = 'down',
 }: FilterSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -95,16 +97,26 @@ const FilterSelect = ({
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            initial={{
+              opacity: 0,
+              y: openDirection === 'up' ? -10 : 10,
+              scale: 0.95,
+            }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            exit={{
+              opacity: 0,
+              y: openDirection === 'up' ? -10 : 10,
+              scale: 0.95,
+            }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className={`
-              absolute ${align === 'right' ? 'right-0' : 'left-0'} top-full mt-3 z-[999]
+              absolute ${align === 'right' ? 'right-0' : 'left-0'} 
+              ${openDirection === 'up' ? 'bottom-full mb-3' : 'top-full mt-3'}
+              z-[999]
               w-full min-w-[220px] p-2
               bg-white border-2 border-gray-100
               rounded-2xl shadow-2xl shadow-gray-200/50
-              flex flex-col gap-1 max-h-[400px]
+              flex flex-col gap-1 max-h-[300px]
             `}
           >
             {searchable && (

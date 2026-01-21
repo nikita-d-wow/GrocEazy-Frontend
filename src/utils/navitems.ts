@@ -16,5 +16,6 @@ export const managerNav = [
   { label: 'Products', path: '/manager/products' },
   { label: 'Categories', path: '/manager/categories' },
   { label: 'Orders', path: '/manager/orders' },
+  { label: 'Marketing', path: '/manager/marketing' },
   { label: 'Support', path: '/manager/support' },
 ];

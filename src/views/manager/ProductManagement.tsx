@@ -37,6 +37,7 @@ import FilterSelect from '../../components/common/FilterSelect';
 import { TableSkeleton } from '../../components/common/Skeleton';
 import PageHeader from '../../components/common/PageHeader';
 import FilterBar from '../../components/common/FilterBar';
+import ProductMobileCard from '../../components/products/ProductMobileCard';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -163,8 +164,6 @@ const ProductRow = React.memo(
 
 ProductRow.displayName = 'ProductRow';
 
-import ProductMobileCard from '../../components/products/ProductMobileCard';
-
 const ProductManagement: FC = () => {
   const dispatch = useAppDispatch();
   const products = useSelector(selectProducts);
@@ -177,8 +176,10 @@ const ProductManagement: FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [stockFilter, setStockFilter] = useState('');
   const [categoryId, setCategoryId] = useState('');
+
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+
   const [page, setPage] = useState(1);
 
   /* Fetch categories on mount */
@@ -264,7 +265,7 @@ const ProductManagement: FC = () => {
       <PageHeader
         title="Product Management"
         highlightText="Product"
-        subtitle="Manage your store inventory and product catalog"
+        subtitle="Manage your store inventory and product catalog from a single dashboard."
         icon={Package}
       >
         <Button
@@ -276,28 +277,9 @@ const ProductManagement: FC = () => {
         </Button>
       </PageHeader>
 
-      {loading && products.length === 0 ? (
-        <TableSkeleton rows={5} cols={2} />
-      ) : displayProducts.length === 0 ? (
-        <EmptyState
-          title="No Products Found"
-          description={
-            search
-              ? `No products match "${search}"`
-              : 'Start by adding products to your inventory.'
-          }
-          icon={<Package className="w-12 h-12" />}
-          action={
-            !search
-              ? {
-                  label: 'Add Product',
-                  onClick: handleAddNew,
-                }
-              : undefined
-          }
-        />
-      ) : (
-        <>
+      {/* Filter Bar (Outside Card) */}
+      {(products.length > 0 || showReset) && (
+        <div className="mb-6">
           <FilterBar
             searchComponent={
               <DebouncedSearch
@@ -347,76 +329,109 @@ const ProductManagement: FC = () => {
               }}
             />
           </FilterBar>
-
-          <div className="relative">
-            {loading && (
-              <div className="absolute inset-x-0 -top-2 z-20 flex justify-center">
-                <div className="bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2">
-                  <Loader size="sm" />
-                  <span className="text-xs font-bold text-gray-500">
-                    Updating...
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Mobile View: Card List */}
-            <div className="block md:hidden">
-              {displayProducts.map((product, index) => (
-                <ProductMobileCard
-                  key={product._id}
-                  product={product}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  index={index}
-                />
-              ))}
-            </div>
-
-            {/* Desktop View: Table */}
-            <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead className="bg-gradient-to-r from-green-50/50 to-emerald-50/30 border-b-2 border-green-100">
-                    <tr>
-                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Product
-                      </th>
-                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Price
-                      </th>
-                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Stock
-                      </th>
-                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {displayProducts.map((product, index) => (
-                      <ProductRow
-                        key={product._id}
-                        product={product}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        index={index}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </>
+        </div>
       )}
 
-      {/* Pagination */}
+      {/* Main Content Card (Table Only) */}
+      <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden mb-8">
+        <div className="p-0 animate-fadeIn">
+          {' '}
+          {/* Removed padding to make table flush or consistent */}
+          {loading && products.length === 0 ? (
+            <div className="p-8">
+              <TableSkeleton rows={5} cols={2} />
+            </div>
+          ) : displayProducts.length === 0 ? (
+            <div className="p-8">
+              <EmptyState
+                title="No Products Found"
+                description={
+                  search
+                    ? `No products match "${search}"`
+                    : 'Start by adding products to your inventory.'
+                }
+                icon={<Package className="w-12 h-12" />}
+                action={
+                  !search
+                    ? {
+                        label: 'Add Product',
+                        onClick: handleAddNew,
+                      }
+                    : undefined
+                }
+              />
+            </div>
+          ) : (
+            <div className="relative">
+              {loading && (
+                <div className="absolute inset-x-0 top-4 z-20 flex justify-center">
+                  <div className="bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2">
+                    <Loader size="sm" />
+                    <span className="text-xs font-bold text-gray-500">
+                      Updating...
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile View: Card List */}
+              <div className="block md:hidden p-4">
+                {displayProducts.map((product, index) => (
+                  <ProductMobileCard
+                    key={product._id}
+                    product={product}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    index={index}
+                  />
+                ))}
+              </div>
+
+              {/* Desktop View: Table */}
+              <div className="hidden md:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                      <tr>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider pl-8">
+                          Product
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                          Price
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                          Stock
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right pr-8">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {displayProducts.map((product, index) => (
+                        <ProductRow
+                          key={product._id}
+                          product={product}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          index={index}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pagination (Outside Card) */}
       {pagination && pagination.pages > 1 && (
-        <div className="mt-8 flex justify-center">
+        <div className="flex justify-center mb-8">
           <Pagination
             currentPage={page}
             totalPages={pagination.pages}
@@ -429,7 +444,6 @@ const ProductManagement: FC = () => {
 
       {isFormOpen && (
         <ProductForm
-          key={editingProduct?._id ?? 'new'}
           product={editingProduct}
           onClose={() => setIsFormOpen(false)}
           onSuccess={handleSuccess}

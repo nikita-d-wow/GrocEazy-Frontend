@@ -15,7 +15,29 @@ import {
   setSearchLoading,
   setAnalyticsProducts,
   setAnalyticsLoading,
+  setProductDetails,
 } from '../reducers/productReducer';
+
+/**
+ * Fetch a single product by ID
+ */
+export const fetchProductById =
+  (id: string) => async (dispatch: AppDispatch) => {
+    dispatch(setLoading(true));
+    try {
+      const product = await productApi.getProductById(id);
+      dispatch(setProductDetails(product));
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      dispatch(
+        setError(
+          err.response?.data?.message || 'Failed to fetch product details'
+        )
+      );
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
 
 /**
  * Fetch products for customer (public endpoint)

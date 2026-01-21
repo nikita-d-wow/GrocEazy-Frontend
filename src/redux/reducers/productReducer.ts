@@ -18,6 +18,7 @@ interface ProductState {
   searchLoading: boolean;
   analyticsProducts: Product[];
   analyticsLoading: boolean;
+  productDetails: Product | null;
 }
 
 const initialState: ProductState = {
@@ -32,6 +33,7 @@ const initialState: ProductState = {
   searchLoading: false,
   analyticsProducts: [],
   analyticsLoading: false,
+  productDetails: null,
 };
 
 const productSlice = createSlice({
@@ -126,6 +128,9 @@ const productSlice = createSlice({
     setAnalyticsLoading(state, action: PayloadAction<boolean>) {
       state.analyticsLoading = action.payload;
     },
+    setProductDetails(state, action: PayloadAction<Product | null>) {
+      state.productDetails = action.payload;
+    },
   },
 });
 
@@ -143,6 +148,7 @@ export const {
   setSearchLoading,
   setAnalyticsProducts,
   setAnalyticsLoading,
+  setProductDetails,
 } = productSlice.actions;
 
 export default productSlice.reducer;

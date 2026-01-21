@@ -7,7 +7,7 @@ import {
   AlertCircle,
   ArrowRight,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import toast from 'react-hot-toast';
 
@@ -29,6 +29,8 @@ const CheckoutAddress = () => {
 
   const { user } = useSelector((state: RootState) => state.auth);
   const { items: cartItems } = useSelector((state: RootState) => state.cart);
+  const location = useLocation();
+  const { paymentMethod, couponCode } = location.state || {};
 
   /* ---------------- SAFE NORMALIZATION ---------------- */
   const addresses: IAddress[] = user?.addresses ?? EMPTY_ADDRESSES;
@@ -93,8 +95,9 @@ const CheckoutAddress = () => {
             quantity: item.quantity,
             unitPrice: item.product.price,
           })),
-          address, // ✅ value, correctly typed
-          paymentMethod: 'cod',
+          address,
+          paymentMethod: paymentMethod || 'cod',
+          couponCode: couponCode || undefined,
         },
         navigate
       )

@@ -11,6 +11,7 @@ import PageHeader from '../../components/common/PageHeader';
 
 import CartItem from '../../components/customer/cart/CartItem';
 import CartSummary from '../../components/customer/cart/CartSummary';
+import { calculateProductPrice } from '../../utils/offerUtils';
 
 import {
   fetchCart,
@@ -27,7 +28,6 @@ import {
 import {
   selectCartItems,
   selectCartLoading,
-  selectCartTotal,
   selectCartPagination,
 } from '../../redux/selectors/cartSelectors';
 import { selectWishlistItems } from '../../redux/selectors/wishlistSelectors';
@@ -45,6 +45,7 @@ interface CartItemUI {
   unitPrice: number;
   quantity: number;
   stock: number;
+  lineTotal?: number;
 }
 
 const PAGE_LIMIT = 8;
@@ -58,7 +59,8 @@ export default function CartPage() {
   const loading = useSelector(selectCartLoading);
   const cartItems = useSelector(selectCartItems);
   const wishlistItems = useSelector(selectWishlistItems);
-  const total = useSelector(selectCartTotal);
+  const { activeOffers } = useSelector((state: RootState) => state.offer);
+  // const total = useSelector(selectCartTotal); // We calculate total dynamically now
   const { page, totalPages } = useSelector(selectCartPagination);
 
   const [isClearing, setIsClearing] = useState(false);
@@ -147,17 +149,28 @@ export default function CartPage() {
   /* ================= UI MAPPING ================= */
   const uiCartItems: CartItemUI[] = cartItems
     .filter((item) => item.product && item.product._id)
-    .map((item) => ({
-      _id: item._id,
-      productId: item.product._id,
-      name: item.product.name,
-      image: item.product.images?.[0] ?? '',
-      unitPrice: item.product.price,
-      quantity: item.quantity,
-      stock: item.product.stock,
-    }));
+    .map((item) => {
+      const { discountedPrice } = calculateProductPrice(
+        item.product as any,
+        activeOffers
+      );
+      return {
+        _id: item._id,
+        productId: item.product._id,
+        name: item.product.name,
+        image: item.product.images?.[0] ?? '',
+        unitPrice: discountedPrice,
+        quantity: item.quantity,
+        stock: item.product.stock,
+        lineTotal: discountedPrice * item.quantity,
+      };
+    });
 
-  const formattedTotal = Number(total).toFixed(2);
+  const dynamicTotal = uiCartItems.reduce(
+    (sum, item) => sum + (item.lineTotal || 0),
+    0
+  );
+  const formattedTotal = Number(dynamicTotal).toFixed(2);
   const isEmpty = uiCartItems.length === 0;
 
   /* ================= RENDER ================= */

@@ -9,6 +9,7 @@ import type { RootState } from '../redux/rootReducer';
 import type { AppDispatch } from '../redux/store';
 import { fetchCart } from '../redux/actions/cartActions';
 import { fetchWishlist } from '../redux/actions/wishlistActions';
+import { fetchActiveOffers } from '../redux/actions/offerActions';
 
 export default function CustomerLayout() {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,6 +20,7 @@ export default function CustomerLayout() {
       dispatch(fetchCart(1, 100)); // Populate cart itemMap
       dispatch(fetchWishlist(1, 500, true)); // Populate wishlist idMap (silently)
     }
+    dispatch(fetchActiveOffers()); // Always fetch active offers for display
   }, [dispatch, user]);
 
   if (user?.role === 'admin') {

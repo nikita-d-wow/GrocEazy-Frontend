@@ -15,6 +15,7 @@ import ProfilePage from '../views/customer/ProfilePage';
 import OrderDetails from '../views/customer/OrderDetails';
 import MyTickets from '../views/customer/MyTickets';
 import TicketDetails from '../views/customer/TicketDetails';
+import OffersPage from '../views/customer/OffersPage';
 import ProtectedRoute from './ProtectedRoute';
 import SetPassword from '../views/auth/SetPassword';
 import ForgotPassword from '../views/auth/ForgotPassword';
@@ -39,6 +40,7 @@ export const CustomerRoutes = (
       <Route path="/orders" element={<OrdersPage />} />
       <Route path="/orders/:id" element={<OrderDetails />} />
       <Route path="/cart" element={<CartPage />} />
+      <Route path="/rewards" element={<OffersPage />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/checkout/address" element={<CheckoutAddress />} />
 
