@@ -12,7 +12,6 @@ import {
   ChevronRight,
   Info,
   Calendar,
-  Globe,
   Layers,
 } from 'lucide-react';
 
@@ -88,7 +87,6 @@ const CouponForm: FC<Props> = ({ coupon, onClose, onSuccess }) => {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isSubmitting },
   } = useForm<CouponFormData>({
     resolver: zodResolver(couponSchema) as any,
@@ -125,8 +123,6 @@ const CouponForm: FC<Props> = ({ coupon, onClose, onSuccess }) => {
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const discountType = watch('discountType');
-
-  const platforms = watch('platforms') || [];
 
   const onSubmit = async (data: CouponFormData) => {
     const toastId = toast.loading(
@@ -167,7 +163,6 @@ const CouponForm: FC<Props> = ({ coupon, onClose, onSuccess }) => {
         return !!(
           errors.discountType ||
           errors.discountValue ||
-          errors.platforms ||
           errors.maxDiscountAmount
         );
       case 'limits':
@@ -181,18 +176,6 @@ const CouponForm: FC<Props> = ({ coupon, onClose, onSuccess }) => {
       // case 'advanced': return !!(errors.stackable || errors.autoApply || errors.priority); // Removed
       default:
         return false;
-    }
-  };
-
-  const togglePlatform = (p: string) => {
-    const current = [...platforms];
-    if (current.includes(p)) {
-      setValue(
-        'platforms',
-        current.filter((x) => x !== p)
-      );
-    } else {
-      setValue('platforms', [...current, p]);
     }
   };
 
@@ -383,37 +366,6 @@ const CouponForm: FC<Props> = ({ coupon, onClose, onSuccess }) => {
                         placeholder="Unlimited if empty"
                       />
                     )}
-                  </div>
-                </div>
-                <div className="p-6 rounded-[32px] bg-gray-50 border border-gray-100">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-2xl bg-white shadow-sm text-gray-900">
-                      <Globe size={20} />
-                    </div>
-                    <div>
-                      <h4 className="font-black text-gray-900">
-                        Platform Restrictions
-                      </h4>
-                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                        Where can this coupon be used
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    {['web', 'android', 'ios'].map((p) => (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => togglePlatform(p)}
-                        className={`flex-1 py-4 rounded-2xl border-2 font-black text-xs uppercase tracking-widest transition-all ${
-                          platforms.includes(p)
-                            ? 'bg-gray-900 border-gray-900 text-white shadow-lg'
-                            : 'bg-white border-gray-100 text-gray-400 hover:border-gray-300'
-                        }`}
-                      >
-                        {p}
-                      </button>
-                    ))}
                   </div>
                 </div>
               </div>
