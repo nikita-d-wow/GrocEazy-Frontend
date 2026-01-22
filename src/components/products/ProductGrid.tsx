@@ -43,6 +43,11 @@ const ProductGrid: FC<Props> = ({ products }) => {
           price={product.price}
           image={product.images[0]}
           stock={product.stock}
+          categoryId={
+            typeof product.categoryId === 'object'
+              ? product.categoryId._id
+              : product.categoryId
+          }
           index={index}
         />
       ))}

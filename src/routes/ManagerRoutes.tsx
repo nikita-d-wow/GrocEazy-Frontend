@@ -12,6 +12,7 @@ import ManagerOrderDetails from '../views/manager/ManagerOrderDetails';
 import Inventory from '../views/manager/Inventory';
 import ManagerLiveChat from '../views/manager/LiveChat';
 import CustomerDetails from '../views/manager/CustomerDetails';
+import MarketingDashboard from '../views/manager/MarketingDashboard';
 
 export const ManagerRoutes = (
   <>
@@ -34,6 +35,7 @@ export const ManagerRoutes = (
       <Route path="support" element={<SupportTickets />} />
       <Route path="support/:id" element={<TicketDetails />} />
       <Route path="live-chat" element={<ManagerLiveChat />} />
+      <Route path="marketing" element={<MarketingDashboard />} />
       <Route path="customer-details/:id" element={<CustomerDetails />} />
     </Route>
   </>

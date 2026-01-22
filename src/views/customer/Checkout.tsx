@@ -11,10 +11,13 @@ import { useNavigate, Link } from 'react-router-dom';
 
 import type { RootState } from '../../redux/rootReducer';
 import PageHeader from '../../components/common/PageHeader';
+import { calculateProductPrice } from '../../utils/offerUtils';
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { items } = useSelector((state: RootState) => state.cart);
+  const { activeOffers } = useSelector((state: RootState) => state.offer);
+  const { validation } = useSelector((state: RootState) => state.coupon);
 
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'online'>('cod');
 
@@ -36,12 +39,17 @@ const Checkout = () => {
     );
   }
 
-  const subtotal = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const subtotal = items.reduce((sum, item) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { discountedPrice } = calculateProductPrice(
+      item.product as any,
+      activeOffers
+    );
+    return sum + discountedPrice * item.quantity;
+  }, 0);
+  const discount = validation?.valid ? validation.discountAmount : 0;
   const delivery = subtotal > 499 ? 0 : 40;
-  const total = subtotal + delivery;
+  const total = subtotal + delivery - discount;
 
   const isStockValid = items.every(
     (item) => item.quantity <= (item.product.stock ?? 0)
@@ -122,9 +130,23 @@ const Checkout = () => {
                   </div>
                 </div>
 
-                <p className="font-semibold text-gray-900">
-                  ₹{(item.product.price * item.quantity).toFixed(2)}
-                </p>
+                <div className="text-right">
+                  <p className="font-semibold text-gray-900">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    ₹
+                    {(
+                      calculateProductPrice(item.product as any, activeOffers)
+                        .discountedPrice * item.quantity
+                    ).toFixed(2)}
+                  </p>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {calculateProductPrice(item.product as any, activeOffers)
+                    .discountedPrice < item.product.price && (
+                    <p className="text-xs text-gray-400 line-through">
+                      ₹{(item.product.price * item.quantity).toFixed(2)}
+                    </p>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -158,6 +180,12 @@ const Checkout = () => {
               <span>Delivery</span>
               <span>{delivery === 0 ? 'Free' : `₹${delivery.toFixed(2)}`}</span>
             </div>
+            {validation?.valid && (
+              <div className="flex justify-between text-green-600 font-medium">
+                <span>Coupon Discount</span>
+                <span>-₹{discount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between font-semibold text-base mt-4 pt-4 border-t border-gray-100">
               <span>Total</span>
               <span>₹{total.toFixed(2)}</span>
@@ -167,7 +195,11 @@ const Checkout = () => {
           <button
             onClick={() =>
               navigate('/checkout/address', {
-                state: { paymentMethod, total },
+                state: {
+                  paymentMethod,
+                  total,
+                  couponCode: validation?.valid ? validation.code : undefined,
+                },
               })
             }
             disabled={!isStockValid}

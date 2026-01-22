@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ShieldCheck,
   Briefcase,
+  Ticket,
 } from 'lucide-react';
 import { logout } from '../../redux/actions/authActions';
 import type { RootState } from '../../redux/rootReducer';
@@ -104,6 +105,17 @@ const UserProfileDropdown: React.FC = () => {
           <div className="px-1">
             {user.role === 'customer' && (
               <>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate('/rewards');
+                  }}
+                  className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+                >
+                  <Ticket size={16} />
+                  Rewards
+                </button>
+
                 <button
                   onClick={() => {
                     setIsOpen(false);

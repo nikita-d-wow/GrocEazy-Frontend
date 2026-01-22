@@ -21,11 +21,13 @@ import {
 
 import api from '../../services/api';
 import { clearCart } from './cartActions';
+import { clearCouponValidation } from './couponActions';
 
 interface CreateOrderPayload {
   items: { productId: string; quantity: number; unitPrice: number }[];
   address: Address;
   paymentMethod: 'cod' | 'online';
+  couponCode?: string;
 }
 
 /* ================= USER ORDERS ================= */
@@ -89,6 +91,7 @@ export const createOrder =
 
       // ✅ clear frontend cart ONLY after successful order
       dispatch(clearCart());
+      dispatch(clearCouponValidation());
 
       toast.success('Order placed successfully!');
       navigate('/');

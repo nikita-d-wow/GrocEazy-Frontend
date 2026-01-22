@@ -93,6 +93,11 @@ export default function ProductsSection() {
               price={product.price}
               image={product.images[0] || '/img/placeholder.png'}
               stock={product.stock}
+              categoryId={
+                typeof product.categoryId === 'object'
+                  ? product.categoryId?._id
+                  : product.categoryId
+              }
               index={index}
             />
           ))}

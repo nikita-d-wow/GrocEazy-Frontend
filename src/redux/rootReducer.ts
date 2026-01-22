@@ -9,7 +9,8 @@ import { supportReducer } from './reducers/supportReducer';
 import { orderReducer } from './reducers/orderReducer';
 import { userReducer } from './reducers/userReducer';
 import { chatReducer } from './reducers/chatReducer';
-
+import couponReducer from './reducers/couponReducer';
+import offerReducer from './reducers/offerReducer';
 const rootReducer = combineReducers({
   category: categoryReducer,
   product: productReducer,
@@ -20,6 +21,8 @@ const rootReducer = combineReducers({
   order: orderReducer,
   user: userReducer,
   chat: chatReducer,
+  coupon: couponReducer,
+  offer: offerReducer,
 });
 
 export default rootReducer;

@@ -121,6 +121,7 @@ const CategoryManagement: FC = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [sortOrder, setSortOrder] = useState<string>('newest');
@@ -168,7 +169,7 @@ const CategoryManagement: FC = () => {
       <PageHeader
         title="Category Management"
         highlightText="Category"
-        subtitle="Organize your products catalog and categories"
+        subtitle="Organize your products catalog and categories from a single dashboard."
         icon={Layers}
       >
         <Button
@@ -181,123 +182,135 @@ const CategoryManagement: FC = () => {
         </Button>
       </PageHeader>
 
-      {/* Search & Sort Bar */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
-        <div className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div className="w-full sm:max-w-md">
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
-                Search
-              </span>
-              <DebouncedSearch
-                placeholder="Search categories..."
-                initialValue={search}
-                onSearch={handleSearch}
-              />
-            </div>
-            <div className="w-full sm:w-auto self-end">
-              <FilterSelect
-                label="Sort By"
-                value={sortOrder}
-                onChange={(val: string) => {
-                  setSortOrder(val);
-                  setPage(1);
-                }}
-                options={[
-                  { value: 'newest', label: 'Newest First' },
-                  { value: 'oldest', label: 'Oldest First' },
-                  { value: 'name_asc', label: 'Name (A-Z)' },
-                  { value: 'name_desc', label: 'Name (Z-A)' },
-                ]}
-                className="w-full sm:w-48"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {loading && categories.length === 0 ? (
-        <TableSkeleton rows={5} cols={1} />
-      ) : categories.length === 0 ? (
-        <EmptyState
-          title="No Categories Found"
-          description={
-            search
-              ? `No categories match "${search}"`
-              : 'Create categories to organize your products.'
-          }
-          icon={<Layers className="w-12 h-12" />}
-          action={
-            !search
-              ? { label: 'Add Category', onClick: handleAddNew }
-              : undefined
-          }
-        />
-      ) : (
-        <div className="relative">
-          {loading && (
-            <div className="absolute inset-x-0 -top-2 z-20 flex justify-center">
-              <div className="bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2">
-                <Loader size="sm" />
-                <span className="text-xs font-bold text-gray-500">
-                  Updating...
+      {/* Search & Sort Bar (Outside Card) */}
+      {(categories.length > 0 || search) && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 relative z-30">
+          <div className="p-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="w-full sm:max-w-md">
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-1.5 block">
+                  Search
                 </span>
+                <DebouncedSearch
+                  placeholder="Search categories..."
+                  initialValue={search}
+                  onSearch={handleSearch}
+                />
               </div>
-            </div>
-          )}
-
-          {/* Mobile View: Card List */}
-          <div className="block md:hidden">
-            {categories.map((category, index) => (
-              <CategoryMobileCard
-                key={category._id}
-                category={category}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                index={index}
-              />
-            ))}
-          </div>
-
-          {/* Desktop View: Table */}
-          <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50/50">
-                  <tr>
-                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Category
-                    </th>
-                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Products
-                    </th>
-                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Created Date
-                    </th>
-                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {categories.map((category, index) => (
-                    <CategoryRow
-                      key={category._id}
-                      category={category}
-                      onEdit={handleEdit}
-                      onDelete={handleDelete}
-                      index={index}
-                    />
-                  ))}
-                </tbody>
-              </table>
+              <div className="w-full sm:w-auto self-end">
+                <FilterSelect
+                  label="Sort By"
+                  value={sortOrder}
+                  onChange={(val: string) => {
+                    setSortOrder(val);
+                    setPage(1);
+                  }}
+                  options={[
+                    { value: 'newest', label: 'Newest First' },
+                    { value: 'oldest', label: 'Oldest First' },
+                    { value: 'name_asc', label: 'Name (A-Z)' },
+                    { value: 'name_desc', label: 'Name (Z-A)' },
+                  ]}
+                  className="w-full sm:w-48"
+                />
+              </div>
             </div>
           </div>
         </div>
       )}
 
+      {/* Main Content Card */}
+      <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden mb-8">
+        <div className="p-0 animate-fadeIn">
+          {loading && categories.length === 0 ? (
+            <div className="p-8">
+              <TableSkeleton rows={5} cols={1} />
+            </div>
+          ) : categories.length === 0 ? (
+            <div className="p-8">
+              <EmptyState
+                title="No Categories Found"
+                description={
+                  search
+                    ? `No categories match "${search}"`
+                    : 'Create categories to organize your products.'
+                }
+                icon={<Layers className="w-12 h-12" />}
+                action={
+                  !search
+                    ? { label: 'Add Category', onClick: handleAddNew }
+                    : undefined
+                }
+              />
+            </div>
+          ) : (
+            <div className="relative">
+              {loading && (
+                <div className="absolute inset-x-0 top-4 z-20 flex justify-center">
+                  <div className="bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2">
+                    <Loader size="sm" />
+                    <span className="text-xs font-bold text-gray-500">
+                      Updating...
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Mobile View: Card List */}
+              <div className="block md:hidden p-4">
+                {categories.map((category, index) => (
+                  <CategoryMobileCard
+                    key={category._id}
+                    category={category}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    index={index}
+                  />
+                ))}
+              </div>
+
+              {/* Desktop View: Table */}
+              <div className="hidden md:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                      <tr>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider pl-8">
+                          Category
+                        </th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                          Products
+                        </th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                          Created Date
+                        </th>
+                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right pr-8">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {categories.map((category, index) => (
+                        <CategoryRow
+                          key={category._id}
+                          category={category}
+                          onEdit={handleEdit}
+                          onDelete={handleDelete}
+                          index={index}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pagination (Outside Card) */}
       {pagination && pagination.pages > 1 && (
-        <div className="mt-8 flex justify-center">
+        <div className="flex justify-center mb-8">
           <Pagination
             currentPage={page}
             totalPages={pagination.pages}

@@ -16,7 +16,7 @@ import {
   removeWishlistItem,
 } from '../../redux/actions/wishlistActions';
 import { useSelector } from 'react-redux';
-import { Plus, Minus, Heart } from 'lucide-react';
+import { Plus, Minus, Heart, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import type { CustomerProductCardProps } from '../../types/Product';
@@ -31,6 +31,7 @@ export default function ProductCard({
   image,
   price,
   stock,
+  categoryId,
   index = 0,
 }: Props) {
   const navigate = useNavigate();
@@ -40,12 +41,80 @@ export default function ProductCard({
     (state: RootState) => state.wishlist
   );
   const { user } = useSelector((state: RootState) => state.auth);
+  const { activeOffers } = useSelector((state: RootState) => state.offer);
 
   const cartItem = itemMap[_id];
   const quantity = cartItem ? cartItem.quantity : 0;
 
   const wishlistId = wishlistIdMap[_id];
   const isInWishlist = !!wishlistId;
+
+  // Find best offer for this product
+  const bestOffer = React.useMemo(() => {
+    if (!activeOffers || activeOffers.length === 0) {
+      return null;
+    }
+
+    const productIdStr = _id.toString();
+    const catIdStr = categoryId?.toString();
+
+    const applicableOffers = activeOffers.filter((offer) => {
+      const isProductApplicable = offer.applicableProducts?.some(
+        (p) => (typeof p === 'string' ? p : p._id)?.toString() === productIdStr
+      );
+      const isCategoryApplicable = offer.applicableCategories?.some(
+        (c) => (typeof c === 'string' ? c : c._id)?.toString() === catIdStr
+      );
+      const isExcluded = offer.excludedProducts?.some(
+        (p) => (typeof p === 'string' ? p : p._id)?.toString() === productIdStr
+      );
+
+      // If specific products are listed, they take precedence or strictly limit
+      // But usually it's "if in list OR in category AND NOT excluded"
+      return (isProductApplicable || isCategoryApplicable) && !isExcluded;
+    });
+
+    if (applicableOffers.length === 0) {
+      return null;
+    }
+
+    // Sort by priority: percentage/fixed first
+    return [...applicableOffers].sort((a, b) => {
+      // If same priority (like both percentage), sort by value
+      const valA =
+        a.offerType === 'percentage'
+          ? a.discountValue || 0
+          : ((a.discountValue || 0) / price) * 100;
+      const valB =
+        b.offerType === 'percentage'
+          ? b.discountValue || 0
+          : ((b.discountValue || 0) / price) * 100;
+      return valB - valA;
+    })[0];
+  }, [activeOffers, _id, categoryId, price]);
+
+  const discountAmount = React.useMemo(() => {
+    if (!bestOffer) {
+      return 0;
+    }
+    if (bestOffer.offerType === 'percentage') {
+      return (price * (bestOffer.discountValue || 0)) / 100;
+    }
+    if (bestOffer.offerType === 'fixed') {
+      return bestOffer.discountValue || 0;
+    }
+    return 0;
+  }, [bestOffer, price]);
+
+  const discountPercentage =
+    (bestOffer?.offerType === 'percentage'
+      ? bestOffer.discountValue
+      : bestOffer?.offerType === 'fixed'
+        ? Math.round(((bestOffer.discountValue || 0) / price) * 100)
+        : 0) || 0;
+
+  const discountedPrice =
+    discountAmount > 0 ? Number((price - discountAmount).toFixed(2)) : price;
 
   const handleWishlistFn = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -98,16 +167,31 @@ export default function ProductCard({
           className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500 relative z-10 drop-shadow-sm"
         />
 
-        {stock !== undefined && stock < 10 && stock > 0 && (
-          <span className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm border border-amber-100 text-amber-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider z-20 shadow-sm">
-            Low Stock
-          </span>
+        {/* Offer Badge */}
+        {discountPercentage > 0 && (
+          <div className="absolute top-2 right-2 bg-red-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full font-black uppercase tracking-tighter z-20 shadow-lg shadow-red-200 animate-pulse flex items-center gap-1">
+            <Zap size={10} fill="white" />
+            {bestOffer?.marketing?.badgeLabel ||
+              bestOffer?.title ||
+              `${discountPercentage}% OFF`}
+          </div>
         )}
+
+        {/* Low Stock/Sold Out Badges (only if no discount badge or moved) */}
+        {discountPercentage === 0 &&
+          stock !== undefined &&
+          stock < 10 &&
+          stock > 0 && (
+            <span className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm border border-amber-100 text-amber-700 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider z-20 shadow-sm">
+              Low Stock
+            </span>
+          )}
         {stock === 0 && (
           <span className="absolute top-2 right-2 bg-red-50/90 backdrop-blur-sm border border-red-100 text-red-600 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider z-20 shadow-sm">
             Sold Out
           </span>
         )}
+
         <button
           onClick={handleWishlistFn}
           className={`absolute top-2 left-2 p-2 rounded-full transition-all duration-300 cursor-pointer z-20 active:scale-90 ${
@@ -129,9 +213,17 @@ export default function ProductCard({
           {name}
         </p>
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-          <p className="text-gray-900 font-bold text-base sm:text-lg">
-            ₹{price}
-          </p>
+          <div className="flex flex-col">
+            {discountPercentage > 0 && (
+              <span className="text-gray-400 line-through text-[10px] sm:text-xs font-bold decoration-red-400/50">
+                ₹{price}
+              </span>
+            )}
+            <p className="text-gray-900 font-black text-base sm:text-lg tracking-tight">
+              ₹{discountedPrice}
+            </p>
+          </div>
+
           {quantity === 0 ? (
             <button
               onClick={(e) => {
@@ -141,7 +233,7 @@ export default function ProductCard({
                     addToCart(_id, 1, {
                       _id,
                       name,
-                      price,
+                      price: discountedPrice, // Use discounted price
                       images: [image],
                       stock: stock ?? 0,
                     })

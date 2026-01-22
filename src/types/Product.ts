@@ -37,5 +37,8 @@ export interface CustomerProductCardProps {
   image: string;
   price: number;
   stock: number;
+  categoryId?: string;
   isActive?: boolean;
+  onSale?: boolean;
+  discountPrice?: number;
 }
