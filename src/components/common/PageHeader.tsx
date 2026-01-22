@@ -16,7 +16,6 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   highlightText,
   subtitle,
   icon: Icon,
-  actions,
   children,
   onBack,
 }) => {
