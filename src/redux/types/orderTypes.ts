@@ -9,6 +9,10 @@ export interface Address {
   state: string;
   postalCode: string;
   phone: string;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 /* ================= ORDER ITEM ================= */

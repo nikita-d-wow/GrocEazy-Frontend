@@ -2,10 +2,11 @@ import * as React from 'react';
 import { type LucideIcon, ChevronLeft } from 'lucide-react';
 
 interface PageHeaderProps {
-  title: string;
+  title: string | React.ReactNode;
   highlightText?: string;
-  subtitle: string;
+  subtitle?: string;
   icon?: LucideIcon;
+  actions?: React.ReactNode;
   children?: React.ReactNode;
   onBack?: () => void;
 }
@@ -15,18 +16,20 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   highlightText,
   subtitle,
   icon: Icon,
+  actions,
   children,
   onBack,
 }) => {
-  // Construct title with optional highlight
-  const titleContent = highlightText ? (
-    <>
-      <span className="text-green-700">{highlightText}</span>
-      {title.replace(highlightText, '')}
-    </>
-  ) : (
-    title
-  );
+  // Construct title with optional highlight (only if title is string)
+  const titleContent =
+    typeof title === 'string' && highlightText ? (
+      <>
+        <span className="text-green-700">{highlightText}</span>
+        {title.replace(highlightText, '')}
+      </>
+    ) : (
+      title
+    );
 
   return (
     <div className="relative rounded-2xl sm:rounded-3xl bg-green-50/50 p-4 sm:p-6 md:p-8 lg:p-10 mb-6 sm:mb-8 md:mb-10 border border-green-100/50 overflow-hidden">

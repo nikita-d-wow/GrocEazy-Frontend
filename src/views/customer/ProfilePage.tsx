@@ -6,6 +6,7 @@ import { User, MapPin, ShoppingBag } from 'lucide-react';
 import type { RootState } from '../../redux/rootReducer';
 import ProfileInfo from '../../components/customer/profile/ProfileInfo';
 import AddressManager from '../../components/customer/profile/AddressManager';
+import PageHeader from '../../components/common/PageHeader';
 
 type Tab = 'info' | 'address';
 
@@ -20,12 +21,12 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-500 mt-2">
-          Manage your personal information and delivery addresses
-        </p>
-      </div>
+      <PageHeader
+        title="My Profile"
+        highlightText="My"
+        icon={User}
+        subtitle="Manage your personal information and delivery addresses"
+      />
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Navigation */}

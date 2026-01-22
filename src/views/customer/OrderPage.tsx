@@ -8,6 +8,7 @@ import FilterSelect from '../../components/common/FilterSelect';
 import { ORDER_STATUS_META } from '../../utils/orderStatus';
 import Loader from '../../components/common/Loader';
 import Pagination from '../../components/common/Pagination';
+import PageHeader from '../../components/common/PageHeader';
 import type { RootState } from '../../redux/rootReducer';
 import type { OrderActionTypes } from '../../redux/types/orderTypes';
 import type { ThunkDispatch } from 'redux-thunk';
@@ -96,32 +97,24 @@ export default function OrdersPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-8 animate-fadeIn">
       {/* Header Section */}
-      <div className="relative z-20 flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div className="flex items-center gap-4">
-          <div className="p-4 bg-white rounded-3xl shadow-sm text-primary border border-gray-100 hidden sm:block">
-            <Package size={32} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              My Orders
-            </h1>
-            <p className="text-gray-500 font-medium text-lg">
-              Track your past purchases and deliveries
-            </p>
-          </div>
-        </div>
-
-        <FilterSelect
-          label="Filter by Status"
-          value={statusFilter}
-          options={filterOptions}
-          onChange={(val) => {
-            setStatusFilter(val);
-            setCurrentPage(1);
-          }}
-          className="md:w-64"
-        />
-      </div>
+      <PageHeader
+        title="My Orders"
+        highlightText="My"
+        subtitle="Track your past purchases and deliveries"
+        icon={Package}
+        actions={
+          <FilterSelect
+            label="Filter by Status"
+            value={statusFilter}
+            options={filterOptions}
+            onChange={(val) => {
+              setStatusFilter(val);
+              setCurrentPage(1);
+            }}
+            className="md:w-64"
+          />
+        }
+      />
 
       {orders.length === 0 ? (
         <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-300">

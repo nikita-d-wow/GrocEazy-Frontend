@@ -19,6 +19,10 @@ export interface IAddress {
   zipCode: string;
   country: string;
   isDefault?: boolean;
+  coordinates?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 export interface ILoginResponse {
